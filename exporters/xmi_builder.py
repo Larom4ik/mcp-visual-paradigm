@@ -23,8 +23,10 @@ from core.models import (
     ClassNode,
     EntityNode,
     MethodModel,
+    NoteNode,
     PackageNode,
     RelationModel,
+    SystemBoundaryNode,
     UseCaseNode,
 )
 from core.state import ProjectState
@@ -610,6 +612,25 @@ class XMIBuilder:
             ET.SubElement(act_vp_ext, "businessModel", {f"{{{XMI_NS}}}value": "false"})
             ET.SubElement(act_vp_ext, "qualityScore", {"value": "-1"})
 
+        # System Boundary container (if defined)
+        if self.state.system_boundary:
+            sb = self.state.system_boundary
+            sb_elem = ET.SubElement(
+                self.model,
+                "ownedMember",
+                {
+                    f"{{{XMI_NS}}}type": "uml:Component",
+                    f"{{{XMI_NS}}}id": sb.id,
+                    "name": sb.name,
+                    "visibility": "public",
+                    "isAbstract": "false",
+                    "isLeaf": "false",
+                },
+            )
+            sb_vp_ext = ET.SubElement(sb_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(sb_vp_ext, "modelType", {"value": "System"})
+            ET.SubElement(sb_vp_ext, "qualityScore", {"value": "-1"})
+
         includes_by_source: dict[str, list[tuple[str, str]]] = {}
         extends_by_source: dict[str, list[tuple[str, str]]] = {}
         uc_associations: list[RelationModel] = []
@@ -650,6 +671,7 @@ class XMIBuilder:
                             f"{{{XMI_NS}}}type": "uml:Include",
                             f"{{{XMI_NS}}}id": rel_id,
                             "addition": target_id,
+                            "name": "«include»",
                         },
                     )
                     inc_vp = ET.SubElement(inc_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
@@ -664,6 +686,7 @@ class XMIBuilder:
                             f"{{{XMI_NS}}}type": "uml:Extend",
                             f"{{{XMI_NS}}}id": rel_id,
                             "extendedCase": target_id,
+                            "name": "«extend»",
                         },
                     )
                     ext_vp = ET.SubElement(ext_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
@@ -808,15 +831,41 @@ class XMIBuilder:
                 ET.SubElement(st_ext, "modelType", {"value": "State"})
 
         for tr in self.state.transitions:
+            lbl = tr.trigger_event
+            if tr.guard_condition:
+                guard_fmt = tr.guard_condition if tr.guard_condition.startswith("[") else f"[{tr.guard_condition}]"
+                lbl = f"{lbl} {guard_fmt}".strip() if lbl else guard_fmt
+
             tr_attrs = {
                 f"{{{XMI_NS}}}type": "uml:Transition",
                 f"{{{XMI_NS}}}id": tr.id,
                 "source": tr.source_id,
                 "target": tr.target_id,
             }
-            if tr.trigger_event:
-                tr_attrs["name"] = tr.trigger_event
+            if lbl:
+                tr_attrs["name"] = lbl
             tr_elem = ET.SubElement(region_elem, "transition", tr_attrs)
+
+            if tr.guard_condition:
+                guard_elem = ET.SubElement(
+                    tr_elem,
+                    "guard",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Constraint",
+                        f"{{{XMI_NS}}}id": f"{tr.id}_guard",
+                        "name": tr.guard_condition,
+                    },
+                )
+                ET.SubElement(
+                    guard_elem,
+                    "specification",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:OpaqueExpression",
+                        f"{{{XMI_NS}}}id": f"{tr.id}_guard_spec",
+                        "body": tr.guard_condition,
+                    },
+                )
+
             if tr.trigger_event:
                 ET.SubElement(
                     tr_elem,
@@ -842,6 +891,13 @@ class XMIBuilder:
         caption_side: int = 12,
     ) -> None:
         """Add fully-styled OMG DiagramElement with Visual Paradigm data binding."""
+        az_order = "2"
+        bg_color = "Cr:122,207,245,255"
+        fill_color = "Cr:122,207,245,255"
+        fill_trans = "0"
+        line_color = "Cr:0,0,0,255"
+        line_weight = "1.0"
+
         if shape_type == "Package":
             effective_caption_side = 12
             caption_bounds = f"0,20,{p.width},{max(20, p.height - 20)}"
@@ -854,6 +910,47 @@ class XMIBuilder:
             effective_caption_side = 12
             caption_bounds = f"0,0,{p.width},{p.height}"
             align = "4"
+        elif shape_type == "System":
+            effective_caption_side = 12
+            caption_bounds = f"0,0,{p.width},25"
+            align = "1"
+            az_order = "1"
+            bg_color = "Cr:255,255,255,255"
+            fill_color = "Cr:255,255,255,255"
+            fill_trans = "80"
+            line_color = "Cr:120,120,120,255"
+            line_weight = "1.5"
+        elif shape_type == "NOTE":
+            effective_caption_side = 12
+            caption_bounds = f"0,0,{p.width},{p.height}"
+            align = "9"
+            az_order = "4"
+            bg_color = "Cr:255,255,200,255"
+            fill_color = "Cr:255,255,200,255"
+            fill_trans = "0"
+            line_color = "Cr:180,180,100,255"
+            line_weight = "1.0"
+        elif shape_type == "InitialPseudoState":
+            effective_caption_side = 1
+            caption_bounds = f"0,{p.height},{p.width},16"
+            align = "4"
+            az_order = "3"
+            bg_color = "Cr:0,120,215,255"
+            fill_color = "Cr:0,120,215,255"
+        elif shape_type == "FinalState2":
+            effective_caption_side = 1
+            caption_bounds = f"0,{p.height},{p.width},16"
+            align = "4"
+            az_order = "3"
+            bg_color = "Cr:0,120,215,255"
+            fill_color = "Cr:0,120,215,255"
+        elif shape_type == "State2":
+            effective_caption_side = 12
+            caption_bounds = f"0,0,{p.width},{p.height}"
+            align = "4"
+            az_order = "2"
+            bg_color = "Cr:122,207,245,255"
+            fill_color = "Cr:122,207,245,255"
         else:
             effective_caption_side = caption_side
             caption_bounds = f"0,0,{p.width},16"
@@ -877,8 +974,8 @@ class XMIBuilder:
         ET.SubElement(shape_vp, "captionSide", {"value": str(effective_caption_side)})
 
         props = ET.SubElement(shape_vp, "properties")
-        ET.SubElement(props, "azOrder", {"value": "2"})
-        ET.SubElement(props, "abackground", {"value": "Cr:122,207,245,255"})
+        ET.SubElement(props, "azOrder", {"value": az_order})
+        ET.SubElement(props, "abackground", {"value": bg_color})
         ET.SubElement(props, "aforeground", {"value": "Cr:0,0,0,255"})
         ET.SubElement(props, "acreatorDiagramType", {"value": creator_diag_type})
         ET.SubElement(props, "aselectable", {"value": "true"})
@@ -896,13 +993,13 @@ class XMIBuilder:
         ET.SubElement(props, "ashowOperationSignature", {"value": "true"})
         ET.SubElement(props, "ashowInitialAttributeValue", {"value": "true"})
 
-        # If shape is inside a parent package, establish visual containment
+        # If shape is inside a parent package or system boundary, establish visual containment
         if p.parent_shape_id:
             ET.SubElement(shape_vp, "parentDiagramElement", {"idref": p.parent_shape_id})
 
-        ET.SubElement(omg_elem, "elementFill", {"color1": "Cr:122,207,245,255", "color2": "", "style": "1", "transparency": "0", "type": "1"})
+        ET.SubElement(omg_elem, "elementFill", {"color1": fill_color, "color2": "", "style": "1", "transparency": fill_trans, "type": "1"})
         ET.SubElement(omg_elem, "elementFont", {"bold": "false", "color": "Cr:0,0,0,255", "italic": "false", "name": "Dialog", "size": "11", "style": "0"})
-        ET.SubElement(omg_elem, "elementLine", {"color": "Cr:0,0,0,255", "style": "1", "transparency": "0", "weight": "1.0"})
+        ET.SubElement(omg_elem, "elementLine", {"color": line_color, "style": "1", "transparency": "0", "weight": line_weight})
         ET.SubElement(omg_elem, "CompartmentFont", {"value": "none"})
 
     def _add_connector_element(
@@ -916,11 +1013,38 @@ class XMIBuilder:
         creator_diag_type: str,
         src_mult: str = "",
         tgt_mult: str = "",
+        is_transition: bool = False,
+        is_uc_stereotype: bool = False,
     ) -> None:
         """Add fully-styled OMG DiagramElement connector with Visual Paradigm data binding."""
         wp1, wp2 = WaypointRoutingEngine.calculate_waypoints(src_p, tgt_p)
         mid_x = (wp1[0] + wp2[0]) // 2
         mid_y = (wp1[1] + wp2[1]) // 2
+
+        # In Visual Paradigm, StateMachine transitions must use Transition2
+        effective_shape_type = "Transition2" if (is_transition or rel_type in ("Transition", "Transition2")) else rel_type
+
+        # Check if relation name was an auto-generated title or default
+        is_auto_name = any(
+            rel_name.endswith(suffix)
+            for suffix in ("_Association", "_Composition", "_Aggregation", "_Generalization", "_Realization", "_Dependency")
+        ) or rel_name in ("Association", "Composition", "Aggregation", "Generalization", "Realization", "Dependency", "")
+
+        if rel_type in ("Include", "Extend") or is_uc_stereotype:
+            show_name_val = "2"
+            caption_vis = "true"
+        elif is_transition or effective_shape_type == "Transition2":
+            show_name_val = "2" if rel_name else "0"
+            caption_vis = "true" if rel_name else "false"
+        elif rel_type == "Anchor":
+            show_name_val = "0"
+            caption_vis = "false"
+        elif not is_auto_name:
+            show_name_val = "2"
+            caption_vis = "true"
+        else:
+            show_name_val = "0"
+            caption_vis = "false"
 
         omg_conn = ET.SubElement(
             omg_elements,
@@ -930,15 +1054,15 @@ class XMIBuilder:
                 "fromDiagramElement": src_p.shape_id,
                 "toDiagramElement": tgt_p.shape_id,
                 "geometry": f"{wp1[0]},{wp1[1]};{wp2[0]},{wp2[1]};",
-                "preferredShapeType": rel_type,
+                "preferredShapeType": effective_shape_type,
                 "subject": rel_id,
             },
         )
         conn_vp = ET.SubElement(omg_conn, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
-        ET.SubElement(conn_vp, "captionBounds", {"value": f"{mid_x},{mid_y},50,16"})
+        ET.SubElement(conn_vp, "captionBounds", {"value": f"{mid_x},{mid_y},60,16"})
         ET.SubElement(conn_vp, "captionInternalWidth", {"value": "-2147483648"})
         ET.SubElement(conn_vp, "captionInternalHeight", {"value": "-2147483648"})
-        ET.SubElement(conn_vp, "captionVisible", {"value": "true"})
+        ET.SubElement(conn_vp, "captionVisible", {"value": caption_vis})
         ET.SubElement(conn_vp, "captionSide", {"value": "1"})
 
         if src_mult or tgt_mult:
@@ -954,20 +1078,76 @@ class XMIBuilder:
         ET.SubElement(c_props, "aconnectorStyle", {"value": "3"})
         ET.SubElement(c_props, "aconnectorLineJumps", {"value": "4"})
         ET.SubElement(c_props, "aconnectorLabelOrientation", {"value": "4"})
-        ET.SubElement(c_props, "ashowConnectorName", {"value": "2"})
+        ET.SubElement(c_props, "ashowConnectorName", {"value": show_name_val})
+
+        # CRITICAL: Always suppress auto-generated role names (+customer, +order) to eliminate clutter
+        ET.SubElement(c_props, "ashowFromRoleName", {"value": "false"})
+        ET.SubElement(c_props, "ashowToRoleName", {"value": "false"})
 
         if src_mult or tgt_mult:
             ET.SubElement(c_props, "amultiplicityARectangle", {"value": f"Re:{wp1[0]}.0,{wp1[1]}.0,30.0,16.0"})
             ET.SubElement(c_props, "amultiplicityBRectangle", {"value": f"Re:{wp2[0]}.0,{wp2[1]}.0,30.0,16.0"})
             ET.SubElement(c_props, "ahasMultiplicityAShape", {"value": "true"})
             ET.SubElement(c_props, "ahasMultiplicityBShape", {"value": "true"})
-            ET.SubElement(c_props, "ashowFromRoleName", {"value": "true"})
-            ET.SubElement(c_props, "ashowToRoleName", {"value": "true"})
-            ET.SubElement(c_props, "ashowFromMultiplicity", {"value": "true"})
-            ET.SubElement(c_props, "ashowToMultiplicity", {"value": "true"})
+            ET.SubElement(c_props, "ashowFromMultiplicity", {"value": "true" if src_mult else "false"})
+            ET.SubElement(c_props, "ashowToMultiplicity", {"value": "true" if tgt_mult else "false"})
 
+        line_style = "2" if rel_type in ("Include", "Extend", "Dependency", "Realization", "Anchor") else "1"
+        line_color = "Cr:120,120,120,255" if rel_type == "Anchor" else "Cr:0,0,0,255"
         ET.SubElement(omg_conn, "elementFont", {"bold": "false", "color": "Cr:0,0,0,255", "italic": "false", "name": "Dialog", "size": "11", "style": "0"})
-        ET.SubElement(omg_conn, "elementLine", {"color": "Cr:0,0,0,255", "style": "1", "transparency": "0", "weight": "1.0"})
+        ET.SubElement(omg_conn, "elementLine", {"color": line_color, "style": line_style, "transparency": "0", "weight": "1.0"})
+
+    def _render_notes_for_diagram(
+        self,
+        omg_elements: ET.Element,
+        target_node_ids: set[str],
+        placements: dict[str, NodePlacement],
+        creator_diag_type: str,
+    ) -> None:
+        """Render relevant Notes and their connecting Anchor lines on the diagram canvas."""
+        relevant_notes = [
+            n for n in self.state.notes.values()
+            if (n.target_id and n.target_id in target_node_ids) or (not n.target_id and creator_diag_type == "ClassDiagram")
+        ]
+        for note in relevant_notes:
+            tgt_p = placements.get(note.target_id) if note.target_id else None
+            if tgt_p:
+                nx = tgt_p.x + tgt_p.width + 50
+                ny = tgt_p.y
+            else:
+                max_x = max((p.x + p.width for p in placements.values()), default=60)
+                nx = max_x + 60
+                ny = 60
+            nw = 200
+            nh = max(60, min(140, 24 + len(note.text) // 2))
+
+            note_p = NodePlacement(
+                node_id=note.id,
+                shape_id=f"shape_{note.id}",
+                x=nx,
+                y=ny,
+                width=nw,
+                height=nh,
+            )
+            self._add_shape_element(
+                omg_elements,
+                note_p,
+                note,
+                shape_type="NOTE",
+                creator_diag_type=creator_diag_type,
+                caption_side=12,
+            )
+
+            if tgt_p:
+                self._add_connector_element(
+                    omg_elements,
+                    rel_id=f"anchor_{note.id}",
+                    rel_type="Anchor",
+                    rel_name="",
+                    src_p=note_p,
+                    tgt_p=tgt_p,
+                    creator_diag_type=creator_diag_type,
+                )
 
     def _create_diagram(self, diag_id: str, name: str, diag_type: str) -> tuple[ET.Element, ET.Element]:
         """Create standard OMG <uml:Diagram> with Visual Paradigm diagram-level properties."""
@@ -1059,6 +1239,14 @@ class XMIBuilder:
                         tgt_mult=rel.target_multiplicity,
                     )
 
+            # 4. Render Notes for Class Diagram
+            self._render_notes_for_diagram(
+                omg_elements,
+                set(self.state.classes.keys()) | set(self.state.packages.keys()),
+                class_placements,
+                "ClassDiagram",
+            )
+
         # Diagram 2: ER Diagram with FK Dependency Directed Layout
         if self.state.entities:
             erd_layout = ERDClusterLayout(start_x=60, start_y=60, gap_x=70, gap_y=90)
@@ -1094,12 +1282,56 @@ class XMIBuilder:
                         tgt_mult=tgt_mult,
                     )
 
-        # Diagram 3: Use Case Diagram with 3-Tier Columnar Layout
+            # Render Notes for ER Diagram
+            self._render_notes_for_diagram(
+                omg_elements,
+                set(self.state.entities.keys()),
+                er_placements,
+                "ERDiagram",
+            )
+
+        # Diagram 3: Use Case Diagram with 3-Tier Columnar Layout and System Boundary
         if self.state.actors or self.state.use_cases:
             uc_layout = UseCaseTierLayout(col1_x=60, col2_x=360, col3_x=680, start_y=60, gap_y=130)
             uc_placements = uc_layout.layout(self.state)
             _, omg_elements = self._create_diagram("omg_diag_uc_1", "Use Case Diagram", "UseCaseDiagram")
 
+            # 1. System Boundary shape (if defined)
+            if self.state.system_boundary and self.state.use_cases:
+                sb = self.state.system_boundary
+                target_ucs = [uc_placements[uid] for uid in sb.use_case_ids if uid in uc_placements]
+                if not target_ucs:
+                    target_ucs = [p for p in uc_placements.values() if p.node_id in self.state.use_cases]
+                if target_ucs:
+                    pad_x = 35
+                    pad_y = 45
+                    sb_min_x = min(p.x for p in target_ucs) - pad_x
+                    sb_min_y = min(p.y for p in target_ucs) - pad_y
+                    sb_max_x = max(p.x + p.width for p in target_ucs) + pad_x
+                    sb_max_y = max(p.y + p.height for p in target_ucs) + pad_y
+                    sb_w = sb_max_x - sb_min_x
+                    sb_h = sb_max_y - sb_min_y
+
+                    sb_placement = NodePlacement(
+                        node_id=sb.id,
+                        shape_id=f"shape_{sb.id}",
+                        x=sb_min_x,
+                        y=sb_min_y,
+                        width=sb_w,
+                        height=sb_h,
+                    )
+                    self._add_shape_element(
+                        omg_elements,
+                        sb_placement,
+                        sb,
+                        shape_type="System",
+                        creator_diag_type="UseCaseDiagram",
+                        caption_side=12,
+                    )
+                    for p in target_ucs:
+                        p.parent_shape_id = sb_placement.shape_id
+
+            # 2. Actors and Use Cases
             for p in uc_placements.values():
                 is_actor = p.node_id in self.state.actors
                 shape_type = "Actor" if is_actor else "UseCase"
@@ -1114,19 +1346,30 @@ class XMIBuilder:
                     caption_side=caption_side,
                 )
 
+            # 3. Connectors (Include, Extend, Association)
             for rel in self.state.uc_relations:
                 if rel.source_id in uc_placements and rel.target_id in uc_placements:
                     src_p = uc_placements[rel.source_id]
                     tgt_p = uc_placements[rel.target_id]
+                    rel_lbl = "«include»" if rel.type == "Include" else ("«extend»" if rel.type == "Extend" else (rel.name or ""))
                     self._add_connector_element(
                         omg_elements,
                         rel_id=rel.id,
                         rel_type=rel.type,
-                        rel_name=rel.name or rel.type,
+                        rel_name=rel_lbl,
                         src_p=src_p,
                         tgt_p=tgt_p,
                         creator_diag_type="UseCaseDiagram",
+                        is_uc_stereotype=(rel.type in ("Include", "Extend")),
                     )
+
+            # 4. Render Notes for Use Case Diagram
+            self._render_notes_for_diagram(
+                omg_elements,
+                set(self.state.actors.keys()) | set(self.state.use_cases.keys()),
+                uc_placements,
+                "UseCaseDiagram",
+            )
 
         # Diagram 4: State Machine Diagram with Horizontal Flow Pipeline Layout
         if self.state.states:
@@ -1136,29 +1379,49 @@ class XMIBuilder:
 
             for p in sm_placements.values():
                 st_obj = self.state.states[p.node_id]
-                shape_type = "State" if st_obj.type == "State" else ("InitialPseudoState" if st_obj.type == "Initial" else "FinalState")
+                if st_obj.type == "Initial":
+                    shape_type = "InitialPseudoState"
+                elif st_obj.type == "Final":
+                    shape_type = "FinalState2"
+                else:
+                    shape_type = "State2"
+
                 self._add_shape_element(
                     omg_elements,
                     p,
                     st_obj,
                     shape_type=shape_type,
                     creator_diag_type="StateDiagram",
-                    caption_side=12,
+                    caption_side=12 if shape_type == "State2" else 1,
                 )
 
             for tr in self.state.transitions:
                 if tr.source_id in sm_placements and tr.target_id in sm_placements:
                     src_p = sm_placements[tr.source_id]
                     tgt_p = sm_placements[tr.target_id]
+                    lbl = tr.trigger_event
+                    if tr.guard_condition:
+                        guard_fmt = tr.guard_condition if tr.guard_condition.startswith("[") else f"[{tr.guard_condition}]"
+                        lbl = f"{lbl} {guard_fmt}".strip() if lbl else guard_fmt
+
                     self._add_connector_element(
                         omg_elements,
                         rel_id=tr.id,
-                        rel_type="Transition",
-                        rel_name=tr.trigger_event or "Transition",
+                        rel_type="Transition2",
+                        rel_name=lbl,
                         src_p=src_p,
                         tgt_p=tgt_p,
                         creator_diag_type="StateDiagram",
+                        is_transition=True,
                     )
+
+            # Render Notes for State Machine Diagram
+            self._render_notes_for_diagram(
+                omg_elements,
+                set(self.state.states.keys()),
+                sm_placements,
+                "StateDiagram",
+            )
 
     def build_tree(self) -> ET.ElementTree:
         """Construct full XML ElementTree with Metamodel and Visual Layout."""
@@ -1202,6 +1465,29 @@ class XMIBuilder:
         self._build_er_metamodel()
         self._build_uc_metamodel()
         self._build_sm_metamodel()
+
+        # 1b. Emit Universal Notes (UML Comments)
+        for note in self.state.notes.values():
+            note_attrs = {
+                f"{{{XMI_NS}}}type": "uml:Comment",
+                f"{{{XMI_NS}}}id": note.id,
+                "body": note.text,
+            }
+            if note.target_id:
+                note_attrs["annotatedElement"] = note.target_id
+            c_elem = ET.SubElement(self.model, "ownedComment", note_attrs)
+            c_ext = ET.SubElement(c_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(c_ext, "type", {"value": "NOTE"})
+            ET.SubElement(c_ext, "qualityScore", {"value": "-1"})
+
+        # 1c. Emit vpumlModel for Anchor connectors under projectProperties
+        for note in self.state.notes.values():
+            if note.target_id:
+                anc_model = ET.SubElement(proj_props, "vpumlModel", {"id": f"anchor_{note.id}", "modelType": "Anchor"})
+                a_props = ET.SubElement(anc_model, "properties")
+                ET.SubElement(a_props, "property", {"name": "modelType", "type": "string", "value": "Anchor"})
+                ET.SubElement(a_props, "property", {"name": "from", "type": "fromTo", "modelRef": note.id})
+                ET.SubElement(a_props, "property", {"name": "to", "type": "fromTo", "modelRef": note.target_id})
 
         # 2. Visual Layout Layer (pure native OMG <uml:Diagram> and <uml:DiagramElement>)
         self._build_visual_layers()

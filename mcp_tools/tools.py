@@ -1002,13 +1002,19 @@ def add_state(name: str, type: str = "State") -> str:
         return f"ERROR: Failed to create state: {str(e)}"
 
 
-def add_state_transition(src_name: str, tgt_name: str, trigger: str = "") -> str:
-    """Create a transition between two states in the State Machine.
+def add_state_transition(
+    src_name: str,
+    tgt_name: str,
+    trigger: str = "",
+    guard: str = "",
+) -> str:
+    """Create a transition between two states in the State Machine with trigger and guard condition.
 
     Args:
         src_name: Name or ID of the source state vertex.
         tgt_name: Name or ID of the target state vertex.
-        trigger: Optional event/condition triggering this transition (e.g. 'paySuccess', 'cancelOrder').
+        trigger: Optional event/signal triggering this transition (e.g. 'paySuccess', 'cancelOrder').
+        guard: Optional guard condition expression (e.g. 'balance >= total', '[isValid]').
 
     Returns:
         Confirmation message with Transition ID or error.
@@ -1032,13 +1038,73 @@ def add_state_transition(src_name: str, tgt_name: str, trigger: str = "") -> str
             target_id=tgt.id,
             type="Transition",
             trigger_event=(trigger or "").strip(),
+            guard_condition=(guard or "").strip(),
         )
         state.add_relation(tr)
 
-        trig_str = f" on trigger '{tr.trigger_event}'" if tr.trigger_event else ""
-        return f"Created State Transition: '{src.name}' -> '{tgt.name}'{trig_str} (ID: {tr.id})."
+        details = []
+        if tr.trigger_event:
+            details.append(f"trigger: '{tr.trigger_event}'")
+        if tr.guard_condition:
+            details.append(f"guard: [{tr.guard_condition}]")
+        detail_str = f" ({', '.join(details)})" if details else ""
+        return f"Created State Transition: '{src.name}' -> '{tgt.name}'{detail_str} (ID: {tr.id})."
     except Exception as e:
         return f"ERROR: Failed to create transition: {str(e)}"
+
+
+# --- Universal Annotation & Boundary Tools ---
+
+def add_note(text: str, target: Optional[str] = None) -> str:
+    """Create an architectural Note (yellow sticky comment) on diagrams.
+
+    Notes can attach remarks, business rules, or explanations. If 'target' is specified,
+    an Anchor connector (dashed line) is drawn connecting the Note to the target element.
+
+    Args:
+        text: Comment/note body text.
+        target: Optional name or ID of the model element to annotate (Class, Entity, UseCase, State).
+
+    Returns:
+        Confirmation message with Note ID and target attachment status.
+    """
+    try:
+        clean_text = text.strip()
+        if not clean_text:
+            return "ERROR: Note text cannot be empty."
+
+        clean_target = target.strip() if target else None
+        note = state.add_note(text=clean_text, target=clean_target)
+        tgt_info = f" attached to '{clean_target}' via Anchor" if clean_target else ""
+        return f"Created Note (ID: {note.id}){tgt_info}."
+    except Exception as e:
+        return f"ERROR: Failed to create note: {str(e)}"
+
+
+def set_system_boundary(name: str = "System", use_cases: Optional[str] = None) -> str:
+    """Define or update the System Boundary enclosing Use Cases in the Use Case diagram.
+
+    The System Boundary forms a container box grouping system use cases and separating them
+    from external actors.
+
+    Args:
+        name: Title of the system boundary (e.g. 'E-Commerce Platform', 'Billing System').
+        use_cases: Optional comma-separated list of use case names to enclose.
+                   If omitted, encloses all existing use cases in the diagram.
+
+    Returns:
+        Confirmation message with system boundary name and enclosed use cases count.
+    """
+    try:
+        clean_name = name.strip() or "System"
+        uc_list: Optional[list[str]] = None
+        if use_cases:
+            uc_list = [u.strip() for u in use_cases.split(",") if u.strip()]
+        boundary = state.set_system_boundary(clean_name, uc_list)
+        count = len(boundary.use_case_ids)
+        return f"Defined System Boundary '{boundary.name}' enclosing {count} Use Cases (ID: {boundary.id})."
+    except Exception as e:
+        return f"ERROR: Failed to set system boundary: {str(e)}"
 
 
 # --- Export and Summary Tools ---
@@ -1133,6 +1199,8 @@ def get_project_summary() -> str:
         lines.append(f"  Relation [{er.type}]: {s.name if s else er.source_id} -> {t.name if t else er.target_id}")
 
     lines.append(f"\n3. Use Case Diagram (Actors: {len(state.actors)}, UseCases: {len(state.use_cases)}):")
+    if state.system_boundary:
+        lines.append(f"  System Boundary: '{state.system_boundary.name}' (enclosing {len(state.system_boundary.use_case_ids)} use cases)")
     for a in state.actors.values():
         lines.append(f"  Actor: {a.name}")
     for uc in state.use_cases.values():
@@ -1148,8 +1216,20 @@ def get_project_summary() -> str:
     for tr in state.transitions:
         s = state.find_state(tr.source_id)
         t = state.find_state(tr.target_id)
-        trig = f" (trigger: {tr.trigger_event})" if tr.trigger_event else ""
+        details = []
+        if tr.trigger_event:
+            details.append(f"trigger: {tr.trigger_event}")
+        if tr.guard_condition:
+            details.append(f"guard: [{tr.guard_condition}]")
+        trig = f" ({', '.join(details)})" if details else ""
         lines.append(f"  Transition: {s.name if s else tr.source_id} -> {t.name if t else tr.target_id}{trig}")
+
+    if state.notes:
+        lines.append(f"\n5. Notes & Annotations ({len(state.notes)}):")
+        for n in state.notes.values():
+            tgt_node = state.find_node_by_id(n.target_id) if n.target_id else None
+            tgt_str = f" [attached to '{tgt_node.name}']" if tgt_node else ""
+            lines.append(f"  Note: \"{n.text}\"{tgt_str}")
 
     return "\n".join(lines)
 
@@ -1172,8 +1252,10 @@ def register_all_tools(mcp: Any) -> None:
         add_actor,
         add_use_case,
         add_uc_relation,
+        set_system_boundary,
         add_state,
         add_state_transition,
+        add_note,
         export_xmi,
         get_project_summary,
     ]

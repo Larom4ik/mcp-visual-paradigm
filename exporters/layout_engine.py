@@ -463,9 +463,9 @@ class StateMachineFlowLayout:
         curr_x = self.start_x
 
         for st in full_pipeline:
-            w = 50 if st.type in ("Initial", "Final") else max(140, 12 * len(st.name) + 20)
-            h = 50 if st.type in ("Initial", "Final") else 70
-            y_offset = (70 - h) // 2
+            w = 28 if st.type in ("Initial", "Final") else max(140, 12 * len(st.name) + 20)
+            h = 28 if st.type in ("Initial", "Final") else 60
+            y_offset = (60 - h) // 2
 
             placements[st.id] = NodePlacement(
                 node_id=st.id,

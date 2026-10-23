@@ -8,31 +8,38 @@
 	<xmi:Extension extender="Visual Paradigm">
 		<projectProperties>
 			<projectProperty name="author" value="Architect" />
+			<vpumlModel id="anchor_xmi_77807180e5e34f8a824e032ad856482b" modelType="Anchor">
+				<properties>
+					<property name="modelType" type="string" value="Anchor" />
+					<property name="from" type="fromTo" modelRef="xmi_77807180e5e34f8a824e032ad856482b" />
+					<property name="to" type="fromTo" modelRef="xmi_f3b3f83067e84be1bb3482f3745ddaf6" />
+				</properties>
+			</vpumlModel>
 		</projectProperties>
 	</xmi:Extension>
 	<uml:Model xmi:id="model_1" name="EnterpriseSystem" visibility="public">
-		<ownedMember xmi:type="uml:Package" xmi:id="xmi_7f1de040b7324db3bf7e4602454cea5c" name="CoreDomain" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:Package" xmi:id="xmi_f1b327fb00b84aa187c09b9d32c08dbe" name="CoreDomain" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="Package" />
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<ownedMember xmi:type="uml:Package" xmi:id="xmi_245eba43384147babdc012bb645db5c6" name="Ordering" visibility="public" isAbstract="false" isLeaf="false">
+			<ownedMember xmi:type="uml:Package" xmi:id="xmi_c2eb5bb5eb7f4e34b3c48a55637bcd87" name="Ordering" visibility="public" isAbstract="false" isLeaf="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
 					<modelType value="Package" />
 					<businessModel xmi:value="false" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<ownedMember xmi:type="uml:Class" xmi:id="xmi_fef25426944f49a791d6faa077c30ffc" name="Order" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+				<ownedMember xmi:type="uml:Class" xmi:id="xmi_f3b3f83067e84be1bb3482f3745ddaf6" name="Order" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 					<xmi:Extension extender="Visual Paradigm">
 						<isRoot xmi:value="false" />
 						<modelType value="Class" />
 						<businessModel xmi:value="false" />
 						<qualityScore value="-1" />
 					</xmi:Extension>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_7db21560556042bea359fedcdfb56258" name="total" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="float_id">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_0cc703386797483289feb3474d032cbc" name="total" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="float_id">
 						<xmi:Extension extender="Visual Paradigm">
 							<attribute />
 							<isAbstract xmi:value="false" />
@@ -40,7 +47,7 @@
 							<qualityScore value="-1" />
 						</xmi:Extension>
 					</ownedAttribute>
-					<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_271cb804e6ad4302930c213be9fc89da" name="recalculate" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
+					<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_3571086183394ec4a553e0cb70f49e04" name="recalculate" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
 						<xmi:Extension extender="Visual Paradigm">
 							<returnTypeDocumentation xmi:value="" />
 							<properties>
@@ -51,14 +58,14 @@
 						</xmi:Extension>
 					</ownedOperation>
 				</ownedMember>
-				<ownedMember xmi:type="uml:Class" xmi:id="xmi_761f63cdc0aa4d0a8e6e5d1a3d3abb80" name="OrderItem" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+				<ownedMember xmi:type="uml:Class" xmi:id="xmi_4b3da34959e64f2c8aa3d7e755da1b02" name="OrderItem" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 					<xmi:Extension extender="Visual Paradigm">
 						<isRoot xmi:value="false" />
 						<modelType value="Class" />
 						<businessModel xmi:value="false" />
 						<qualityScore value="-1" />
 					</xmi:Extension>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_c8373be7a7cc4d0c9aa7812287cdaeb3" name="quantity" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="int_id">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_d8fb5bf0c4e446038a79b9dad3670103" name="quantity" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="int_id">
 						<xmi:Extension extender="Visual Paradigm">
 							<attribute />
 							<isAbstract xmi:value="false" />
@@ -68,14 +75,14 @@
 					</ownedAttribute>
 				</ownedMember>
 			</ownedMember>
-			<ownedMember xmi:type="uml:Class" xmi:id="xmi_a5d7b433a78c4336a919d5c43c947e73" name="BaseEntity" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<ownedMember xmi:type="uml:Class" xmi:id="xmi_5efd8978954f4ad3a46f15ae1ba80d54" name="BaseEntity" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
 					<modelType value="Class" />
 					<businessModel xmi:value="false" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_fd3c2b8f4c3d4940acd4cd5900ec2768" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="uuid_id">
+				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_bc550ced26b946ee9c9bd5219a8a8799" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="uuid_id">
 					<xmi:Extension extender="Visual Paradigm">
 						<attribute />
 						<isAbstract xmi:value="false" />
@@ -83,7 +90,7 @@
 						<qualityScore value="-1" />
 					</xmi:Extension>
 				</ownedAttribute>
-				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_030f23903fbd4b34a4a2186575d6453c" name="createdAt" visibility="protected" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="datetime_id">
+				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_e97bd0868a77452da72cdd5122db60ad" name="createdAt" visibility="protected" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="datetime_id">
 					<xmi:Extension extender="Visual Paradigm">
 						<attribute />
 						<isAbstract xmi:value="false" />
@@ -92,14 +99,14 @@
 					</xmi:Extension>
 				</ownedAttribute>
 			</ownedMember>
-			<ownedMember xmi:type="uml:Class" xmi:id="xmi_9b226b8bb94f4236bd9554ded35071e0" name="User" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<ownedMember xmi:type="uml:Class" xmi:id="xmi_df1a17a41d884e9db2cf8b8607eef2b3" name="User" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
 					<modelType value="Class" />
 					<businessModel xmi:value="false" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_fbd2968004494b8dbcea4571dba6b853" name="email" visibility="private" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="string_id">
+				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_a58781821dfd4e2c915b1a5ce532a583" name="email" visibility="private" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="string_id">
 					<xmi:Extension extender="Visual Paradigm">
 						<attribute />
 						<isAbstract xmi:value="false" />
@@ -107,7 +114,7 @@
 						<qualityScore value="-1" />
 					</xmi:Extension>
 				</ownedAttribute>
-				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_74bbf29bdc6b4fb89b91df615c9db656" name="passwordHash" visibility="private" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="string_id">
+				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_d31e5509c9ac4933aaba24e6104a9e4b" name="passwordHash" visibility="private" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="string_id">
 					<xmi:Extension extender="Visual Paradigm">
 						<attribute />
 						<isAbstract xmi:value="false" />
@@ -115,9 +122,9 @@
 						<qualityScore value="-1" />
 					</xmi:Extension>
 				</ownedAttribute>
-				<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_4f2a2f62af8f4f8aa9dbe14ff73c80db" name="authenticate" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
-					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_4f2a2f62af8f4f8aa9dbe14ff73c80db_return" kind="return" type="bool_id" />
-					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_2c525315c09f4f46a9fa520e03e492a4" name="password" kind="in" type="string_id" />
+				<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_d87ca831dee04786ae3a4772e43f5cbc" name="authenticate" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
+					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_d87ca831dee04786ae3a4772e43f5cbc_return" kind="return" type="bool_id" />
+					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_4122d1fb09b74dcd927513b47e7e8d6d" name="password" kind="in" type="string_id" />
 					<xmi:Extension extender="Visual Paradigm">
 						<returnTypeDocumentation xmi:value="" />
 						<properties>
@@ -127,20 +134,20 @@
 						<qualityScore value="-1" />
 					</xmi:Extension>
 				</ownedOperation>
-				<generalization xmi:type="uml:Generalization" xmi:id="xmi_7f41e6cd2213412f89857237a523a4ac" general="xmi_a5d7b433a78c4336a919d5c43c947e73">
+				<generalization xmi:type="uml:Generalization" xmi:id="xmi_e9c516bc1f2b40c0bc22bf0896623c7f" general="xmi_5efd8978954f4ad3a46f15ae1ba80d54">
 					<xmi:Extension extender="Visual Paradigm">
 						<qualityScore value="-1" />
 					</xmi:Extension>
 				</generalization>
 			</ownedMember>
-			<ownedMember xmi:type="uml:Class" xmi:id="xmi_eecaa4e7dcd447819999e8a459ca7ab5" name="Customer" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<ownedMember xmi:type="uml:Class" xmi:id="xmi_8c3a29e2ba6e4706a06cc39389306e1f" name="Customer" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
 					<modelType value="Class" />
 					<businessModel xmi:value="false" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_354c44220dc6479f89ddd876d910e2a3" name="loyaltyPoints" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="int_id">
+				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_ee8bfc1e50b6467093d6839098b04b5e" name="loyaltyPoints" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="int_id">
 					<xmi:Extension extender="Visual Paradigm">
 						<attribute />
 						<isAbstract xmi:value="false" />
@@ -148,7 +155,7 @@
 						<qualityScore value="-1" />
 					</xmi:Extension>
 				</ownedAttribute>
-				<generalization xmi:type="uml:Generalization" xmi:id="xmi_e56ff8a89f824178879b57fc1ec8314b" general="xmi_9b226b8bb94f4236bd9554ded35071e0">
+				<generalization xmi:type="uml:Generalization" xmi:id="xmi_9baa33432e7344e794e1db3a91a35f61" general="xmi_df1a17a41d884e9db2cf8b8607eef2b3">
 					<xmi:Extension extender="Visual Paradigm">
 						<qualityScore value="-1" />
 					</xmi:Extension>
@@ -161,16 +168,16 @@
 		<ownedMember xmi:type="uml:DataType" xmi:id="datetime_id" name="DateTime" visibility="public" />
 		<ownedMember xmi:type="uml:DataType" xmi:id="string_id" name="string" visibility="public" />
 		<ownedMember xmi:type="uml:DataType" xmi:id="bool_id" name="bool" visibility="public" />
-		<ownedMember xmi:type="uml:Package" xmi:id="xmi_1e11962b26354c5fbe490e317cd9e9c1" name="PaymentSubsystem" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:Package" xmi:id="xmi_465a8ca606f847d0af7dfdbfec2dd0d2" name="PaymentSubsystem" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="Package" />
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<ownedMember xmi:type="uml:Class" xmi:id="xmi_f1bdba7c40614ecdb1f92449ba7384ba" name="IPaymentGateway" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
-				<eAnnotations xmi:id="annot_cf851adc8a2c43e29dff7df6e21b4949" source="Stereotype">
-					<details xmi:id="det_46b7127d041e46ceb44f7fb8b2cec7c8" key="interface" value="true" />
+			<ownedMember xmi:type="uml:Class" xmi:id="xmi_a34fb531b7be4348b27efd2ff495cba7" name="IPaymentGateway" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+				<eAnnotations xmi:id="annot_379590a1e37146e4bd00a7f3a1742ecd" source="Stereotype">
+					<details xmi:id="det_0dcadb138b5e4067871841690ceeac6e" key="interface" value="true" />
 				</eAnnotations>
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
@@ -178,9 +185,9 @@
 					<businessModel xmi:value="false" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_10eebf11be774532939b5001669d89d5" name="charge" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
-					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_10eebf11be774532939b5001669d89d5_return" kind="return" type="bool_id" />
-					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_79ee72cfb4dc49b88ec921fb2d5be19a" name="amount" kind="in" type="float_id" />
+				<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_79032b038bf84c5d9d06edce6c6b9c42" name="charge" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
+					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_79032b038bf84c5d9d06edce6c6b9c42_return" kind="return" type="bool_id" />
+					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_c5dfe760d3d24486a3006371feb095dd" name="amount" kind="in" type="float_id" />
 					<xmi:Extension extender="Visual Paradigm">
 						<returnTypeDocumentation xmi:value="" />
 						<properties>
@@ -191,7 +198,7 @@
 					</xmi:Extension>
 				</ownedOperation>
 			</ownedMember>
-			<ownedMember xmi:type="uml:Class" xmi:id="xmi_a7796bac60c1483da798ed058e2d6ced" name="StripePaymentGateway" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<ownedMember xmi:type="uml:Class" xmi:id="xmi_891b5caede4343bd9f4bb085f93155e4" name="StripePaymentGateway" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
 					<modelType value="Class" />
@@ -200,63 +207,63 @@
 				</xmi:Extension>
 			</ownedMember>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_f92c3a0947b241bc9c9102aa5ad4e152" name="Customer_Order_Aggregation" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_f92c3a0947b241bc9c9102aa5ad4e152_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_f92c3a0947b241bc9c9102aa5ad4e152_end_src" name="customer" visibility="public" type="xmi_eecaa4e7dcd447819999e8a459ca7ab5" association="xmi_f92c3a0947b241bc9c9102aa5ad4e152" aggregation="shared" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_5aed83988e354ac1a3afb829caeacaed" name="Customer_Order_Aggregation" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_5aed83988e354ac1a3afb829caeacaed_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_5aed83988e354ac1a3afb829caeacaed_end_src" name="customer" visibility="public" type="xmi_8c3a29e2ba6e4706a06cc39389306e1f" association="xmi_5aed83988e354ac1a3afb829caeacaed" aggregation="shared" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_f92c3a0947b241bc9c9102aa5ad4e152_end_src_multiplicity_lowerValue" value="1" />
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_5aed83988e354ac1a3afb829caeacaed_end_src_multiplicity_lowerValue" value="1" />
 			</ownedEnd>
-			<memberEnd xmi:idref="xmi_f92c3a0947b241bc9c9102aa5ad4e152_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_f92c3a0947b241bc9c9102aa5ad4e152_end_tgt" name="order" visibility="public" type="xmi_fef25426944f49a791d6faa077c30ffc" association="xmi_f92c3a0947b241bc9c9102aa5ad4e152" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+			<memberEnd xmi:idref="xmi_5aed83988e354ac1a3afb829caeacaed_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_5aed83988e354ac1a3afb829caeacaed_end_tgt" name="order" visibility="public" type="xmi_f3b3f83067e84be1bb3482f3745ddaf6" association="xmi_5aed83988e354ac1a3afb829caeacaed" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_f92c3a0947b241bc9c9102aa5ad4e152_end_tgt_multiplicity_lowerValue" value="0" />
-				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_f92c3a0947b241bc9c9102aa5ad4e152_end_tgt_multiplicity_upperValue" value="*" />
-			</ownedEnd>
-			<xmi:Extension extender="Visual Paradigm">
-				<qualityScore value="-1" />
-			</xmi:Extension>
-		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_5ab837ba76eb4130a5eaff886bfeeabb" name="Order_OrderItem_Composition" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_5ab837ba76eb4130a5eaff886bfeeabb_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_5ab837ba76eb4130a5eaff886bfeeabb_end_src" name="order" visibility="public" type="xmi_fef25426944f49a791d6faa077c30ffc" association="xmi_5ab837ba76eb4130a5eaff886bfeeabb" aggregation="composite" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
-				<xmi:Extension extender="Visual Paradigm">
-					<associationEnd />
-					<qualityScore value="-1" />
-				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_5ab837ba76eb4130a5eaff886bfeeabb_end_src_multiplicity_lowerValue" value="1" />
-			</ownedEnd>
-			<memberEnd xmi:idref="xmi_5ab837ba76eb4130a5eaff886bfeeabb_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_5ab837ba76eb4130a5eaff886bfeeabb_end_tgt" name="orderitem" visibility="public" type="xmi_761f63cdc0aa4d0a8e6e5d1a3d3abb80" association="xmi_5ab837ba76eb4130a5eaff886bfeeabb" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
-				<xmi:Extension extender="Visual Paradigm">
-					<associationEnd />
-					<qualityScore value="-1" />
-				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_5ab837ba76eb4130a5eaff886bfeeabb_end_tgt_multiplicity_lowerValue" value="1" />
-				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_5ab837ba76eb4130a5eaff886bfeeabb_end_tgt_multiplicity_upperValue" value="*" />
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_5aed83988e354ac1a3afb829caeacaed_end_tgt_multiplicity_lowerValue" value="0" />
+				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_5aed83988e354ac1a3afb829caeacaed_end_tgt_multiplicity_upperValue" value="*" />
 			</ownedEnd>
 			<xmi:Extension extender="Visual Paradigm">
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Realization" xmi:id="xmi_b365b0d8d3594f3bbd85a65ccc6fd2f5" name="Order_realizes_IPaymentGateway" visibility="public" client="xmi_fef25426944f49a791d6faa077c30ffc" supplier="xmi_f1bdba7c40614ecdb1f92449ba7384ba" realizingClassifier="xmi_f1bdba7c40614ecdb1f92449ba7384ba">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_b3d3f1ee64b54bdabd303f20289231cf" name="Order_OrderItem_Composition" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_b3d3f1ee64b54bdabd303f20289231cf_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_b3d3f1ee64b54bdabd303f20289231cf_end_src" name="order" visibility="public" type="xmi_f3b3f83067e84be1bb3482f3745ddaf6" association="xmi_b3d3f1ee64b54bdabd303f20289231cf" aggregation="composite" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+				<xmi:Extension extender="Visual Paradigm">
+					<associationEnd />
+					<qualityScore value="-1" />
+				</xmi:Extension>
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_b3d3f1ee64b54bdabd303f20289231cf_end_src_multiplicity_lowerValue" value="1" />
+			</ownedEnd>
+			<memberEnd xmi:idref="xmi_b3d3f1ee64b54bdabd303f20289231cf_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_b3d3f1ee64b54bdabd303f20289231cf_end_tgt" name="orderitem" visibility="public" type="xmi_4b3da34959e64f2c8aa3d7e755da1b02" association="xmi_b3d3f1ee64b54bdabd303f20289231cf" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+				<xmi:Extension extender="Visual Paradigm">
+					<associationEnd />
+					<qualityScore value="-1" />
+				</xmi:Extension>
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_b3d3f1ee64b54bdabd303f20289231cf_end_tgt_multiplicity_lowerValue" value="1" />
+				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_b3d3f1ee64b54bdabd303f20289231cf_end_tgt_multiplicity_upperValue" value="*" />
+			</ownedEnd>
 			<xmi:Extension extender="Visual Paradigm">
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Realization" xmi:id="xmi_c6c3516fd57345cfbc5a0b48c88fb01e" name="StripePaymentGateway_realizes_IPaymentGateway" visibility="public" client="xmi_a7796bac60c1483da798ed058e2d6ced" supplier="xmi_f1bdba7c40614ecdb1f92449ba7384ba" realizingClassifier="xmi_f1bdba7c40614ecdb1f92449ba7384ba">
+		<ownedMember xmi:type="uml:Realization" xmi:id="xmi_5e4a7dd57c3143d89bc45146d6c8a223" name="Order_realizes_IPaymentGateway" visibility="public" client="xmi_f3b3f83067e84be1bb3482f3745ddaf6" supplier="xmi_a34fb531b7be4348b27efd2ff495cba7" realizingClassifier="xmi_a34fb531b7be4348b27efd2ff495cba7">
 			<xmi:Extension extender="Visual Paradigm">
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Class" xmi:id="xmi_df98a6bd532447d4b942aa4860dd9fcd" name="users" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
-			<eAnnotations xmi:id="annot_18aa3a61e08e41e387bf02ef7d24b343" source="Stereotype">
-				<details xmi:id="det_1d1d848acb6845aeb46504ff8386f477" key="entity" value="true" />
+		<ownedMember xmi:type="uml:Realization" xmi:id="xmi_833ac0d93a9c4355ab95ff8610cebb13" name="StripePaymentGateway_realizes_IPaymentGateway" visibility="public" client="xmi_891b5caede4343bd9f4bb085f93155e4" supplier="xmi_a34fb531b7be4348b27efd2ff495cba7" realizingClassifier="xmi_a34fb531b7be4348b27efd2ff495cba7">
+			<xmi:Extension extender="Visual Paradigm">
+				<qualityScore value="-1" />
+			</xmi:Extension>
+		</ownedMember>
+		<ownedMember xmi:type="uml:Class" xmi:id="xmi_a90fab9ab3c94e8a863894c6f9887a2e" name="users" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<eAnnotations xmi:id="annot_312bd2eebbce4f14a69c3d20e4520b60" source="Stereotype">
+				<details xmi:id="det_147819eb949f4ad4b07ce5fe5d388fda" key="entity" value="true" />
 			</eAnnotations>
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
@@ -264,46 +271,46 @@
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_a69236f090664aba8c497cd6a5d3b7d8" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_ddc17a169ba74137afaab5720053b8a2" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_8e057788a44f4cc5a1b2d9ea5983109b" source="Stereotype">
-					<details xmi:id="det_1864c091534b4850b7bb042ba3444851" key="column" value="true" />
-					<details xmi:id="det_c36b4785ff2741aaa650de0037a3f9f6" key="primaryKey" value="true" />
-					<details xmi:id="det_a408ef3e9dcc4c3ead145edffeea2869" key="stereotype" value="PK" />
-					<details xmi:id="det_d67cef87c60b42c3b30f38a9cd61c118" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_b9ae16e7f9434edd95e298d9f50c8345" source="Stereotype">
+					<details xmi:id="det_cd4859cb2497448cb274202a933dd5f6" key="column" value="true" />
+					<details xmi:id="det_a9da08f4578143d4880e7cba4831dd36" key="primaryKey" value="true" />
+					<details xmi:id="det_d14616a96781486b9a6307c1c8b3306e" key="stereotype" value="PK" />
+					<details xmi:id="det_f890f278407045b09822458a150025d8" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_03e17c82bf7646f8960186de6262484d" name="email" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_255__id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_039251d89ecb41b1ad5ad5c265ff9407" name="email" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_255__id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_0ca47323c64341f285183aaba283bf8e" source="Stereotype">
-					<details xmi:id="det_ea8053a41ae147c9a78a43006fc85a38" key="column" value="true" />
+				<eAnnotations xmi:id="annot_6bd593b6ae8b4e4593b17deead151d37" source="Stereotype">
+					<details xmi:id="det_ae41a32c51bf4678a0fe5cefe0403db2" key="column" value="true" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_ed11f978ac2944378e7585bdfa55d3b9" name="created_at" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="timestamp_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_d96f42e8524943258ebdd2b707f93cf8" name="created_at" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="timestamp_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_840449c0c19d4dee82a23d2ac8addb7c" source="Stereotype">
-					<details xmi:id="det_cf49ead761b24dd29717c47d6c8fd91f" key="column" value="true" />
+				<eAnnotations xmi:id="annot_5bcb49eb89824c37b57c5358342a3c8d" source="Stereotype">
+					<details xmi:id="det_7ad0b4d176104815b92e1852f57bb9ea" key="column" value="true" />
 				</eAnnotations>
 			</ownedAttribute>
 		</ownedMember>
 		<ownedMember xmi:type="uml:DataType" xmi:id="bigint_id" name="BIGINT" visibility="public" />
 		<ownedMember xmi:type="uml:DataType" xmi:id="varchar_255__id" name="VARCHAR(255)" visibility="public" />
 		<ownedMember xmi:type="uml:DataType" xmi:id="timestamp_id" name="TIMESTAMP" visibility="public" />
-		<ownedMember xmi:type="uml:Class" xmi:id="xmi_b46d939f4e4c432bb43982ef783a17d4" name="user_profiles" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
-			<eAnnotations xmi:id="annot_10b06577dbf04a0fa620f095d5c2f9f6" source="Stereotype">
-				<details xmi:id="det_036bca2e2c884300a0723b8482a93fac" key="entity" value="true" />
+		<ownedMember xmi:type="uml:Class" xmi:id="xmi_73274edb972e4174abd52262e41eda62" name="user_profiles" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<eAnnotations xmi:id="annot_570dacd9f4ae40b3a64fb396b546cb3e" source="Stereotype">
+				<details xmi:id="det_ab2f33b46b164f7bbd16c4525195c75b" key="entity" value="true" />
 			</eAnnotations>
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
@@ -311,46 +318,46 @@
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_35304bc734334f1ca437087b54f43ceb" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_45945b15d5d84d63baca14791d71cf81" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_5aa882570a984a8cb53ecb4564b621eb" source="Stereotype">
-					<details xmi:id="det_964899e2922949f384431758792d496a" key="column" value="true" />
-					<details xmi:id="det_e7677edcf16549d39eb7be5dd7a21dbb" key="primaryKey" value="true" />
-					<details xmi:id="det_e330029cfb65446aa6079c548197b4b6" key="stereotype" value="PK" />
-					<details xmi:id="det_2fea8baabcaf4a9dbfd60cd5ddf2c506" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_64ff8f57ea92470183944e787a1ae9be" source="Stereotype">
+					<details xmi:id="det_dc16d84a178c4e83b8dc0532400eddb7" key="column" value="true" />
+					<details xmi:id="det_eeea8029c4274c709af8d0841b747696" key="primaryKey" value="true" />
+					<details xmi:id="det_a094e562441e48f3a75ae4e821b19ae6" key="stereotype" value="PK" />
+					<details xmi:id="det_e6822352547d4704812e214e1669d947" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_a79266c3280e4160b3dc05eab4a18a07" name="user_id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_8106bc659c8846f594c58e3796a7bb08" name="user_id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_b02ca8d9acfe47e4b85ba11d4c966034" source="Stereotype">
-					<details xmi:id="det_9337b308121e415d8bd464c31f475134" key="column" value="true" />
-					<details xmi:id="det_d96ae3eba0804d36ae5ec33ecc6a76fa" key="foreignKey" value="true" />
-					<details xmi:id="det_9786d0de0e31481d9a5034d37fc27057" key="stereotype" value="FK" />
+				<eAnnotations xmi:id="annot_50f36b0feff2472ea76309f23701217d" source="Stereotype">
+					<details xmi:id="det_9991d6b2bffe45e6951d406b7620fb18" key="column" value="true" />
+					<details xmi:id="det_0b64d34c3783448797607550712075a2" key="foreignKey" value="true" />
+					<details xmi:id="det_46bcad8d6d9842c9af4c52da48c765dd" key="stereotype" value="FK" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_dad0f1b4a620443ea50f2effc2d6b451" name="avatar_url" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="text_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_f13053e2337d4232bc430058e5d9e2df" name="avatar_url" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="text_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_db0c78c3c5aa4002a54f7dde4637b1d6" source="Stereotype">
-					<details xmi:id="det_37d7452487544b0cbe8f3ea508e49b60" key="column" value="true" />
+				<eAnnotations xmi:id="annot_bab33eee76c2414dbfd6575d15cb53f4" source="Stereotype">
+					<details xmi:id="det_3b3d6a7116374afda37d2e373f7bf052" key="column" value="true" />
 				</eAnnotations>
 			</ownedAttribute>
 		</ownedMember>
 		<ownedMember xmi:type="uml:DataType" xmi:id="text_id" name="TEXT" visibility="public" />
-		<ownedMember xmi:type="uml:Class" xmi:id="xmi_ca7551ed3ea2427f88a3bc69630c020c" name="orders" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
-			<eAnnotations xmi:id="annot_2be9707c5d7a4bdc86e537e99437da50" source="Stereotype">
-				<details xmi:id="det_e841f814dffd48809af6c6f3cc54c4fb" key="entity" value="true" />
+		<ownedMember xmi:type="uml:Class" xmi:id="xmi_75e379794fac4a2b95b2ca1e9754c990" name="orders" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<eAnnotations xmi:id="annot_b0614c39927c43e29592758e72f459de" source="Stereotype">
+				<details xmi:id="det_3525f9e18c704f1283c057e01fa5374f" key="entity" value="true" />
 			</eAnnotations>
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
@@ -358,46 +365,46 @@
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_8e0beb030bdf41fa8084544e4dad1330" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_7723ce61380f4912a0fa797649d25e31" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_3ed22679362446c3bd1341e29a087cff" source="Stereotype">
-					<details xmi:id="det_6c7b725ab1ba4fa2b23b0f0773980c92" key="column" value="true" />
-					<details xmi:id="det_769c1fefad1c461fafe4cda9de54826b" key="primaryKey" value="true" />
-					<details xmi:id="det_f2acbcd23d9f44d7969c7accf80505d5" key="stereotype" value="PK" />
-					<details xmi:id="det_1a5e98c845f448bab1a395c457078ab9" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_63e83645167e4527a145977443b1af2f" source="Stereotype">
+					<details xmi:id="det_13ff2f5b62ed4034850bc466361210c7" key="column" value="true" />
+					<details xmi:id="det_69cbbc5b3b04467f8e78b08f593f11d9" key="primaryKey" value="true" />
+					<details xmi:id="det_3cfcebde0b0647fea5da0a3d25a50e5b" key="stereotype" value="PK" />
+					<details xmi:id="det_14fd2a9019a4434284cdf2b5c1bc3aea" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_0bf813f853774f1c9ee97218cd94ea4d" name="user_id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_34133bbfad2f4ece8da6b0dea1f61d5a" name="user_id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_417dea070d2a424ab34f515b5db6fa2f" source="Stereotype">
-					<details xmi:id="det_1a27bce0934041bfa2a3e9cdeabe712d" key="column" value="true" />
-					<details xmi:id="det_2a988fe4a5704e0fa599f3a8883fe97a" key="foreignKey" value="true" />
-					<details xmi:id="det_e4a9ad0fc1664d7aa7ead8040506dff1" key="stereotype" value="FK" />
+				<eAnnotations xmi:id="annot_952ff14c1d2e449faf5405dcc13778ea" source="Stereotype">
+					<details xmi:id="det_4912336a966b4a43a28e18baf17ff61b" key="column" value="true" />
+					<details xmi:id="det_73b82529277046888b14e54996cd42d6" key="foreignKey" value="true" />
+					<details xmi:id="det_cc3044adbfe647e186cd5a1218970458" key="stereotype" value="FK" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_4e706af3ccb146968829a8cb92bd9d8c" name="status" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_50__id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_611a7a6c677d4862a0628a1c4972e29a" name="status" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_50__id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_beed2cce5023452f915333a815fdc2e0" source="Stereotype">
-					<details xmi:id="det_0d9a0bea4999436c8bad4d48737c76ad" key="column" value="true" />
+				<eAnnotations xmi:id="annot_4bbb5d34f23240bfab773e027fe6da15" source="Stereotype">
+					<details xmi:id="det_35d13c5640954ac19b3ddb68bd682464" key="column" value="true" />
 				</eAnnotations>
 			</ownedAttribute>
 		</ownedMember>
 		<ownedMember xmi:type="uml:DataType" xmi:id="varchar_50__id" name="VARCHAR(50)" visibility="public" />
-		<ownedMember xmi:type="uml:Class" xmi:id="xmi_b0b8c92d4736476d91ba35463a11faad" name="tags" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
-			<eAnnotations xmi:id="annot_fb6831b7a8164c7aba314764f37d597f" source="Stereotype">
-				<details xmi:id="det_b16322db089246d2beb275d9ae20a3cb" key="entity" value="true" />
+		<ownedMember xmi:type="uml:Class" xmi:id="xmi_d100c3e8c1674495aa52e2bfc0893e24" name="tags" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<eAnnotations xmi:id="annot_8fe303ab2e5045dab818440271a0ea65" source="Stereotype">
+				<details xmi:id="det_bf8849517b65434595cd084abf16eed6" key="entity" value="true" />
 			</eAnnotations>
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
@@ -405,97 +412,97 @@
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_93ba56c6a3e04fb1a8948256b29f51d9" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_4c89e938f7064c83bc460fde9ce86bd6" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_4b99e1b6cd1043ff8cd481a2b6a01308" source="Stereotype">
-					<details xmi:id="det_0bbe018ff9e344cb86bd7ac4d1c2e0fc" key="column" value="true" />
-					<details xmi:id="det_7b1559530a3543fc9960abad0fc1b86a" key="primaryKey" value="true" />
-					<details xmi:id="det_c99b118da29d441c8b9ee0b8b5764c7c" key="stereotype" value="PK" />
-					<details xmi:id="det_f83d02c4cc5f43c5baef49d610e6f992" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_0ee12d11de5143bd9a2020292bebd5a6" source="Stereotype">
+					<details xmi:id="det_f1719f76301b41eba5e24c34b61eaf5b" key="column" value="true" />
+					<details xmi:id="det_919b65e07ef94ee69fc5caf3e0814347" key="primaryKey" value="true" />
+					<details xmi:id="det_331c3af22d554fae865ea82a79ca217b" key="stereotype" value="PK" />
+					<details xmi:id="det_c1ad16eb7c1e40f8b330e3ae29a6fd97" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_c6742556081d4ddbaba9f11eeda84a81" name="name" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_50__id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_1739f45288c24e6ab81b0b2877f70d3a" name="name" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_50__id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<isVisble xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_54f726896227424fa199164fa889a3ca" source="Stereotype">
-					<details xmi:id="det_5dc89d339be54b8c901ddb18e897e2cf" key="column" value="true" />
+				<eAnnotations xmi:id="annot_8de9e23e62bc41ad9e4ae98d37e6647a" source="Stereotype">
+					<details xmi:id="det_a3a98b2695924c23bf9081d73dbc3265" key="column" value="true" />
 				</eAnnotations>
 			</ownedAttribute>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_ca30e6a6d88444199952de396c34fee8" name="users_user_profiles_1:1" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_ca30e6a6d88444199952de396c34fee8_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_ca30e6a6d88444199952de396c34fee8_end_src" name="users" visibility="public" type="xmi_df98a6bd532447d4b942aa4860dd9fcd" association="xmi_ca30e6a6d88444199952de396c34fee8" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_bd41386d60dd40fd863c241ac3f640dc" name="users_user_profiles_1:1" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_bd41386d60dd40fd863c241ac3f640dc_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_bd41386d60dd40fd863c241ac3f640dc_end_src" name="users" visibility="public" type="xmi_a90fab9ab3c94e8a863894c6f9887a2e" association="xmi_bd41386d60dd40fd863c241ac3f640dc" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_ca30e6a6d88444199952de396c34fee8_end_src_multiplicity_lowerValue" value="1" />
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_bd41386d60dd40fd863c241ac3f640dc_end_src_multiplicity_lowerValue" value="1" />
 			</ownedEnd>
-			<memberEnd xmi:idref="xmi_ca30e6a6d88444199952de396c34fee8_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_ca30e6a6d88444199952de396c34fee8_end_tgt" name="user_profiles" visibility="public" type="xmi_b46d939f4e4c432bb43982ef783a17d4" association="xmi_ca30e6a6d88444199952de396c34fee8" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+			<memberEnd xmi:idref="xmi_bd41386d60dd40fd863c241ac3f640dc_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_bd41386d60dd40fd863c241ac3f640dc_end_tgt" name="user_profiles" visibility="public" type="xmi_73274edb972e4174abd52262e41eda62" association="xmi_bd41386d60dd40fd863c241ac3f640dc" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_ca30e6a6d88444199952de396c34fee8_end_tgt_multiplicity_lowerValue" value="1" />
-			</ownedEnd>
-			<xmi:Extension extender="Visual Paradigm">
-				<qualityScore value="-1" />
-			</xmi:Extension>
-		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_ff60b69b18554524a709d909d01518b6" name="users_orders_1:N" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_ff60b69b18554524a709d909d01518b6_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_ff60b69b18554524a709d909d01518b6_end_src" name="users" visibility="public" type="xmi_df98a6bd532447d4b942aa4860dd9fcd" association="xmi_ff60b69b18554524a709d909d01518b6" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
-				<xmi:Extension extender="Visual Paradigm">
-					<associationEnd />
-					<qualityScore value="-1" />
-				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_ff60b69b18554524a709d909d01518b6_end_src_multiplicity_lowerValue" value="1" />
-			</ownedEnd>
-			<memberEnd xmi:idref="xmi_ff60b69b18554524a709d909d01518b6_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_ff60b69b18554524a709d909d01518b6_end_tgt" name="orders" visibility="public" type="xmi_ca7551ed3ea2427f88a3bc69630c020c" association="xmi_ff60b69b18554524a709d909d01518b6" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
-				<xmi:Extension extender="Visual Paradigm">
-					<associationEnd />
-					<qualityScore value="-1" />
-				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_ff60b69b18554524a709d909d01518b6_end_tgt_multiplicity_lowerValue" value="0" />
-				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_ff60b69b18554524a709d909d01518b6_end_tgt_multiplicity_upperValue" value="*" />
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_bd41386d60dd40fd863c241ac3f640dc_end_tgt_multiplicity_lowerValue" value="1" />
 			</ownedEnd>
 			<xmi:Extension extender="Visual Paradigm">
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_e84bd74e42c346108ab9db9797c5b727" name="orders_tags_M:N" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_e84bd74e42c346108ab9db9797c5b727_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_e84bd74e42c346108ab9db9797c5b727_end_src" name="orders" visibility="public" type="xmi_ca7551ed3ea2427f88a3bc69630c020c" association="xmi_e84bd74e42c346108ab9db9797c5b727" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_6cca14e95b1548e191efa6934dab16dd" name="users_orders_1:N" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_6cca14e95b1548e191efa6934dab16dd_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_6cca14e95b1548e191efa6934dab16dd_end_src" name="users" visibility="public" type="xmi_a90fab9ab3c94e8a863894c6f9887a2e" association="xmi_6cca14e95b1548e191efa6934dab16dd" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_e84bd74e42c346108ab9db9797c5b727_end_src_multiplicity_lowerValue" value="0" />
-				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_e84bd74e42c346108ab9db9797c5b727_end_src_multiplicity_upperValue" value="*" />
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_6cca14e95b1548e191efa6934dab16dd_end_src_multiplicity_lowerValue" value="1" />
 			</ownedEnd>
-			<memberEnd xmi:idref="xmi_e84bd74e42c346108ab9db9797c5b727_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_e84bd74e42c346108ab9db9797c5b727_end_tgt" name="tags" visibility="public" type="xmi_b0b8c92d4736476d91ba35463a11faad" association="xmi_e84bd74e42c346108ab9db9797c5b727" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+			<memberEnd xmi:idref="xmi_6cca14e95b1548e191efa6934dab16dd_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_6cca14e95b1548e191efa6934dab16dd_end_tgt" name="orders" visibility="public" type="xmi_75e379794fac4a2b95b2ca1e9754c990" association="xmi_6cca14e95b1548e191efa6934dab16dd" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_e84bd74e42c346108ab9db9797c5b727_end_tgt_multiplicity_lowerValue" value="0" />
-				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_e84bd74e42c346108ab9db9797c5b727_end_tgt_multiplicity_upperValue" value="*" />
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_6cca14e95b1548e191efa6934dab16dd_end_tgt_multiplicity_lowerValue" value="0" />
+				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_6cca14e95b1548e191efa6934dab16dd_end_tgt_multiplicity_upperValue" value="*" />
 			</ownedEnd>
 			<xmi:Extension extender="Visual Paradigm">
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Actor" xmi:id="xmi_99c24d14337f4b1494b112098f66888e" name="CustomerActor" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_d93281d5e2514dd580b43ca4c68c2f74" name="orders_tags_M:N" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_d93281d5e2514dd580b43ca4c68c2f74_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_d93281d5e2514dd580b43ca4c68c2f74_end_src" name="orders" visibility="public" type="xmi_75e379794fac4a2b95b2ca1e9754c990" association="xmi_d93281d5e2514dd580b43ca4c68c2f74" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+				<xmi:Extension extender="Visual Paradigm">
+					<associationEnd />
+					<qualityScore value="-1" />
+				</xmi:Extension>
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_d93281d5e2514dd580b43ca4c68c2f74_end_src_multiplicity_lowerValue" value="0" />
+				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_d93281d5e2514dd580b43ca4c68c2f74_end_src_multiplicity_upperValue" value="*" />
+			</ownedEnd>
+			<memberEnd xmi:idref="xmi_d93281d5e2514dd580b43ca4c68c2f74_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_d93281d5e2514dd580b43ca4c68c2f74_end_tgt" name="tags" visibility="public" type="xmi_d100c3e8c1674495aa52e2bfc0893e24" association="xmi_d93281d5e2514dd580b43ca4c68c2f74" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+				<xmi:Extension extender="Visual Paradigm">
+					<associationEnd />
+					<qualityScore value="-1" />
+				</xmi:Extension>
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_d93281d5e2514dd580b43ca4c68c2f74_end_tgt_multiplicity_lowerValue" value="0" />
+				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_d93281d5e2514dd580b43ca4c68c2f74_end_tgt_multiplicity_upperValue" value="*" />
+			</ownedEnd>
+			<xmi:Extension extender="Visual Paradigm">
+				<qualityScore value="-1" />
+			</xmi:Extension>
+		</ownedMember>
+		<ownedMember xmi:type="uml:Actor" xmi:id="xmi_894dc31fb9ce459ab017a2da1cf25a4d" name="CustomerActor" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="Actor" />
@@ -503,7 +510,7 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Actor" xmi:id="xmi_71e7ec0f63254daaaa4a1452af651124" name="AdminActor" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:Actor" xmi:id="xmi_6b8655e7bca94a35a0664cb93be25a1d" name="AdminActor" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="Actor" />
@@ -511,20 +518,26 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_c2b7e9cde54d4d4d8a902a6855908a00" name="Login" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:Component" xmi:id="xmi_58697f319033414f945c33ec8cd6b49f" name="E-Commerce Platform" visibility="public" isAbstract="false" isLeaf="false">
+			<xmi:Extension extender="Visual Paradigm">
+				<modelType value="System" />
+				<qualityScore value="-1" />
+			</xmi:Extension>
+		</ownedMember>
+		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_5d00579594cb4c6a9b16b80855d5c823" name="Login" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="UseCase" />
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<include xmi:type="uml:Include" xmi:id="xmi_c648b6270d2a4292b623f166e3411276" addition="xmi_da18dc479bbd4f6e918af4d51e17b633">
+			<include xmi:type="uml:Include" xmi:id="xmi_906de7700be94b4092a2118cc59e6b83" addition="xmi_6dc8aaa07ca349118acb5d22cd0809fa" name="«include»">
 				<xmi:Extension extender="Visual Paradigm">
 					<qualityScore value="-1" />
 				</xmi:Extension>
 			</include>
 		</ownedMember>
-		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_da18dc479bbd4f6e918af4d51e17b633" name="TwoFactorAuth" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_6dc8aaa07ca349118acb5d22cd0809fa" name="TwoFactorAuth" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="UseCase" />
@@ -532,20 +545,20 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_b0e37b2e89374589bb51339ececdec82" name="PlaceOrder" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_af09954c13514d7d8f4a2cd170995d2e" name="PlaceOrder" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="UseCase" />
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<extend xmi:type="uml:Extend" xmi:id="xmi_3fa7d43e9f9c4d1a96c41d5eb1fd09ee" extendedCase="xmi_6eb0b675260140fda842df4d0c20f10a">
+			<extend xmi:type="uml:Extend" xmi:id="xmi_2b6e146125d4474f9b368bd1251352cc" extendedCase="xmi_f92a11b36ceb482f8d0c941aa7f4d201" name="«extend»">
 				<xmi:Extension extender="Visual Paradigm">
 					<qualityScore value="-1" />
 				</xmi:Extension>
 			</extend>
 		</ownedMember>
-		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_6eb0b675260140fda842df4d0c20f10a" name="ApplyDiscountCoupon" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_f92a11b36ceb482f8d0c941aa7f4d201" name="ApplyDiscountCoupon" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="UseCase" />
@@ -553,35 +566,16 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_50253fdb4caf48d182899de6e347c18b" name="CustomerActor_PlaceOrder_Association" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_50253fdb4caf48d182899de6e347c18b_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_50253fdb4caf48d182899de6e347c18b_end_src" name="customeractor" visibility="public" type="xmi_99c24d14337f4b1494b112098f66888e" association="xmi_50253fdb4caf48d182899de6e347c18b" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_06d9f9e61f3741e3a11a264932417c03" name="CustomerActor_PlaceOrder_Association" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_06d9f9e61f3741e3a11a264932417c03_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_06d9f9e61f3741e3a11a264932417c03_end_src" name="customeractor" visibility="public" type="xmi_894dc31fb9ce459ab017a2da1cf25a4d" association="xmi_06d9f9e61f3741e3a11a264932417c03" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
 				</xmi:Extension>
 			</ownedEnd>
-			<memberEnd xmi:idref="xmi_50253fdb4caf48d182899de6e347c18b_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_50253fdb4caf48d182899de6e347c18b_end_tgt" name="placeorder" visibility="public" type="xmi_b0e37b2e89374589bb51339ececdec82" association="xmi_50253fdb4caf48d182899de6e347c18b" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
-				<xmi:Extension extender="Visual Paradigm">
-					<associationEnd />
-					<qualityScore value="-1" />
-				</xmi:Extension>
-			</ownedEnd>
-			<xmi:Extension extender="Visual Paradigm">
-				<qualityScore value="-1" />
-			</xmi:Extension>
-		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_42caa526c3ff4d839ec55904ef3896a2" name="CustomerActor_Login_Association" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_42caa526c3ff4d839ec55904ef3896a2_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_42caa526c3ff4d839ec55904ef3896a2_end_src" name="customeractor" visibility="public" type="xmi_99c24d14337f4b1494b112098f66888e" association="xmi_42caa526c3ff4d839ec55904ef3896a2" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
-				<xmi:Extension extender="Visual Paradigm">
-					<associationEnd />
-					<qualityScore value="-1" />
-				</xmi:Extension>
-			</ownedEnd>
-			<memberEnd xmi:idref="xmi_42caa526c3ff4d839ec55904ef3896a2_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_42caa526c3ff4d839ec55904ef3896a2_end_tgt" name="login" visibility="public" type="xmi_c2b7e9cde54d4d4d8a902a6855908a00" association="xmi_42caa526c3ff4d839ec55904ef3896a2" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+			<memberEnd xmi:idref="xmi_06d9f9e61f3741e3a11a264932417c03_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_06d9f9e61f3741e3a11a264932417c03_end_tgt" name="placeorder" visibility="public" type="xmi_af09954c13514d7d8f4a2cd170995d2e" association="xmi_06d9f9e61f3741e3a11a264932417c03" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
@@ -591,47 +585,78 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:StateMachine" xmi:id="sm_e7dab4105df045dbbc066f07dfb03935" name="EnterpriseSystem_StateMachine">
-			<region xmi:type="uml:Region" xmi:id="region_d98b28a26e7e44a98ce6a13defc4c602" name="DefaultRegion">
-				<subvertex xmi:type="uml:Pseudostate" xmi:id="xmi_94e5dcdcfd8f4876879855d7193cedf2" name="InitialState" kind="initial">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_015022625a5b4de8b8373f025529aa4c" name="CustomerActor_Login_Association" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_015022625a5b4de8b8373f025529aa4c_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_015022625a5b4de8b8373f025529aa4c_end_src" name="customeractor" visibility="public" type="xmi_894dc31fb9ce459ab017a2da1cf25a4d" association="xmi_015022625a5b4de8b8373f025529aa4c" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+				<xmi:Extension extender="Visual Paradigm">
+					<associationEnd />
+					<qualityScore value="-1" />
+				</xmi:Extension>
+			</ownedEnd>
+			<memberEnd xmi:idref="xmi_015022625a5b4de8b8373f025529aa4c_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_015022625a5b4de8b8373f025529aa4c_end_tgt" name="login" visibility="public" type="xmi_5d00579594cb4c6a9b16b80855d5c823" association="xmi_015022625a5b4de8b8373f025529aa4c" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+				<xmi:Extension extender="Visual Paradigm">
+					<associationEnd />
+					<qualityScore value="-1" />
+				</xmi:Extension>
+			</ownedEnd>
+			<xmi:Extension extender="Visual Paradigm">
+				<qualityScore value="-1" />
+			</xmi:Extension>
+		</ownedMember>
+		<ownedMember xmi:type="uml:StateMachine" xmi:id="sm_5ce9b6fbef6347249006ec3319fdd1e6" name="EnterpriseSystem_StateMachine">
+			<region xmi:type="uml:Region" xmi:id="region_69a1669e58f345f286ecc7641d82ea33" name="DefaultRegion">
+				<subvertex xmi:type="uml:Pseudostate" xmi:id="xmi_b8c371d65edb441080236f99465c9e9c" name="InitialState" kind="initial">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="Pseudostate" />
 					</xmi:Extension>
 				</subvertex>
-				<subvertex xmi:type="uml:State" xmi:id="xmi_210af8189a284fcdab95298ae3c4526f" name="Draft">
+				<subvertex xmi:type="uml:State" xmi:id="xmi_c2fb083d12654b4a98343e8083923c9b" name="Draft">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="State" />
 					</xmi:Extension>
 				</subvertex>
-				<subvertex xmi:type="uml:State" xmi:id="xmi_577ebfef066f4d58908ab2d5a2445603" name="Paid">
+				<subvertex xmi:type="uml:State" xmi:id="xmi_f034e3b0083b42cf81aa380caaca7f38" name="Paid">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="State" />
 					</xmi:Extension>
 				</subvertex>
-				<subvertex xmi:type="uml:State" xmi:id="xmi_5cdfdb3dea7e4516839980f65c131151" name="Shipped">
+				<subvertex xmi:type="uml:State" xmi:id="xmi_a9b47dabedda4d0e81bf666d5302f92f" name="Shipped">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="State" />
 					</xmi:Extension>
 				</subvertex>
-				<subvertex xmi:type="uml:FinalState" xmi:id="xmi_708f6e8e5f8f493d919ceaefe06e66c1" name="Completed">
+				<subvertex xmi:type="uml:FinalState" xmi:id="xmi_2eba7624f3454691878a73f72569c6c1" name="Completed">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="FinalState" />
 					</xmi:Extension>
 				</subvertex>
-				<transition xmi:type="uml:Transition" xmi:id="xmi_a737351caa1c45c3bd91313fcf07e9a1" source="xmi_94e5dcdcfd8f4876879855d7193cedf2" target="xmi_210af8189a284fcdab95298ae3c4526f" name="create">
-					<trigger xmi:type="uml:Trigger" xmi:id="trigger_66f81666775a4356bec617024360b8ba" name="create" />
+				<transition xmi:type="uml:Transition" xmi:id="xmi_a2a2cec450db44db90b8353919abe091" source="xmi_b8c371d65edb441080236f99465c9e9c" target="xmi_c2fb083d12654b4a98343e8083923c9b" name="create">
+					<trigger xmi:type="uml:Trigger" xmi:id="trigger_81354eb957104a828c3248c565a5c2c1" name="create" />
 				</transition>
-				<transition xmi:type="uml:Transition" xmi:id="xmi_5ae951ff136f4e6095114992868faab0" source="xmi_210af8189a284fcdab95298ae3c4526f" target="xmi_577ebfef066f4d58908ab2d5a2445603" name="paySuccess">
-					<trigger xmi:type="uml:Trigger" xmi:id="trigger_47271a7a68d64eab920f2d24c441d423" name="paySuccess" />
+				<transition xmi:type="uml:Transition" xmi:id="xmi_6ee0c241059d4cd8bbc0f88733914db7" source="xmi_c2fb083d12654b4a98343e8083923c9b" target="xmi_f034e3b0083b42cf81aa380caaca7f38" name="paySuccess [balance &gt;= total]">
+					<guard xmi:type="uml:Constraint" xmi:id="xmi_6ee0c241059d4cd8bbc0f88733914db7_guard" name="balance &gt;= total">
+						<specification xmi:type="uml:OpaqueExpression" xmi:id="xmi_6ee0c241059d4cd8bbc0f88733914db7_guard_spec" body="balance &gt;= total" />
+					</guard>
+					<trigger xmi:type="uml:Trigger" xmi:id="trigger_c4c4afc87d4643c59f31cb59cfa078b0" name="paySuccess" />
 				</transition>
-				<transition xmi:type="uml:Transition" xmi:id="xmi_207be14a3a724de0aa9c7ee010a591d8" source="xmi_577ebfef066f4d58908ab2d5a2445603" target="xmi_5cdfdb3dea7e4516839980f65c131151" name="dispatchOrder">
-					<trigger xmi:type="uml:Trigger" xmi:id="trigger_97bd8d836cc549878422a96888247b36" name="dispatchOrder" />
+				<transition xmi:type="uml:Transition" xmi:id="xmi_40fc263734e34361826a380f82c4cd94" source="xmi_f034e3b0083b42cf81aa380caaca7f38" target="xmi_a9b47dabedda4d0e81bf666d5302f92f" name="dispatchOrder [inStock == true]">
+					<guard xmi:type="uml:Constraint" xmi:id="xmi_40fc263734e34361826a380f82c4cd94_guard" name="inStock == true">
+						<specification xmi:type="uml:OpaqueExpression" xmi:id="xmi_40fc263734e34361826a380f82c4cd94_guard_spec" body="inStock == true" />
+					</guard>
+					<trigger xmi:type="uml:Trigger" xmi:id="trigger_c309068201d842fb9f16f93cfc33b047" name="dispatchOrder" />
 				</transition>
-				<transition xmi:type="uml:Transition" xmi:id="xmi_17a079a28e4a4ceeb6520780b39f80bd" source="xmi_5cdfdb3dea7e4516839980f65c131151" target="xmi_708f6e8e5f8f493d919ceaefe06e66c1" name="deliveredConfirmation">
-					<trigger xmi:type="uml:Trigger" xmi:id="trigger_15cfab7d7c1e4517b66ef389f59499a1" name="deliveredConfirmation" />
+				<transition xmi:type="uml:Transition" xmi:id="xmi_5e420c15506a4ab6abcd17193e5d5dc6" source="xmi_a9b47dabedda4d0e81bf666d5302f92f" target="xmi_2eba7624f3454691878a73f72569c6c1" name="deliveredConfirmation">
+					<trigger xmi:type="uml:Trigger" xmi:id="trigger_8c87dec068984a4ca9f963f17d8f41d8" name="deliveredConfirmation" />
 				</transition>
 			</region>
 		</ownedMember>
+		<ownedComment xmi:type="uml:Comment" xmi:id="xmi_77807180e5e34f8a824e032ad856482b" body="Order state transitions must be strictly audited and idempotent." annotatedElement="xmi_f3b3f83067e84be1bb3482f3745ddaf6">
+			<xmi:Extension extender="Visual Paradigm">
+				<type value="NOTE" />
+				<qualityScore value="-1" />
+			</xmi:Extension>
+		</ownedComment>
 	</uml:Model>
 	<uml:Diagram xmi:id="omg_diag_class_1" name="Class Diagram" diagramType="ClassDiagram" toolName="Visual Paradigm" documentation="">
 		<xmi:Extension extender="Visual Paradigm">
@@ -656,7 +681,7 @@
 			</properties>
 		</xmi:Extension>
 		<uml:Diagram.element>
-			<uml:DiagramElement xmi:id="shape_xmi_7f1de040b7324db3bf7e4602454cea5c" geometry="30,20,970,337" preferredShapeType="Package" subject="xmi_7f1de040b7324db3bf7e4602454cea5c">
+			<uml:DiagramElement xmi:id="shape_xmi_f1b327fb00b84aa187c09b9d32c08dbe" geometry="30,20,970,337" preferredShapeType="Package" subject="xmi_f1b327fb00b84aa187c09b9d32c08dbe">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,20,970,317" />
 					<captionInternalWidth value="-2147483648" />
@@ -684,7 +709,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_245eba43384147babdc012bb645db5c6" geometry="60,60,440,166" preferredShapeType="Package" subject="xmi_245eba43384147babdc012bb645db5c6">
+			<uml:DiagramElement xmi:id="shape_xmi_c2eb5bb5eb7f4e34b3c48a55637bcd87" geometry="60,60,440,166" preferredShapeType="Package" subject="xmi_c2eb5bb5eb7f4e34b3c48a55637bcd87">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,20,440,146" />
 					<captionInternalWidth value="-2147483648" />
@@ -706,14 +731,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_7f1de040b7324db3bf7e4602454cea5c" />
+					<parentDiagramElement idref="shape_xmi_f1b327fb00b84aa187c09b9d32c08dbe" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_1e11962b26354c5fbe490e317cd9e9c1" geometry="1590,60,640,166" preferredShapeType="Package" subject="xmi_1e11962b26354c5fbe490e317cd9e9c1">
+			<uml:DiagramElement xmi:id="shape_xmi_465a8ca606f847d0af7dfdbfec2dd0d2" geometry="1590,60,640,166" preferredShapeType="Package" subject="xmi_465a8ca606f847d0af7dfdbfec2dd0d2">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,20,640,146" />
 					<captionInternalWidth value="-2147483648" />
@@ -741,7 +766,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_a5d7b433a78c4336a919d5c43c947e73" geometry="590,121,170,80" preferredShapeType="Class" subject="xmi_a5d7b433a78c4336a919d5c43c947e73">
+			<uml:DiagramElement xmi:id="shape_xmi_5efd8978954f4ad3a46f15ae1ba80d54" geometry="590,121,170,80" preferredShapeType="Class" subject="xmi_5efd8978954f4ad3a46f15ae1ba80d54">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -762,14 +787,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_7f1de040b7324db3bf7e4602454cea5c" />
+					<parentDiagramElement idref="shape_xmi_f1b327fb00b84aa187c09b9d32c08dbe" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_9b226b8bb94f4236bd9554ded35071e0" geometry="800,121,170,94" preferredShapeType="Class" subject="xmi_9b226b8bb94f4236bd9554ded35071e0">
+			<uml:DiagramElement xmi:id="shape_xmi_df1a17a41d884e9db2cf8b8607eef2b3" geometry="800,121,170,94" preferredShapeType="Class" subject="xmi_df1a17a41d884e9db2cf8b8607eef2b3">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -790,14 +815,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_7f1de040b7324db3bf7e4602454cea5c" />
+					<parentDiagramElement idref="shape_xmi_f1b327fb00b84aa187c09b9d32c08dbe" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_eecaa4e7dcd447819999e8a459ca7ab5" geometry="590,231,170,80" preferredShapeType="Class" subject="xmi_eecaa4e7dcd447819999e8a459ca7ab5">
+			<uml:DiagramElement xmi:id="shape_xmi_8c3a29e2ba6e4706a06cc39389306e1f" geometry="590,231,170,80" preferredShapeType="Class" subject="xmi_8c3a29e2ba6e4706a06cc39389306e1f">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -818,14 +843,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_7f1de040b7324db3bf7e4602454cea5c" />
+					<parentDiagramElement idref="shape_xmi_f1b327fb00b84aa187c09b9d32c08dbe" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_fef25426944f49a791d6faa077c30ffc" geometry="90,121,170,80" preferredShapeType="Class" subject="xmi_fef25426944f49a791d6faa077c30ffc">
+			<uml:DiagramElement xmi:id="shape_xmi_f3b3f83067e84be1bb3482f3745ddaf6" geometry="90,121,170,80" preferredShapeType="Class" subject="xmi_f3b3f83067e84be1bb3482f3745ddaf6">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -846,14 +871,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_245eba43384147babdc012bb645db5c6" />
+					<parentDiagramElement idref="shape_xmi_c2eb5bb5eb7f4e34b3c48a55637bcd87" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_761f63cdc0aa4d0a8e6e5d1a3d3abb80" geometry="300,121,170,80" preferredShapeType="Class" subject="xmi_761f63cdc0aa4d0a8e6e5d1a3d3abb80">
+			<uml:DiagramElement xmi:id="shape_xmi_4b3da34959e64f2c8aa3d7e755da1b02" geometry="300,121,170,80" preferredShapeType="Class" subject="xmi_4b3da34959e64f2c8aa3d7e755da1b02">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -874,14 +899,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_245eba43384147babdc012bb645db5c6" />
+					<parentDiagramElement idref="shape_xmi_c2eb5bb5eb7f4e34b3c48a55637bcd87" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_f1bdba7c40614ecdb1f92449ba7384ba" geometry="1620,121,210,80" preferredShapeType="Interface" subject="xmi_f1bdba7c40614ecdb1f92449ba7384ba">
+			<uml:DiagramElement xmi:id="shape_xmi_a34fb531b7be4348b27efd2ff495cba7" geometry="1620,121,210,80" preferredShapeType="Interface" subject="xmi_a34fb531b7be4348b27efd2ff495cba7">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,210,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -902,14 +927,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_1e11962b26354c5fbe490e317cd9e9c1" />
+					<parentDiagramElement idref="shape_xmi_465a8ca606f847d0af7dfdbfec2dd0d2" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_a7796bac60c1483da798ed058e2d6ced" geometry="1930,121,270,80" preferredShapeType="Class" subject="xmi_a7796bac60c1483da798ed058e2d6ced">
+			<uml:DiagramElement xmi:id="shape_xmi_891b5caede4343bd9f4bb085f93155e4" geometry="1930,121,270,80" preferredShapeType="Class" subject="xmi_891b5caede4343bd9f4bb085f93155e4">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,270,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -930,19 +955,19 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_1e11962b26354c5fbe490e317cd9e9c1" />
+					<parentDiagramElement idref="shape_xmi_465a8ca606f847d0af7dfdbfec2dd0d2" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_7f41e6cd2213412f89857237a523a4ac" fromDiagramElement="shape_xmi_9b226b8bb94f4236bd9554ded35071e0" toDiagramElement="shape_xmi_a5d7b433a78c4336a919d5c43c947e73" geometry="800,168;760,161;" preferredShapeType="Generalization" subject="xmi_7f41e6cd2213412f89857237a523a4ac">
+			<uml:DiagramElement xmi:id="conn_xmi_e9c516bc1f2b40c0bc22bf0896623c7f" fromDiagramElement="shape_xmi_df1a17a41d884e9db2cf8b8607eef2b3" toDiagramElement="shape_xmi_5efd8978954f4ad3a46f15ae1ba80d54" geometry="800,168;760,161;" preferredShapeType="Generalization" subject="xmi_e9c516bc1f2b40c0bc22bf0896623c7f">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="780,164,50,16" />
+					<captionBounds value="780,164,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
-					<captionVisible value="true" />
+					<captionVisible value="false" />
 					<captionSide value="1" />
 					<properties>
 						<azOrder value="10" />
@@ -953,18 +978,20 @@
 						<aconnectorStyle value="3" />
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
-						<ashowConnectorName value="2" />
+						<ashowConnectorName value="0" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_e56ff8a89f824178879b57fc1ec8314b" fromDiagramElement="shape_xmi_eecaa4e7dcd447819999e8a459ca7ab5" toDiagramElement="shape_xmi_9b226b8bb94f4236bd9554ded35071e0" geometry="760,271;800,168;" preferredShapeType="Generalization" subject="xmi_e56ff8a89f824178879b57fc1ec8314b">
+			<uml:DiagramElement xmi:id="conn_xmi_9baa33432e7344e794e1db3a91a35f61" fromDiagramElement="shape_xmi_8c3a29e2ba6e4706a06cc39389306e1f" toDiagramElement="shape_xmi_df1a17a41d884e9db2cf8b8607eef2b3" geometry="760,271;800,168;" preferredShapeType="Generalization" subject="xmi_9baa33432e7344e794e1db3a91a35f61">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="780,219,50,16" />
+					<captionBounds value="780,219,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
-					<captionVisible value="true" />
+					<captionVisible value="false" />
 					<captionSide value="1" />
 					<properties>
 						<azOrder value="10" />
@@ -975,18 +1002,20 @@
 						<aconnectorStyle value="3" />
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
-						<ashowConnectorName value="2" />
+						<ashowConnectorName value="0" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_f92c3a0947b241bc9c9102aa5ad4e152" fromDiagramElement="shape_xmi_eecaa4e7dcd447819999e8a459ca7ab5" toDiagramElement="shape_xmi_fef25426944f49a791d6faa077c30ffc" geometry="590,271;260,161;" preferredShapeType="Aggregation" subject="xmi_f92c3a0947b241bc9c9102aa5ad4e152">
+			<uml:DiagramElement xmi:id="conn_xmi_5aed83988e354ac1a3afb829caeacaed" fromDiagramElement="shape_xmi_8c3a29e2ba6e4706a06cc39389306e1f" toDiagramElement="shape_xmi_f3b3f83067e84be1bb3482f3745ddaf6" geometry="590,271;260,161;" preferredShapeType="Aggregation" subject="xmi_5aed83988e354ac1a3afb829caeacaed">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="425,216,50,16" />
+					<captionBounds value="425,216,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
-					<captionVisible value="true" />
+					<captionVisible value="false" />
 					<captionSide value="1" />
 					<roleA multiplicity="590,271,30,16" />
 					<roleB multiplicity="260,161,30,16" />
@@ -999,13 +1028,13 @@
 						<aconnectorStyle value="3" />
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
-						<ashowConnectorName value="2" />
+						<ashowConnectorName value="0" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 						<amultiplicityARectangle value="Re:590.0,271.0,30.0,16.0" />
 						<amultiplicityBRectangle value="Re:260.0,161.0,30.0,16.0" />
 						<ahasMultiplicityAShape value="true" />
 						<ahasMultiplicityBShape value="true" />
-						<ashowFromRoleName value="true" />
-						<ashowToRoleName value="true" />
 						<ashowFromMultiplicity value="true" />
 						<ashowToMultiplicity value="true" />
 					</properties>
@@ -1013,12 +1042,12 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_5ab837ba76eb4130a5eaff886bfeeabb" fromDiagramElement="shape_xmi_fef25426944f49a791d6faa077c30ffc" toDiagramElement="shape_xmi_761f63cdc0aa4d0a8e6e5d1a3d3abb80" geometry="260,161;300,161;" preferredShapeType="Composition" subject="xmi_5ab837ba76eb4130a5eaff886bfeeabb">
+			<uml:DiagramElement xmi:id="conn_xmi_b3d3f1ee64b54bdabd303f20289231cf" fromDiagramElement="shape_xmi_f3b3f83067e84be1bb3482f3745ddaf6" toDiagramElement="shape_xmi_4b3da34959e64f2c8aa3d7e755da1b02" geometry="260,161;300,161;" preferredShapeType="Composition" subject="xmi_b3d3f1ee64b54bdabd303f20289231cf">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="280,161,50,16" />
+					<captionBounds value="280,161,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
-					<captionVisible value="true" />
+					<captionVisible value="false" />
 					<captionSide value="1" />
 					<roleA multiplicity="260,161,30,16" />
 					<roleB multiplicity="300,161,30,16" />
@@ -1031,13 +1060,13 @@
 						<aconnectorStyle value="3" />
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
-						<ashowConnectorName value="2" />
+						<ashowConnectorName value="0" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 						<amultiplicityARectangle value="Re:260.0,161.0,30.0,16.0" />
 						<amultiplicityBRectangle value="Re:300.0,161.0,30.0,16.0" />
 						<ahasMultiplicityAShape value="true" />
 						<ahasMultiplicityBShape value="true" />
-						<ashowFromRoleName value="true" />
-						<ashowToRoleName value="true" />
 						<ashowFromMultiplicity value="true" />
 						<ashowToMultiplicity value="true" />
 					</properties>
@@ -1045,12 +1074,12 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_b365b0d8d3594f3bbd85a65ccc6fd2f5" fromDiagramElement="shape_xmi_fef25426944f49a791d6faa077c30ffc" toDiagramElement="shape_xmi_f1bdba7c40614ecdb1f92449ba7384ba" geometry="260,161;1620,161;" preferredShapeType="Realization" subject="xmi_b365b0d8d3594f3bbd85a65ccc6fd2f5">
+			<uml:DiagramElement xmi:id="conn_xmi_5e4a7dd57c3143d89bc45146d6c8a223" fromDiagramElement="shape_xmi_f3b3f83067e84be1bb3482f3745ddaf6" toDiagramElement="shape_xmi_a34fb531b7be4348b27efd2ff495cba7" geometry="260,161;1620,161;" preferredShapeType="Realization" subject="xmi_5e4a7dd57c3143d89bc45146d6c8a223">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="940,161,50,16" />
+					<captionBounds value="940,161,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
-					<captionVisible value="true" />
+					<captionVisible value="false" />
 					<captionSide value="1" />
 					<properties>
 						<azOrder value="10" />
@@ -1061,18 +1090,20 @@
 						<aconnectorStyle value="3" />
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
-						<ashowConnectorName value="2" />
+						<ashowConnectorName value="0" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
-				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
+				<elementLine color="Cr:0,0,0,255" style="2" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_c6c3516fd57345cfbc5a0b48c88fb01e" fromDiagramElement="shape_xmi_a7796bac60c1483da798ed058e2d6ced" toDiagramElement="shape_xmi_f1bdba7c40614ecdb1f92449ba7384ba" geometry="1930,161;1830,161;" preferredShapeType="Realization" subject="xmi_c6c3516fd57345cfbc5a0b48c88fb01e">
+			<uml:DiagramElement xmi:id="conn_xmi_833ac0d93a9c4355ab95ff8610cebb13" fromDiagramElement="shape_xmi_891b5caede4343bd9f4bb085f93155e4" toDiagramElement="shape_xmi_a34fb531b7be4348b27efd2ff495cba7" geometry="1930,161;1830,161;" preferredShapeType="Realization" subject="xmi_833ac0d93a9c4355ab95ff8610cebb13">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="1880,161,50,16" />
+					<captionBounds value="1880,161,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
-					<captionVisible value="true" />
+					<captionVisible value="false" />
 					<captionSide value="1" />
 					<properties>
 						<azOrder value="10" />
@@ -1083,11 +1114,64 @@
 						<aconnectorStyle value="3" />
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
-						<ashowConnectorName value="2" />
+						<ashowConnectorName value="0" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
-				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
+				<elementLine color="Cr:0,0,0,255" style="2" transparency="0" weight="1.0" />
+			</uml:DiagramElement>
+			<uml:DiagramElement xmi:id="shape_xmi_77807180e5e34f8a824e032ad856482b" geometry="310,121,200,60" preferredShapeType="NOTE" subject="xmi_77807180e5e34f8a824e032ad856482b">
+				<xmi:Extension extender="Visual Paradigm">
+					<captionBounds value="0,0,200,60" />
+					<captionInternalWidth value="-2147483648" />
+					<captionInternalHeight value="-2147483648" />
+					<captionVisible value="true" />
+					<captionSide value="12" />
+					<properties>
+						<azOrder value="4" />
+						<abackground value="Cr:255,255,200,255" />
+						<aforeground value="Cr:0,0,0,255" />
+						<acreatorDiagramType value="ClassDiagram" />
+						<aselectable value="true" />
+						<amodelElementNameAlignment value="9" />
+						<ashowAttributeType value="1" />
+						<ashowOperationType value="1" />
+						<ashowReceptionType value="1" />
+						<ashowEmptyCompartments value="0" />
+						<ashowOperationSignature value="true" />
+						<ashowInitialAttributeValue value="true" />
+					</properties>
+				</xmi:Extension>
+				<elementFill color1="Cr:255,255,200,255" color2="" style="1" transparency="0" type="1" />
+				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
+				<elementLine color="Cr:180,180,100,255" style="1" transparency="0" weight="1.0" />
+				<CompartmentFont value="none" />
+			</uml:DiagramElement>
+			<uml:DiagramElement xmi:id="conn_anchor_xmi_77807180e5e34f8a824e032ad856482b" fromDiagramElement="shape_xmi_77807180e5e34f8a824e032ad856482b" toDiagramElement="shape_xmi_f3b3f83067e84be1bb3482f3745ddaf6" geometry="310,151;260,161;" preferredShapeType="Anchor" subject="anchor_xmi_77807180e5e34f8a824e032ad856482b">
+				<xmi:Extension extender="Visual Paradigm">
+					<captionBounds value="285,156,60,16" />
+					<captionInternalWidth value="-2147483648" />
+					<captionInternalHeight value="-2147483648" />
+					<captionVisible value="false" />
+					<captionSide value="1" />
+					<properties>
+						<azOrder value="10" />
+						<abackground value="Cr:255,255,255,255" />
+						<aforeground value="Cr:0,0,0,255" />
+						<acreatorDiagramType value="ClassDiagram" />
+						<aselectable value="true" />
+						<aconnectorStyle value="3" />
+						<aconnectorLineJumps value="4" />
+						<aconnectorLabelOrientation value="4" />
+						<ashowConnectorName value="0" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
+					</properties>
+				</xmi:Extension>
+				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
+				<elementLine color="Cr:120,120,120,255" style="2" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
 		</uml:Diagram.element>
 	</uml:Diagram>
@@ -1114,7 +1198,7 @@
 			</properties>
 		</xmi:Extension>
 		<uml:Diagram.element>
-			<uml:DiagramElement xmi:id="shape_xmi_df98a6bd532447d4b942aa4860dd9fcd" geometry="60,60,170,96" preferredShapeType="Class" subject="xmi_df98a6bd532447d4b942aa4860dd9fcd">
+			<uml:DiagramElement xmi:id="shape_xmi_a90fab9ab3c94e8a863894c6f9887a2e" geometry="60,60,170,96" preferredShapeType="Class" subject="xmi_a90fab9ab3c94e8a863894c6f9887a2e">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1141,7 +1225,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_b0b8c92d4736476d91ba35463a11faad" geometry="300,60,170,80" preferredShapeType="Class" subject="xmi_b0b8c92d4736476d91ba35463a11faad">
+			<uml:DiagramElement xmi:id="shape_xmi_d100c3e8c1674495aa52e2bfc0893e24" geometry="300,60,170,80" preferredShapeType="Class" subject="xmi_d100c3e8c1674495aa52e2bfc0893e24">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1168,7 +1252,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_b46d939f4e4c432bb43982ef783a17d4" geometry="60,246,186,96" preferredShapeType="Class" subject="xmi_b46d939f4e4c432bb43982ef783a17d4">
+			<uml:DiagramElement xmi:id="shape_xmi_73274edb972e4174abd52262e41eda62" geometry="60,246,186,96" preferredShapeType="Class" subject="xmi_73274edb972e4174abd52262e41eda62">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,186,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1195,7 +1279,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_ca7551ed3ea2427f88a3bc69630c020c" geometry="316,246,170,96" preferredShapeType="Class" subject="xmi_ca7551ed3ea2427f88a3bc69630c020c">
+			<uml:DiagramElement xmi:id="shape_xmi_75e379794fac4a2b95b2ca1e9754c990" geometry="316,246,170,96" preferredShapeType="Class" subject="xmi_75e379794fac4a2b95b2ca1e9754c990">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1222,9 +1306,9 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_ca30e6a6d88444199952de396c34fee8" fromDiagramElement="shape_xmi_df98a6bd532447d4b942aa4860dd9fcd" toDiagramElement="shape_xmi_b46d939f4e4c432bb43982ef783a17d4" geometry="145,156;153,246;" preferredShapeType="Association" subject="xmi_ca30e6a6d88444199952de396c34fee8">
+			<uml:DiagramElement xmi:id="conn_xmi_bd41386d60dd40fd863c241ac3f640dc" fromDiagramElement="shape_xmi_a90fab9ab3c94e8a863894c6f9887a2e" toDiagramElement="shape_xmi_73274edb972e4174abd52262e41eda62" geometry="145,156;153,246;" preferredShapeType="Association" subject="xmi_bd41386d60dd40fd863c241ac3f640dc">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="149,201,50,16" />
+					<captionBounds value="149,201,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1241,12 +1325,12 @@
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
 						<ashowConnectorName value="2" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 						<amultiplicityARectangle value="Re:145.0,156.0,30.0,16.0" />
 						<amultiplicityBRectangle value="Re:153.0,246.0,30.0,16.0" />
 						<ahasMultiplicityAShape value="true" />
 						<ahasMultiplicityBShape value="true" />
-						<ashowFromRoleName value="true" />
-						<ashowToRoleName value="true" />
 						<ashowFromMultiplicity value="true" />
 						<ashowToMultiplicity value="true" />
 					</properties>
@@ -1254,9 +1338,9 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_ff60b69b18554524a709d909d01518b6" fromDiagramElement="shape_xmi_df98a6bd532447d4b942aa4860dd9fcd" toDiagramElement="shape_xmi_ca7551ed3ea2427f88a3bc69630c020c" geometry="230,108;316,294;" preferredShapeType="Association" subject="xmi_ff60b69b18554524a709d909d01518b6">
+			<uml:DiagramElement xmi:id="conn_xmi_6cca14e95b1548e191efa6934dab16dd" fromDiagramElement="shape_xmi_a90fab9ab3c94e8a863894c6f9887a2e" toDiagramElement="shape_xmi_75e379794fac4a2b95b2ca1e9754c990" geometry="230,108;316,294;" preferredShapeType="Association" subject="xmi_6cca14e95b1548e191efa6934dab16dd">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="273,201,50,16" />
+					<captionBounds value="273,201,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1273,12 +1357,12 @@
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
 						<ashowConnectorName value="2" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 						<amultiplicityARectangle value="Re:230.0,108.0,30.0,16.0" />
 						<amultiplicityBRectangle value="Re:316.0,294.0,30.0,16.0" />
 						<ahasMultiplicityAShape value="true" />
 						<ahasMultiplicityBShape value="true" />
-						<ashowFromRoleName value="true" />
-						<ashowToRoleName value="true" />
 						<ashowFromMultiplicity value="true" />
 						<ashowToMultiplicity value="true" />
 					</properties>
@@ -1286,9 +1370,9 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_e84bd74e42c346108ab9db9797c5b727" fromDiagramElement="shape_xmi_ca7551ed3ea2427f88a3bc69630c020c" toDiagramElement="shape_xmi_b0b8c92d4736476d91ba35463a11faad" geometry="401,246;385,140;" preferredShapeType="Association" subject="xmi_e84bd74e42c346108ab9db9797c5b727">
+			<uml:DiagramElement xmi:id="conn_xmi_d93281d5e2514dd580b43ca4c68c2f74" fromDiagramElement="shape_xmi_75e379794fac4a2b95b2ca1e9754c990" toDiagramElement="shape_xmi_d100c3e8c1674495aa52e2bfc0893e24" geometry="401,246;385,140;" preferredShapeType="Association" subject="xmi_d93281d5e2514dd580b43ca4c68c2f74">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="393,193,50,16" />
+					<captionBounds value="393,193,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1305,12 +1389,12 @@
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
 						<ashowConnectorName value="2" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 						<amultiplicityARectangle value="Re:401.0,246.0,30.0,16.0" />
 						<amultiplicityBRectangle value="Re:385.0,140.0,30.0,16.0" />
 						<ahasMultiplicityAShape value="true" />
 						<ahasMultiplicityBShape value="true" />
-						<ashowFromRoleName value="true" />
-						<ashowToRoleName value="true" />
 						<ashowFromMultiplicity value="true" />
 						<ashowToMultiplicity value="true" />
 					</properties>
@@ -1343,7 +1427,34 @@
 			</properties>
 		</xmi:Extension>
 		<uml:Diagram.element>
-			<uml:DiagramElement xmi:id="shape_xmi_99c24d14337f4b1494b112098f66888e" geometry="60,60,80,80" preferredShapeType="Actor" subject="xmi_99c24d14337f4b1494b112098f66888e">
+			<uml:DiagramElement xmi:id="shape_xmi_58697f319033414f945c33ec8cd6b49f" geometry="325,15,610,300" preferredShapeType="System" subject="xmi_58697f319033414f945c33ec8cd6b49f">
+				<xmi:Extension extender="Visual Paradigm">
+					<captionBounds value="0,0,610,25" />
+					<captionInternalWidth value="-2147483648" />
+					<captionInternalHeight value="-2147483648" />
+					<captionVisible value="true" />
+					<captionSide value="12" />
+					<properties>
+						<azOrder value="1" />
+						<abackground value="Cr:255,255,255,255" />
+						<aforeground value="Cr:0,0,0,255" />
+						<acreatorDiagramType value="UseCaseDiagram" />
+						<aselectable value="true" />
+						<amodelElementNameAlignment value="1" />
+						<ashowAttributeType value="1" />
+						<ashowOperationType value="1" />
+						<ashowReceptionType value="1" />
+						<ashowEmptyCompartments value="0" />
+						<ashowOperationSignature value="true" />
+						<ashowInitialAttributeValue value="true" />
+					</properties>
+				</xmi:Extension>
+				<elementFill color1="Cr:255,255,255,255" color2="" style="1" transparency="80" type="1" />
+				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
+				<elementLine color="Cr:120,120,120,255" style="1" transparency="0" weight="1.5" />
+				<CompartmentFont value="none" />
+			</uml:DiagramElement>
+			<uml:DiagramElement xmi:id="shape_xmi_894dc31fb9ce459ab017a2da1cf25a4d" geometry="60,60,80,80" preferredShapeType="Actor" subject="xmi_894dc31fb9ce459ab017a2da1cf25a4d">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,80,80,18" />
 					<captionInternalWidth value="-2147483648" />
@@ -1371,7 +1482,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_c2b7e9cde54d4d4d8a902a6855908a00" geometry="360,60,170,70" preferredShapeType="UseCase" subject="xmi_c2b7e9cde54d4d4d8a902a6855908a00">
+			<uml:DiagramElement xmi:id="shape_xmi_5d00579594cb4c6a9b16b80855d5c823" geometry="360,60,170,70" preferredShapeType="UseCase" subject="xmi_5d00579594cb4c6a9b16b80855d5c823">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,70" />
 					<captionInternalWidth value="-2147483648" />
@@ -1392,13 +1503,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
+					<parentDiagramElement idref="shape_xmi_58697f319033414f945c33ec8cd6b49f" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_b0e37b2e89374589bb51339ececdec82" geometry="360,200,170,70" preferredShapeType="UseCase" subject="xmi_b0e37b2e89374589bb51339ececdec82">
+			<uml:DiagramElement xmi:id="shape_xmi_af09954c13514d7d8f4a2cd170995d2e" geometry="360,200,170,70" preferredShapeType="UseCase" subject="xmi_af09954c13514d7d8f4a2cd170995d2e">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,70" />
 					<captionInternalWidth value="-2147483648" />
@@ -1419,13 +1531,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
+					<parentDiagramElement idref="shape_xmi_58697f319033414f945c33ec8cd6b49f" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_da18dc479bbd4f6e918af4d51e17b633" geometry="680,60,170,70" preferredShapeType="UseCase" subject="xmi_da18dc479bbd4f6e918af4d51e17b633">
+			<uml:DiagramElement xmi:id="shape_xmi_6dc8aaa07ca349118acb5d22cd0809fa" geometry="680,60,170,70" preferredShapeType="UseCase" subject="xmi_6dc8aaa07ca349118acb5d22cd0809fa">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,70" />
 					<captionInternalWidth value="-2147483648" />
@@ -1446,13 +1559,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
+					<parentDiagramElement idref="shape_xmi_58697f319033414f945c33ec8cd6b49f" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_6eb0b675260140fda842df4d0c20f10a" geometry="680,200,220,70" preferredShapeType="UseCase" subject="xmi_6eb0b675260140fda842df4d0c20f10a">
+			<uml:DiagramElement xmi:id="shape_xmi_f92a11b36ceb482f8d0c941aa7f4d201" geometry="680,200,220,70" preferredShapeType="UseCase" subject="xmi_f92a11b36ceb482f8d0c941aa7f4d201">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,220,70" />
 					<captionInternalWidth value="-2147483648" />
@@ -1473,13 +1587,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
+					<parentDiagramElement idref="shape_xmi_58697f319033414f945c33ec8cd6b49f" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_71e7ec0f63254daaaa4a1452af651124" geometry="730,340,80,80" preferredShapeType="Actor" subject="xmi_71e7ec0f63254daaaa4a1452af651124">
+			<uml:DiagramElement xmi:id="shape_xmi_6b8655e7bca94a35a0664cb93be25a1d" geometry="730,340,80,80" preferredShapeType="Actor" subject="xmi_6b8655e7bca94a35a0664cb93be25a1d">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,80,80,18" />
 					<captionInternalWidth value="-2147483648" />
@@ -1507,12 +1622,12 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_50253fdb4caf48d182899de6e347c18b" fromDiagramElement="shape_xmi_99c24d14337f4b1494b112098f66888e" toDiagramElement="shape_xmi_b0e37b2e89374589bb51339ececdec82" geometry="140,100;360,235;" preferredShapeType="Association" subject="xmi_50253fdb4caf48d182899de6e347c18b">
+			<uml:DiagramElement xmi:id="conn_xmi_06d9f9e61f3741e3a11a264932417c03" fromDiagramElement="shape_xmi_894dc31fb9ce459ab017a2da1cf25a4d" toDiagramElement="shape_xmi_af09954c13514d7d8f4a2cd170995d2e" geometry="140,100;360,235;" preferredShapeType="Association" subject="xmi_06d9f9e61f3741e3a11a264932417c03">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="250,167,50,16" />
+					<captionBounds value="250,167,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
-					<captionVisible value="true" />
+					<captionVisible value="false" />
 					<captionSide value="1" />
 					<properties>
 						<azOrder value="10" />
@@ -1523,18 +1638,20 @@
 						<aconnectorStyle value="3" />
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
-						<ashowConnectorName value="2" />
+						<ashowConnectorName value="0" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_42caa526c3ff4d839ec55904ef3896a2" fromDiagramElement="shape_xmi_99c24d14337f4b1494b112098f66888e" toDiagramElement="shape_xmi_c2b7e9cde54d4d4d8a902a6855908a00" geometry="140,100;360,95;" preferredShapeType="Association" subject="xmi_42caa526c3ff4d839ec55904ef3896a2">
+			<uml:DiagramElement xmi:id="conn_xmi_015022625a5b4de8b8373f025529aa4c" fromDiagramElement="shape_xmi_894dc31fb9ce459ab017a2da1cf25a4d" toDiagramElement="shape_xmi_5d00579594cb4c6a9b16b80855d5c823" geometry="140,100;360,95;" preferredShapeType="Association" subject="xmi_015022625a5b4de8b8373f025529aa4c">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="250,97,50,16" />
+					<captionBounds value="250,97,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
-					<captionVisible value="true" />
+					<captionVisible value="false" />
 					<captionSide value="1" />
 					<properties>
 						<azOrder value="10" />
@@ -1545,15 +1662,17 @@
 						<aconnectorStyle value="3" />
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
-						<ashowConnectorName value="2" />
+						<ashowConnectorName value="0" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_c648b6270d2a4292b623f166e3411276" fromDiagramElement="shape_xmi_c2b7e9cde54d4d4d8a902a6855908a00" toDiagramElement="shape_xmi_da18dc479bbd4f6e918af4d51e17b633" geometry="530,95;680,95;" preferredShapeType="Include" subject="xmi_c648b6270d2a4292b623f166e3411276">
+			<uml:DiagramElement xmi:id="conn_xmi_906de7700be94b4092a2118cc59e6b83" fromDiagramElement="shape_xmi_5d00579594cb4c6a9b16b80855d5c823" toDiagramElement="shape_xmi_6dc8aaa07ca349118acb5d22cd0809fa" geometry="530,95;680,95;" preferredShapeType="Include" subject="xmi_906de7700be94b4092a2118cc59e6b83">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="605,95,50,16" />
+					<captionBounds value="605,95,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1568,14 +1687,16 @@
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
 						<ashowConnectorName value="2" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
-				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
+				<elementLine color="Cr:0,0,0,255" style="2" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_3fa7d43e9f9c4d1a96c41d5eb1fd09ee" fromDiagramElement="shape_xmi_b0e37b2e89374589bb51339ececdec82" toDiagramElement="shape_xmi_6eb0b675260140fda842df4d0c20f10a" geometry="530,235;680,235;" preferredShapeType="Extend" subject="xmi_3fa7d43e9f9c4d1a96c41d5eb1fd09ee">
+			<uml:DiagramElement xmi:id="conn_xmi_2b6e146125d4474f9b368bd1251352cc" fromDiagramElement="shape_xmi_af09954c13514d7d8f4a2cd170995d2e" toDiagramElement="shape_xmi_f92a11b36ceb482f8d0c941aa7f4d201" geometry="530,235;680,235;" preferredShapeType="Extend" subject="xmi_2b6e146125d4474f9b368bd1251352cc">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="605,235,50,16" />
+					<captionBounds value="605,235,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1590,10 +1711,12 @@
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
 						<ashowConnectorName value="2" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
-				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
+				<elementLine color="Cr:0,0,0,255" style="2" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
 		</uml:Diagram.element>
 	</uml:Diagram>
@@ -1620,9 +1743,36 @@
 			</properties>
 		</xmi:Extension>
 		<uml:Diagram.element>
-			<uml:DiagramElement xmi:id="shape_xmi_94e5dcdcfd8f4876879855d7193cedf2" geometry="60,160,50,50" preferredShapeType="InitialPseudoState" subject="xmi_94e5dcdcfd8f4876879855d7193cedf2">
+			<uml:DiagramElement xmi:id="shape_xmi_b8c371d65edb441080236f99465c9e9c" geometry="60,166,28,28" preferredShapeType="InitialPseudoState" subject="xmi_b8c371d65edb441080236f99465c9e9c">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="0,0,50,16" />
+					<captionBounds value="0,28,28,16" />
+					<captionInternalWidth value="-2147483648" />
+					<captionInternalHeight value="-2147483648" />
+					<captionVisible value="true" />
+					<captionSide value="1" />
+					<properties>
+						<azOrder value="3" />
+						<abackground value="Cr:0,120,215,255" />
+						<aforeground value="Cr:0,0,0,255" />
+						<acreatorDiagramType value="StateDiagram" />
+						<aselectable value="true" />
+						<amodelElementNameAlignment value="4" />
+						<ashowAttributeType value="1" />
+						<ashowOperationType value="1" />
+						<ashowReceptionType value="1" />
+						<ashowEmptyCompartments value="0" />
+						<ashowOperationSignature value="true" />
+						<ashowInitialAttributeValue value="true" />
+					</properties>
+				</xmi:Extension>
+				<elementFill color1="Cr:0,120,215,255" color2="" style="1" transparency="0" type="1" />
+				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
+				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
+				<CompartmentFont value="none" />
+			</uml:DiagramElement>
+			<uml:DiagramElement xmi:id="shape_xmi_c2fb083d12654b4a98343e8083923c9b" geometry="248,150,140,60" preferredShapeType="State2" subject="xmi_c2fb083d12654b4a98343e8083923c9b">
+				<xmi:Extension extender="Visual Paradigm">
+					<captionBounds value="0,0,140,60" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1633,7 +1783,7 @@
 						<aforeground value="Cr:0,0,0,255" />
 						<acreatorDiagramType value="StateDiagram" />
 						<aselectable value="true" />
-						<amodelElementNameAlignment value="9" />
+						<amodelElementNameAlignment value="4" />
 						<ashowAttributeType value="1" />
 						<ashowOperationType value="1" />
 						<ashowReceptionType value="1" />
@@ -1647,9 +1797,9 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_210af8189a284fcdab95298ae3c4526f" geometry="270,150,140,70" preferredShapeType="State" subject="xmi_210af8189a284fcdab95298ae3c4526f">
+			<uml:DiagramElement xmi:id="shape_xmi_f034e3b0083b42cf81aa380caaca7f38" geometry="548,150,140,60" preferredShapeType="State2" subject="xmi_f034e3b0083b42cf81aa380caaca7f38">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="0,0,140,16" />
+					<captionBounds value="0,0,140,60" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1660,7 +1810,7 @@
 						<aforeground value="Cr:0,0,0,255" />
 						<acreatorDiagramType value="StateDiagram" />
 						<aselectable value="true" />
-						<amodelElementNameAlignment value="9" />
+						<amodelElementNameAlignment value="4" />
 						<ashowAttributeType value="1" />
 						<ashowOperationType value="1" />
 						<ashowReceptionType value="1" />
@@ -1674,9 +1824,9 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_577ebfef066f4d58908ab2d5a2445603" geometry="570,150,140,70" preferredShapeType="State" subject="xmi_577ebfef066f4d58908ab2d5a2445603">
+			<uml:DiagramElement xmi:id="shape_xmi_a9b47dabedda4d0e81bf666d5302f92f" geometry="848,150,140,60" preferredShapeType="State2" subject="xmi_a9b47dabedda4d0e81bf666d5302f92f">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="0,0,140,16" />
+					<captionBounds value="0,0,140,60" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1687,7 +1837,7 @@
 						<aforeground value="Cr:0,0,0,255" />
 						<acreatorDiagramType value="StateDiagram" />
 						<aselectable value="true" />
-						<amodelElementNameAlignment value="9" />
+						<amodelElementNameAlignment value="4" />
 						<ashowAttributeType value="1" />
 						<ashowOperationType value="1" />
 						<ashowReceptionType value="1" />
@@ -1701,20 +1851,20 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_5cdfdb3dea7e4516839980f65c131151" geometry="870,150,140,70" preferredShapeType="State" subject="xmi_5cdfdb3dea7e4516839980f65c131151">
+			<uml:DiagramElement xmi:id="shape_xmi_2eba7624f3454691878a73f72569c6c1" geometry="1148,166,28,28" preferredShapeType="FinalState2" subject="xmi_2eba7624f3454691878a73f72569c6c1">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="0,0,140,16" />
+					<captionBounds value="0,28,28,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
-					<captionSide value="12" />
+					<captionSide value="1" />
 					<properties>
-						<azOrder value="2" />
-						<abackground value="Cr:122,207,245,255" />
+						<azOrder value="3" />
+						<abackground value="Cr:0,120,215,255" />
 						<aforeground value="Cr:0,0,0,255" />
 						<acreatorDiagramType value="StateDiagram" />
 						<aselectable value="true" />
-						<amodelElementNameAlignment value="9" />
+						<amodelElementNameAlignment value="4" />
 						<ashowAttributeType value="1" />
 						<ashowOperationType value="1" />
 						<ashowReceptionType value="1" />
@@ -1723,41 +1873,14 @@
 						<ashowInitialAttributeValue value="true" />
 					</properties>
 				</xmi:Extension>
-				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
+				<elementFill color1="Cr:0,120,215,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_708f6e8e5f8f493d919ceaefe06e66c1" geometry="1170,160,50,50" preferredShapeType="FinalState" subject="xmi_708f6e8e5f8f493d919ceaefe06e66c1">
+			<uml:DiagramElement xmi:id="conn_xmi_a2a2cec450db44db90b8353919abe091" fromDiagramElement="shape_xmi_b8c371d65edb441080236f99465c9e9c" toDiagramElement="shape_xmi_c2fb083d12654b4a98343e8083923c9b" geometry="88,180;248,180;" preferredShapeType="Transition2" subject="xmi_a2a2cec450db44db90b8353919abe091">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="0,0,50,16" />
-					<captionInternalWidth value="-2147483648" />
-					<captionInternalHeight value="-2147483648" />
-					<captionVisible value="true" />
-					<captionSide value="12" />
-					<properties>
-						<azOrder value="2" />
-						<abackground value="Cr:122,207,245,255" />
-						<aforeground value="Cr:0,0,0,255" />
-						<acreatorDiagramType value="StateDiagram" />
-						<aselectable value="true" />
-						<amodelElementNameAlignment value="9" />
-						<ashowAttributeType value="1" />
-						<ashowOperationType value="1" />
-						<ashowReceptionType value="1" />
-						<ashowEmptyCompartments value="0" />
-						<ashowOperationSignature value="true" />
-						<ashowInitialAttributeValue value="true" />
-					</properties>
-				</xmi:Extension>
-				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
-				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
-				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
-				<CompartmentFont value="none" />
-			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_a737351caa1c45c3bd91313fcf07e9a1" fromDiagramElement="shape_xmi_94e5dcdcfd8f4876879855d7193cedf2" toDiagramElement="shape_xmi_210af8189a284fcdab95298ae3c4526f" geometry="110,185;270,185;" preferredShapeType="Transition" subject="xmi_a737351caa1c45c3bd91313fcf07e9a1">
-				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="190,185,50,16" />
+					<captionBounds value="168,180,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1772,14 +1895,16 @@
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
 						<ashowConnectorName value="2" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_5ae951ff136f4e6095114992868faab0" fromDiagramElement="shape_xmi_210af8189a284fcdab95298ae3c4526f" toDiagramElement="shape_xmi_577ebfef066f4d58908ab2d5a2445603" geometry="410,185;570,185;" preferredShapeType="Transition" subject="xmi_5ae951ff136f4e6095114992868faab0">
+			<uml:DiagramElement xmi:id="conn_xmi_6ee0c241059d4cd8bbc0f88733914db7" fromDiagramElement="shape_xmi_c2fb083d12654b4a98343e8083923c9b" toDiagramElement="shape_xmi_f034e3b0083b42cf81aa380caaca7f38" geometry="388,180;548,180;" preferredShapeType="Transition2" subject="xmi_6ee0c241059d4cd8bbc0f88733914db7">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="490,185,50,16" />
+					<captionBounds value="468,180,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1794,14 +1919,16 @@
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
 						<ashowConnectorName value="2" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_207be14a3a724de0aa9c7ee010a591d8" fromDiagramElement="shape_xmi_577ebfef066f4d58908ab2d5a2445603" toDiagramElement="shape_xmi_5cdfdb3dea7e4516839980f65c131151" geometry="710,185;870,185;" preferredShapeType="Transition" subject="xmi_207be14a3a724de0aa9c7ee010a591d8">
+			<uml:DiagramElement xmi:id="conn_xmi_40fc263734e34361826a380f82c4cd94" fromDiagramElement="shape_xmi_f034e3b0083b42cf81aa380caaca7f38" toDiagramElement="shape_xmi_a9b47dabedda4d0e81bf666d5302f92f" geometry="688,180;848,180;" preferredShapeType="Transition2" subject="xmi_40fc263734e34361826a380f82c4cd94">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="790,185,50,16" />
+					<captionBounds value="768,180,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1816,14 +1943,16 @@
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
 						<ashowConnectorName value="2" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_17a079a28e4a4ceeb6520780b39f80bd" fromDiagramElement="shape_xmi_5cdfdb3dea7e4516839980f65c131151" toDiagramElement="shape_xmi_708f6e8e5f8f493d919ceaefe06e66c1" geometry="1010,185;1170,185;" preferredShapeType="Transition" subject="xmi_17a079a28e4a4ceeb6520780b39f80bd">
+			<uml:DiagramElement xmi:id="conn_xmi_5e420c15506a4ab6abcd17193e5d5dc6" fromDiagramElement="shape_xmi_a9b47dabedda4d0e81bf666d5302f92f" toDiagramElement="shape_xmi_2eba7624f3454691878a73f72569c6c1" geometry="988,180;1148,180;" preferredShapeType="Transition2" subject="xmi_5e420c15506a4ab6abcd17193e5d5dc6">
 				<xmi:Extension extender="Visual Paradigm">
-					<captionBounds value="1090,185,50,16" />
+					<captionBounds value="1068,180,60,16" />
 					<captionInternalWidth value="-2147483648" />
 					<captionInternalHeight value="-2147483648" />
 					<captionVisible value="true" />
@@ -1838,6 +1967,8 @@
 						<aconnectorLineJumps value="4" />
 						<aconnectorLabelOrientation value="4" />
 						<ashowConnectorName value="2" />
+						<ashowFromRoleName value="false" />
+						<ashowToRoleName value="false" />
 					</properties>
 				</xmi:Extension>
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />

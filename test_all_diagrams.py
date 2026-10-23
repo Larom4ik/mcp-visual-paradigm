@@ -19,6 +19,7 @@ from mcp_tools.tools import (
     add_er_column,
     add_er_entity,
     add_er_relation,
+    add_note,
     add_package,
     add_state,
     add_state_transition,
@@ -28,6 +29,7 @@ from mcp_tools.tools import (
     get_project_summary,
     init_project,
     move_class_to_package,
+    set_system_boundary,
     smart_add_relation,
     suggest_relation,
 )
@@ -67,6 +69,9 @@ def run_tests():
     print(add_class_method("IPaymentGateway", "charge", "bool", [{"name": "amount", "type": "float"}]))
 
     print(add_class("StripePaymentGateway", package="PaymentSubsystem"))
+
+    # Add architectural note connected to Order
+    print(add_note("Order state transitions must be strictly audited and idempotent.", target="Order"))
 
     print("\n=== 4. Semantic Relationship Decision Engine Testing ===")
     # 4.1 Test suggest_relation
@@ -111,7 +116,7 @@ def run_tests():
     print(add_er_relation("users", "orders", "1:N"))
     print(add_er_relation("orders", "tags", "M:N"))
 
-    print("\n=== 4. Use Case Diagram Setup ===")
+    print("\n=== 6. Use Case Diagram Setup with System Boundary ===")
     print(add_actor("CustomerActor"))
     print(add_actor("AdminActor"))
 
@@ -120,26 +125,29 @@ def run_tests():
     print(add_use_case("PlaceOrder"))
     print(add_use_case("ApplyDiscountCoupon"))
 
+    # System Boundary enclosing use cases
+    print(set_system_boundary("E-Commerce Platform", "Login,TwoFactorAuth,PlaceOrder,ApplyDiscountCoupon"))
+
     # UC Relations
     print(add_uc_relation("CustomerActor", "PlaceOrder", "Association"))
     print(add_uc_relation("CustomerActor", "Login", "Association"))
     print(add_uc_relation("Login", "TwoFactorAuth", "Include"))
     print(add_uc_relation("PlaceOrder", "ApplyDiscountCoupon", "Extend"))
 
-    print("\n=== 5. State Machine Diagram Setup ===")
+    print("\n=== 7. State Machine Diagram Setup with Guards ===")
     print(add_state("InitialState", "Initial"))
     print(add_state("Draft", "State"))
     print(add_state("Paid", "State"))
     print(add_state("Shipped", "State"))
     print(add_state("Completed", "Final"))
 
-    # Transitions
+    # Transitions with event triggers and guard conditions
     print(add_state_transition("InitialState", "Draft", "create"))
-    print(add_state_transition("Draft", "Paid", "paySuccess"))
-    print(add_state_transition("Paid", "Shipped", "dispatchOrder"))
+    print(add_state_transition("Draft", "Paid", "paySuccess", guard="balance >= total"))
+    print(add_state_transition("Paid", "Shipped", "dispatchOrder", guard="inStock == true"))
     print(add_state_transition("Shipped", "Completed", "deliveredConfirmation"))
 
-    print("\n=== 6. Project Summary ===")
+    print("\n=== 8. Project Summary ===")
     print(get_project_summary())
 
     print("\n=== 7. Export to XMI 2.1 ===")
@@ -254,7 +262,64 @@ def run_tests():
 
     transitions = region_elem.findall("transition")
     assert len(transitions) == 4
-    print("State Machine vertices and transitions verified.")
+    # Check guard condition on transition
+    guard_tr = next(t for t in transitions if t.find("guard") is not None)
+    assert guard_tr is not None
+    guard_node = guard_tr.find("guard")
+    assert guard_node.attrib.get("name") == "balance >= total"
+    print("State Machine vertices, transitions, and guard conditions verified.")
+
+    # Validate Universal Notes (uml:Comment) & Visual NOTE / Anchor
+    owned_comments = model.findall("ownedComment")
+    assert len(owned_comments) >= 1
+    note_comment = owned_comments[0]
+    assert "Order state transitions" in note_comment.attrib.get("body", "")
+    print("Metamodel ownedComment (Note) verified.")
+
+    # Check Visual NOTE shape and Anchor connector in ClassDiagram
+    note_shapes = [el for el in diag_elems if el.attrib.get("preferredShapeType") == "NOTE"]
+    assert len(note_shapes) >= 1
+    anchor_conns = [el for el in diag_elems if el.attrib.get("preferredShapeType") == "Anchor"]
+    assert len(anchor_conns) >= 1
+    print("Visual NOTE shape and Anchor connector in Class Diagram verified.")
+
+    # Check Use Case Diagram System Boundary shape
+    uc_diag = next(d for d in omg_diagrams if d.attrib.get("diagramType") == "UseCaseDiagram")
+    uc_elems = uc_diag.find(f"{{{UML_NS}}}Diagram.element").findall(f"{{{UML_NS}}}DiagramElement")
+    system_shapes = [el for el in uc_elems if el.attrib.get("preferredShapeType") == "System"]
+    assert len(system_shapes) == 1
+    print("Visual System Boundary shape in Use Case Diagram verified.")
+
+    # Check State Machine Visual Shapes (State2, FinalState2, InitialPseudoState, Transition2)
+    sm_diag = next(d for d in omg_diagrams if d.attrib.get("diagramType") == "StateDiagram")
+    sm_elems = sm_diag.find(f"{{{UML_NS}}}Diagram.element").findall(f"{{{UML_NS}}}DiagramElement")
+    sm_state2 = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "State2"]
+    assert len(sm_state2) == 3, f"Expected 3 State2 shapes, got {len(sm_state2)}"
+    sm_final = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "FinalState2"]
+    assert len(sm_final) == 1, f"Expected 1 FinalState2 shape, got {len(sm_final)}"
+    sm_init = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "InitialPseudoState"]
+    assert len(sm_init) == 1, f"Expected 1 InitialPseudoState shape, got {len(sm_init)}"
+    sm_trans = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "Transition2"]
+    assert len(sm_trans) == 4, f"Expected 4 Transition2 connectors, got {len(sm_trans)}"
+    print("Visual State Machine shapes (State2, FinalState2, InitialPseudoState, Transition2) verified.")
+
+    # Check that auto-generated role names are suppressed on connectors
+    all_connectors = [
+        el for d in omg_diagrams for el in d.find(f"{{{UML_NS}}}Diagram.element").findall(f"{{{UML_NS}}}DiagramElement")
+        if el.attrib.get("fromDiagramElement") and el.attrib.get("toDiagramElement")
+    ]
+    for conn in all_connectors:
+        ext = conn.find(f"{{{XMI_NS}}}Extension")
+        if ext is not None:
+            props = ext.find("properties")
+            if props is not None:
+                from_role = props.find("ashowFromRoleName")
+                to_role = props.find("ashowToRoleName")
+                if from_role is not None:
+                    assert from_role.attrib.get("value") == "false", "Connector must suppress ashowFromRoleName"
+                if to_role is not None:
+                    assert to_role.attrib.get("value") == "false", "Connector must suppress ashowToRoleName"
+    print("Connector role name clutter suppression verified (ashowFromRoleName='false').")
 
     # Validate that every model element, shape, and connector has an xmi:id attribute
     required_id_tags = (
