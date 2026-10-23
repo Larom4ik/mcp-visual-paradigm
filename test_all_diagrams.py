@@ -46,26 +46,26 @@ def run_tests():
     print(add_package("PaymentSubsystem"))
 
     print("\n=== 3. UML Class Diagram Setup with Packages ===")
-    print(add_class("BaseEntity", package="CoreDomain"))
-    print(add_class_attribute("BaseEntity", "id", "UUID", "public"))
+    print(add_class("BaseEntity", package="CoreDomain", description="Root entity with UUID identifier and audit timestamps."))
+    print(add_class_attribute("BaseEntity", "id", "UUID", "public", description="Primary unique identifier"))
     print(add_class_attribute("BaseEntity", "createdAt", "DateTime", "protected"))
 
-    print(add_class("User", package="CoreDomain"))
+    print(add_class("User", package="CoreDomain", description="Represents a registered user in the enterprise application."))
     print(add_class_attribute("User", "email", "string", "private"))
     print(add_class_attribute("User", "passwordHash", "string", "private"))
-    print(add_class_method("User", "authenticate", "bool", [{"name": "password", "type": "string", "direction": "in"}]))
+    print(add_class_method("User", "authenticate", "bool", [{"name": "password", "type": "string", "direction": "in"}], description="Verify credentials and generate JWT token."))
 
     print(add_class("Customer", package="CoreDomain"))
     print(add_class_attribute("Customer", "loyaltyPoints", "int", "public"))
 
-    print(add_class("Order", package="Ordering"))
+    print(add_class("Order", package="Ordering", description="Customer commercial order with financial totals."))
     print(add_class_attribute("Order", "total", "float", "public"))
     print(add_class_method("Order", "recalculate", "void", []))
 
     print(add_class("OrderItem", package="Ordering"))
     print(add_class_attribute("OrderItem", "quantity", "int", "public"))
 
-    print(add_class("IPaymentGateway", element_type="Interface", package="PaymentSubsystem"))
+    print(add_class("IPaymentGateway", element_type="Interface", package="PaymentSubsystem", description="Contract for processing third-party financial charges."))
     print(add_class_method("IPaymentGateway", "charge", "bool", [{"name": "amount", "type": "float"}]))
 
     print(add_class("StripePaymentGateway", package="PaymentSubsystem"))
@@ -92,9 +92,9 @@ def run_tests():
     print(smart_add_relation("StripePaymentGateway", "IPaymentGateway", "implements interface contract"))
 
     print("\n=== 5. ER Diagram Setup ===")
-    print(add_er_entity("users"))
+    print(add_er_entity("users", description="Stores core authentication and user profile data."))
     print(add_er_column("users", "id", "BIGINT", is_pk=True))
-    print(add_er_column("users", "email", "VARCHAR(255)"))
+    print(add_er_column("users", "email", "VARCHAR(255)", description="Unique user login email address."))
     print(add_er_column("users", "created_at", "TIMESTAMP"))
 
     print(add_er_entity("user_profiles"))
@@ -117,11 +117,11 @@ def run_tests():
     print(add_er_relation("orders", "tags", "M:N"))
 
     print("\n=== 6. Use Case Diagram Setup with System Boundary ===")
-    print(add_actor("CustomerActor"))
+    print(add_actor("CustomerActor", description="Registered end-user purchasing goods."))
     print(add_actor("AdminActor"))
 
-    print(add_use_case("Login"))
-    print(add_use_case("TwoFactorAuth"))
+    print(add_use_case("Login", description="Authenticate customer with email and password."))
+    print(add_use_case("TwoFactorAuth", description="Verify second factor via SMS or authenticator app."))
     print(add_use_case("PlaceOrder"))
     print(add_use_case("ApplyDiscountCoupon"))
 
@@ -134,11 +134,11 @@ def run_tests():
     print(add_uc_relation("Login", "TwoFactorAuth", "Include"))
     print(add_uc_relation("PlaceOrder", "ApplyDiscountCoupon", "Extend"))
 
-    print("\n=== 7. State Machine Diagram Setup with Guards ===")
+    print("\n=== 7. State Machine Diagram Setup with Guards & Behaviors ===")
     print(add_state("InitialState", "Initial"))
-    print(add_state("Draft", "State"))
-    print(add_state("Paid", "State"))
-    print(add_state("Shipped", "State"))
+    print(add_state("Draft", "State", entry="init_draft()", exit="validate_items()", description="Order is being edited."))
+    print(add_state("Paid", "State", entry="send_receipt()", do="reserve_inventory()", description="Funds captured successfully."))
+    print(add_state("Shipped", "State", do="track_carrier()", description="Package is in transit with carrier."))
     print(add_state("Completed", "Final"))
 
     # Transitions with event triggers and guard conditions
@@ -222,31 +222,44 @@ def run_tests():
     assert table_annot.attrib.get("source") == "Stereotype"
     details = table_annot.find("details")
     assert details is not None and details.attrib.get("key") == "entity"
-    print("ER Entity eAnnotation verified.")
+    users_ext = users_table.find(f"{{{XMI_NS}}}Extension")
+    assert users_ext is not None
+    assert users_ext.find("modelType").attrib.get("value") == "DBTable", "ER table modelType must be DBTable"
+    assert users_ext.find("documentation").attrib.get("value") == "Stores core authentication and user profile data."
+    users_comment = users_table.find("ownedComment")
+    assert users_comment is not None and users_comment.attrib.get("body") == "Stores core authentication and user profile data."
+    print("ER Entity DBTable modelType, eAnnotation, and documentation verified.")
 
-    # Validate PK / FK annotations
+    # Validate PK / FK annotations and column documentation
     id_col = next(el for el in users_table.findall("ownedAttribute") if el.attrib.get("name") == "id")
     pk_annot = id_col.find("eAnnotations")
     assert pk_annot is not None
     pk_keys = [d.attrib.get("key") for d in pk_annot.findall("details")]
     assert "primaryKey" in pk_keys
-    print("Column PK eAnnotation verified.")
+    email_col = next(el for el in users_table.findall("ownedAttribute") if el.attrib.get("name") == "email")
+    email_ext = email_col.find(f"{{{XMI_NS}}}Extension")
+    assert email_ext is not None and email_ext.find("documentation").attrib.get("value") == "Unique user login email address."
+    print("Column PK eAnnotation and documentation verified.")
 
-    # Validate Use Case & Include / Extend
+    # Validate Use Case & Include / Extend (Capitalized Stereotypes)
     login_uc = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "Login")
     assert login_uc.attrib.get(f"{{{XMI_NS}}}type") == "uml:UseCase"
+    login_ext = login_uc.find(f"{{{XMI_NS}}}Extension")
+    assert login_ext is not None and login_ext.find("documentation").attrib.get("value") == "Authenticate customer with email and password."
     include_elem = login_uc.find("include")
     assert include_elem is not None
     assert include_elem.attrib.get(f"{{{XMI_NS}}}type") == "uml:Include"
-    print("Use Case Include verified.")
+    assert include_elem.attrib.get("name") == "«Include»", f"Expected «Include», got {include_elem.attrib.get('name')}"
+    print("Use Case Include (capitalized «Include») and documentation verified.")
 
     place_order_uc = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "PlaceOrder")
     extend_elem = place_order_uc.find("extend")
     assert extend_elem is not None
     assert extend_elem.attrib.get(f"{{{XMI_NS}}}type") == "uml:Extend"
-    print("Use Case Extend verified.")
+    assert extend_elem.attrib.get("name") == "«Extend»", f"Expected «Extend», got {extend_elem.attrib.get('name')}"
+    print("Use Case Extend (capitalized «Extend») verified.")
 
-    # Validate State Machine
+    # Validate State Machine & Internal Behaviors
     sm_elem = next(el for el in model.findall("ownedMember") if el.attrib.get(f"{{{XMI_NS}}}type") == "uml:StateMachine")
     region_elem = sm_elem.find("region")
     assert region_elem is not None
@@ -260,6 +273,19 @@ def run_tests():
     final_state = next(v for v in subvertices if v.attrib.get("name") == "Completed")
     assert final_state.attrib.get(f"{{{XMI_NS}}}type") == "uml:FinalState"
 
+    draft_vertex = next(v for v in subvertices if v.attrib.get("name") == "Draft")
+    draft_entry = draft_vertex.find("entry")
+    assert draft_entry is not None and draft_entry.attrib.get("name") == "init_draft()"
+    draft_exit = draft_vertex.find("exit")
+    assert draft_exit is not None and draft_exit.attrib.get("name") == "validate_items()"
+    draft_ext = draft_vertex.find(f"{{{XMI_NS}}}Extension")
+    assert draft_ext is not None and draft_ext.find("documentation").attrib.get("value") == "Order is being edited."
+
+    paid_vertex = next(v for v in subvertices if v.attrib.get("name") == "Paid")
+    paid_do = paid_vertex.find("doActivity")
+    assert paid_do is not None and paid_do.attrib.get("name") == "reserve_inventory()"
+    print("State Machine vertices, internal behaviors (entry, do, exit), and documentation verified.")
+
     transitions = region_elem.findall("transition")
     assert len(transitions) == 4
     # Check guard condition on transition
@@ -267,7 +293,7 @@ def run_tests():
     assert guard_tr is not None
     guard_node = guard_tr.find("guard")
     assert guard_node.attrib.get("name") == "balance >= total"
-    print("State Machine vertices, transitions, and guard conditions verified.")
+    print("State Machine transitions and guard conditions verified.")
 
     # Validate Universal Notes (uml:Comment) & Visual NOTE / Anchor
     owned_comments = model.findall("ownedComment")
@@ -283,6 +309,23 @@ def run_tests():
     assert len(anchor_conns) >= 1
     print("Visual NOTE shape and Anchor connector in Class Diagram verified.")
 
+    # Check ER Diagram Visual Shapes (DBTable with Peach color, DBForeignKey with no multiplicity text)
+    erd_diag = next(d for d in omg_diagrams if d.attrib.get("diagramType") == "ERDiagram")
+    erd_elems = erd_diag.find(f"{{{UML_NS}}}Diagram.element").findall(f"{{{UML_NS}}}DiagramElement")
+    table_shapes = [el for el in erd_elems if el.attrib.get("preferredShapeType") == "DBTable"]
+    assert len(table_shapes) == 4, f"Expected 4 DBTable shapes, got {len(table_shapes)}"
+    for ts in table_shapes:
+        ts_props = ts.find(f"{{{XMI_NS}}}Extension").find("properties")
+        assert ts_props.find("abackground").attrib.get("value") == "Cr:245,182,122,255", "DBTable must be peach/orange"
+    erd_conns = [el for el in erd_elems if el.attrib.get("preferredShapeType") == "DBForeignKey"]
+    assert len(erd_conns) == 3, f"Expected 3 DBForeignKey connectors, got {len(erd_conns)}"
+    for ec in erd_conns:
+        ec_props = ec.find(f"{{{XMI_NS}}}Extension").find("properties")
+        assert ec_props.find("ashowConnectorName").attrib.get("value") == "0", "DBForeignKey must suppress name caption"
+        assert ec_props.find("ashowFromMultiplicity").attrib.get("value") == "false", "DBForeignKey must suppress text multiplicity"
+        assert ec_props.find("ashowToMultiplicity").attrib.get("value") == "false", "DBForeignKey must suppress text multiplicity"
+    print("Visual ER Diagram native DBTable (peach color) and DBForeignKey (clean Crow's Foot) verified.")
+
     # Check Use Case Diagram System Boundary shape
     uc_diag = next(d for d in omg_diagrams if d.attrib.get("diagramType") == "UseCaseDiagram")
     uc_elems = uc_diag.find(f"{{{UML_NS}}}Diagram.element").findall(f"{{{UML_NS}}}DiagramElement")
@@ -295,13 +338,23 @@ def run_tests():
     sm_elems = sm_diag.find(f"{{{UML_NS}}}Diagram.element").findall(f"{{{UML_NS}}}DiagramElement")
     sm_state2 = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "State2"]
     assert len(sm_state2) == 3, f"Expected 3 State2 shapes, got {len(sm_state2)}"
+    for s2 in sm_state2:
+        s2_props = s2.find(f"{{{XMI_NS}}}Extension").find("properties")
+        assert s2_props.find("ashowActionActivities").attrib.get("value") == "true", "State2 must display action activities"
+
     sm_final = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "FinalState2"]
     assert len(sm_final) == 1, f"Expected 1 FinalState2 shape, got {len(sm_final)}"
+    final_props = sm_final[0].find(f"{{{XMI_NS}}}Extension").find("properties")
+    assert final_props.find("abackground").attrib.get("value") == "Cr:0,0,0,255", "FinalState2 must be solid black"
+
     sm_init = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "InitialPseudoState"]
     assert len(sm_init) == 1, f"Expected 1 InitialPseudoState shape, got {len(sm_init)}"
+    init_props = sm_init[0].find(f"{{{XMI_NS}}}Extension").find("properties")
+    assert init_props.find("abackground").attrib.get("value") == "Cr:0,0,0,255", "InitialPseudoState must be solid black"
+
     sm_trans = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "Transition2"]
     assert len(sm_trans) == 4, f"Expected 4 Transition2 connectors, got {len(sm_trans)}"
-    print("Visual State Machine shapes (State2, FinalState2, InitialPseudoState, Transition2) verified.")
+    print("Visual State Machine shapes (State2 with activities, solid black Initial/Final, Transition2) verified.")
 
     # Check that auto-generated role names are suppressed on connectors
     all_connectors = [

@@ -192,6 +192,7 @@ def add_class(
     is_abstract: bool = False,
     element_type: str = "Class",
     package: Optional[str] = None,
+    description: str = "",
 ) -> str:
     """Create a new UML Class or Interface classifier in the model.
 
@@ -200,6 +201,7 @@ def add_class(
         is_abstract: Set True if this class is abstract (cannot be directly instantiated).
         element_type: 'Class' or 'Interface'.
         package: Optional name of the package container to place this class into.
+        description: Optional documentation description for Open Specification.
 
     Returns:
         Confirmation message with class ID or error description.
@@ -211,6 +213,8 @@ def add_class(
 
         existing = state.find_class(clean_name)
         if existing:
+            if description:
+                existing.description = description
             return f"Class '{clean_name}' already exists with ID: {existing.id}."
 
         clean_elem_type: ClassElementType = "Interface" if element_type.strip().capitalize() == "Interface" else "Class"
@@ -218,6 +222,7 @@ def add_class(
             name=clean_name,
             is_abstract=bool(is_abstract),
             element_type=clean_elem_type,
+            description=description,
         )
         state.add_node(new_class)
 
@@ -238,6 +243,7 @@ def add_class_attribute(
     type: str = "string",
     visibility: str = "public",
     multiplicity: str = "",
+    description: str = "",
 ) -> str:
     """Add an attribute (field/property) to an existing UML class.
 
@@ -247,6 +253,7 @@ def add_class_attribute(
         type: Data type (e.g., 'string', 'int', 'UUID', 'UserStatus').
         visibility: Access level ('public', 'private', or 'protected').
         multiplicity: Multiplicity constraint (e.g., '1', '0..1', '*', '1..*').
+        description: Optional documentation description for Open Specification.
 
     Returns:
         Confirmation message or error feedback.
@@ -270,6 +277,7 @@ def add_class_attribute(
             type=type.strip(),
             visibility=norm_vis,
             multiplicity=multiplicity.strip(),
+            description=description,
         )
         cls.attributes.append(attr)
         mult_str = f" [{multiplicity}]" if multiplicity else ""
@@ -283,6 +291,7 @@ def add_class_method(
     name: str,
     return_type: str = "void",
     params: Optional[list[dict[str, Any]]] = None,
+    description: str = "",
 ) -> str:
     """Add a method (operation) to an existing UML class.
 
@@ -291,6 +300,7 @@ def add_class_method(
         name: Name of the method (e.g., 'authenticate', 'calculateTotal').
         return_type: Return type (e.g., 'void', 'bool', 'Order', 'List[Item]').
         params: Optional parameter dicts, e.g. [{"name": "password", "type": "string", "direction": "in"}].
+        description: Optional documentation description for Open Specification.
 
     Returns:
         Confirmation message with method signature or error feedback.
@@ -316,7 +326,12 @@ def add_class_method(
                     p_dir = p_dir_raw  # type: ignore
                 param_models.append(MethodParam(name=p_name, type=p_type, direction=p_dir))
 
-        method = MethodModel(name=method_name, return_type=return_type.strip(), params=param_models)
+        method = MethodModel(
+            name=method_name,
+            return_type=return_type.strip(),
+            params=param_models,
+            description=description,
+        )
         cls.methods.append(method)
 
         params_repr = ", ".join(f"{p.name}: {p.type}" for p in param_models)
@@ -740,11 +755,12 @@ def smart_add_relation(
 
 # --- ER Diagram Tools ---
 
-def add_er_entity(name: str) -> str:
+def add_er_entity(name: str, description: str = "") -> str:
     """Create an ER Entity (Database Table) in the diagram.
 
     Args:
         name: Name of the entity/table (e.g. 'users', 'orders', 'order_items').
+        description: Optional documentation description for Open Specification.
 
     Returns:
         Confirmation message with Entity ID or error.
@@ -756,9 +772,11 @@ def add_er_entity(name: str) -> str:
 
         existing = state.find_entity(clean_name)
         if existing:
+            if description:
+                existing.description = description
             return f"Entity '{clean_name}' already exists with ID: {existing.id}."
 
-        new_entity = EntityModel(name=clean_name)
+        new_entity = EntityModel(name=clean_name, description=description)
         state.add_node(new_entity)
         return f"Created ER Entity '{clean_name}' (ID: {new_entity.id})."
     except Exception as e:
@@ -773,6 +791,7 @@ def add_er_column(
     is_nullable: bool = True,
     is_pk: bool = False,
     is_fk: bool = False,
+    description: str = "",
 ) -> str:
     """Add a column/field to an existing ER Entity.
 
@@ -784,6 +803,7 @@ def add_er_column(
         is_nullable: Whether column allows NULL (automatically False if is_pk is True).
         is_pk: True if column is part of the Primary Key.
         is_fk: True if column is a Foreign Key.
+        description: Optional documentation description for Open Specification.
 
     Returns:
         Confirmation message with column flags or error.
@@ -805,6 +825,7 @@ def add_er_column(
             is_nullable=bool(is_nullable),
             is_primary_key=bool(is_pk),
             is_foreign_key=bool(is_fk),
+            description=description,
         )
         ent.columns.append(col)
 
@@ -868,11 +889,12 @@ def add_er_relation(src_name: str, tgt_name: str, type: str) -> str:
 
 # --- Use Case Diagram Tools ---
 
-def add_actor(name: str) -> str:
+def add_actor(name: str, description: str = "") -> str:
     """Create a UML Actor in the Use Case diagram.
 
     Args:
         name: Name of the actor (e.g. 'Customer', 'Admin', 'PaymentGateway').
+        description: Optional documentation description for Open Specification.
 
     Returns:
         Confirmation message with Actor ID or error.
@@ -884,20 +906,23 @@ def add_actor(name: str) -> str:
 
         existing = state.find_actor(clean_name)
         if existing:
+            if description:
+                existing.description = description
             return f"Actor '{clean_name}' already exists with ID: {existing.id}."
 
-        actor = ActorModel(name=clean_name)
+        actor = ActorModel(name=clean_name, description=description)
         state.add_node(actor)
         return f"Created Actor '{clean_name}' (ID: {actor.id})."
     except Exception as e:
         return f"ERROR: Failed to create actor: {str(e)}"
 
 
-def add_use_case(name: str) -> str:
+def add_use_case(name: str, description: str = "") -> str:
     """Create a UML Use Case in the diagram.
 
     Args:
         name: Name of the use case (e.g. 'Login', 'PlaceOrder', 'GenerateInvoice').
+        description: Optional documentation description for Open Specification.
 
     Returns:
         Confirmation message with Use Case ID or error.
@@ -909,9 +934,11 @@ def add_use_case(name: str) -> str:
 
         existing = state.find_use_case(clean_name)
         if existing:
+            if description:
+                existing.description = description
             return f"Use Case '{clean_name}' already exists with ID: {existing.id}."
 
-        uc = UseCaseModel(name=clean_name)
+        uc = UseCaseModel(name=clean_name, description=description)
         state.add_node(uc)
         return f"Created Use Case '{clean_name}' (ID: {uc.id})."
     except Exception as e:
@@ -972,8 +999,15 @@ def add_uc_relation(src_name: str, tgt_name: str, type: str) -> str:
 
 # --- State Machine Diagram Tools ---
 
-def add_state(name: str, type: str = "State") -> str:
-    """Create a state vertex in the UML State Machine diagram.
+def add_state(
+    name: str,
+    type: str = "State",
+    entry: str = "",
+    do: str = "",
+    exit: str = "",
+    description: str = "",
+) -> str:
+    """Create a state vertex in the UML State Machine diagram with optional internal behaviors.
 
     Args:
         name: Name of the state (e.g. 'InitialState', 'Draft', 'Processing', 'Finished').
@@ -981,6 +1015,10 @@ def add_state(name: str, type: str = "State") -> str:
               - 'Initial': Initial pseudo-state (start of the machine)
               - 'State': Normal operational state
               - 'Final': Final state (termination of the machine)
+        entry: Optional behavior executed on state entry (e.g. 'init_timers()').
+        do: Optional ongoing activity executed while in state (e.g. 'process_payments()').
+        exit: Optional behavior executed on state exit (e.g. 'cleanup()').
+        description: Optional documentation description for Open Specification.
 
     Returns:
         Confirmation message with State ID or error.
@@ -993,13 +1031,87 @@ def add_state(name: str, type: str = "State") -> str:
         norm_type = _normalize_state_type(type)
         existing = state.find_state(clean_name)
         if existing:
-            return f"State '{clean_name}' already exists with ID: {existing.id}."
+            if entry:
+                existing.entry_action = entry
+            if do:
+                existing.do_activity = do
+            if exit:
+                existing.exit_action = exit
+            if description:
+                existing.description = description
+            return f"Updated State '{clean_name}' (ID: {existing.id}) with behaviors/documentation."
 
-        st = StateModel(name=clean_name, type=norm_type)
+        st = StateModel(
+            name=clean_name,
+            type=norm_type,
+            entry_action=entry,
+            do_activity=do,
+            exit_action=exit,
+            description=description,
+        )
         state.add_node(st)
         return f"Created State [{norm_type}] '{clean_name}' (ID: {st.id})."
     except Exception as e:
         return f"ERROR: Failed to create state: {str(e)}"
+
+
+def add_state_behavior(
+    state_name: str,
+    entry: str = "",
+    do: str = "",
+    exit: str = "",
+    description: str = "",
+) -> str:
+    """Add or update internal actions (entry, doActivity, exit) or documentation for an existing state.
+
+    Args:
+        state_name: Name or ID of the state vertex.
+        entry: Optional entry behavior action.
+        do: Optional ongoing doActivity behavior.
+        exit: Optional exit behavior action.
+        description: Optional documentation description for Open Specification.
+
+    Returns:
+        Confirmation message or error feedback.
+    """
+    try:
+        st = state.set_state_behavior(
+            state_ref=state_name,
+            entry=entry,
+            do=do,
+            exit=exit,
+            description=description,
+        )
+        behaviors = []
+        if st.entry_action:
+            behaviors.append(f"entry / {st.entry_action}")
+        if st.do_activity:
+            behaviors.append(f"do / {st.do_activity}")
+        if st.exit_action:
+            behaviors.append(f"exit / {st.exit_action}")
+        b_str = f" [{', '.join(behaviors)}]" if behaviors else ""
+        return f"Updated behaviors for State '{st.name}' (ID: {st.id}){b_str}."
+    except Exception as e:
+        return f"ERROR: Failed to set state behavior: {str(e)}"
+
+
+def set_element_documentation(element_name: str, documentation: str) -> str:
+    """Set or update rich documentation description for any model element (visible via Open Specification).
+
+    Args:
+        element_name: Name or ID of the Class, Package, Entity, UseCase, Actor, or State.
+        documentation: Rich description text for the element specification.
+
+    Returns:
+        Confirmation message or error feedback.
+    """
+    try:
+        node = state.update_element_description(element_name, documentation)
+        if not node:
+            return f"ERROR: Element '{element_name}' not found."
+        return f"Updated documentation for {type(node).__name__} '{getattr(node, 'name', element_name)}' (ID: {node.id})."
+    except Exception as e:
+        return f"ERROR: Failed to update documentation: {str(e)}"
 
 
 def add_state_transition(
@@ -1254,7 +1366,9 @@ def register_all_tools(mcp: Any) -> None:
         add_uc_relation,
         set_system_boundary,
         add_state,
+        add_state_behavior,
         add_state_transition,
+        set_element_documentation,
         add_note,
         export_xmi,
         get_project_summary,

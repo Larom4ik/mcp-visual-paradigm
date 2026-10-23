@@ -66,21 +66,40 @@ class BoundingBoxCalculator:
 
     @staticmethod
     def calculate_class_dimension(node: ClassNode) -> tuple[int, int]:
-        """Compute shape dimensions based on name length and member count."""
+        """Compute shape dimensions based on class name, attributes, and full method signatures."""
         attr_count = len(getattr(node, "attributes", []))
         method_count = len(getattr(node, "methods", []))
-        name_len = len(getattr(node, "name", ""))
-        calc_width = max(170, 12 * name_len + 30)
-        calc_height = max(80, 40 + 18 * attr_count + 18 * method_count)
+
+        lines: list[str] = [getattr(node, "name", "")]
+        if getattr(node, "element_type", "") == "Interface":
+            lines.append("«Interface»")
+        for attr in getattr(node, "attributes", []):
+            lines.append(f"+ {attr.name}: {attr.type}")
+        for m in getattr(node, "methods", []):
+            param_str = ", ".join(f"{p.name}: {p.type}" for p in getattr(m, "params", []))
+            lines.append(f"+ {m.name}({param_str}): {getattr(m, 'return_type', 'void')}")
+
+        max_len = max(len(line) for line in lines) if lines else 10
+        calc_width = max(200, int(max_len * 8.5) + 36)
+        calc_height = max(80, 42 + 20 * attr_count + 20 * method_count)
         return calc_width, calc_height
 
     @staticmethod
     def calculate_entity_dimension(node: EntityNode) -> tuple[int, int]:
-        """Compute shape dimensions for ERD entities based on column count."""
+        """Compute shape dimensions for ERD entities based on column names, data types, lengths, and constraints."""
         col_count = len(getattr(node, "columns", []))
-        name_len = len(getattr(node, "name", ""))
-        calc_width = max(170, 12 * name_len + 30)
-        calc_height = max(80, 42 + 18 * col_count)
+        lines: list[str] = [getattr(node, "name", "")]
+        for col in getattr(node, "columns", []):
+            type_str = col.type
+            if getattr(col, "length", None):
+                type_str += f"({col.length})"
+            pk_suffix = " [PK]" if getattr(col, "is_pk", False) else ""
+            fk_suffix = " [FK]" if getattr(col, "is_fk", False) else ""
+            lines.append(f"+ {col.name}: {type_str}{pk_suffix}{fk_suffix}")
+
+        max_len = max(len(line) for line in lines) if lines else 10
+        calc_width = max(220, int(max_len * 8.8) + 40)
+        calc_height = max(90, 48 + 20 * col_count)
         return calc_width, calc_height
 
     @classmethod
@@ -366,7 +385,7 @@ class UseCaseTierLayout:
 class ERDClusterLayout:
     """Arranges Database Entities by dependency order: root tables on top/left, child tables below."""
 
-    def __init__(self, start_x: int = 60, start_y: int = 60, gap_x: int = 70, gap_y: int = 90):
+    def __init__(self, start_x: int = 60, start_y: int = 60, gap_x: int = 90, gap_y: int = 110):
         self.start_x = start_x
         self.start_y = start_y
         self.gap_x = gap_x
@@ -463,8 +482,22 @@ class StateMachineFlowLayout:
         curr_x = self.start_x
 
         for st in full_pipeline:
-            w = 28 if st.type in ("Initial", "Final") else max(140, 12 * len(st.name) + 20)
-            h = 28 if st.type in ("Initial", "Final") else 60
+            if st.type in ("Initial", "Final"):
+                w = 28
+                h = 28
+            else:
+                lines = [st.name]
+                if getattr(st, "entry_action", ""):
+                    lines.append(f"entry / {st.entry_action}")
+                if getattr(st, "do_activity", ""):
+                    lines.append(f"do / {st.do_activity}")
+                if getattr(st, "exit_action", ""):
+                    lines.append(f"exit / {st.exit_action}")
+                max_len = max(len(line) for line in lines)
+                w = max(150, int(max_len * 8.5) + 36)
+                behavior_count = len(lines) - 1
+                h = max(60, 42 + 20 * behavior_count)
+
             y_offset = (60 - h) // 2
 
             placements[st.id] = NodePlacement(

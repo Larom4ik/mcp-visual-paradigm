@@ -268,6 +268,37 @@ class ProjectState:
                     return st
             return None
 
+    def set_state_behavior(
+        self,
+        state_ref: str,
+        entry: str = "",
+        do: str = "",
+        exit: str = "",
+        description: str = "",
+    ) -> StateNode:
+        """Set entry, doActivity, exit behaviors and description for a state vertex."""
+        with self._lock:
+            st = self.find_state(state_ref)
+            if st is None:
+                raise ValueError(f"State '{state_ref}' not found.")
+            if entry:
+                st.entry_action = entry
+            if do:
+                st.do_activity = do
+            if exit:
+                st.exit_action = exit
+            if description:
+                st.description = description
+            return st
+
+    def update_element_description(self, element_ref: str, description: str) -> Optional[BaseNode]:
+        """Update documentation description for any architectural model element."""
+        with self._lock:
+            node = self.find_node_by_name(element_ref) or self.find_node_by_id(element_ref)
+            if node:
+                node.description = description
+            return node
+
     # Categorized relations accessors
     @property
     def class_relations(self) -> list[RelationModel]:

@@ -169,6 +169,17 @@ class XMIBuilder:
         ET.SubElement(cls_vp_ext, "modelType", {"value": cls.element_type})
         ET.SubElement(cls_vp_ext, "businessModel", {f"{{{XMI_NS}}}value": "false"})
         ET.SubElement(cls_vp_ext, "qualityScore", {"value": "-1"})
+        if getattr(cls, "description", ""):
+            ET.SubElement(
+                class_elem,
+                "ownedComment",
+                {
+                    f"{{{XMI_NS}}}type": "uml:Comment",
+                    f"{{{XMI_NS}}}id": f"{cls.id}_comment",
+                    "body": cls.description,
+                },
+            )
+            ET.SubElement(cls_vp_ext, "documentation", {"value": cls.description})
 
         # Attributes STRICTLY inside class
         for attr in cls.attributes:
@@ -195,6 +206,17 @@ class XMIBuilder:
             ET.SubElement(attr_vp_ext, "isAbstract", {f"{{{XMI_NS}}}value": "false"})
             ET.SubElement(attr_vp_ext, "isVisble", {f"{{{XMI_NS}}}value": "true"})
             ET.SubElement(attr_vp_ext, "qualityScore", {"value": "-1"})
+            if getattr(attr, "description", ""):
+                ET.SubElement(
+                    prop_elem,
+                    "ownedComment",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Comment",
+                        f"{{{XMI_NS}}}id": f"{attr.id}_comment",
+                        "body": attr.description,
+                    },
+                )
+                ET.SubElement(attr_vp_ext, "documentation", {"value": attr.description})
 
             if attr.multiplicity:
                 self._append_multiplicity(prop_elem, attr.multiplicity, attr.id)
@@ -247,6 +269,17 @@ class XMIBuilder:
             ET.SubElement(props, "property", {"name": "visible", "type": "boolean", "value": "true"})
             ET.SubElement(props, "property", {"name": "qualityScore", "type": "int", "value": "-1"})
             ET.SubElement(op_vp_ext, "qualityScore", {"value": "-1"})
+            if getattr(method, "description", ""):
+                ET.SubElement(
+                    op_elem,
+                    "ownedComment",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Comment",
+                        f"{{{XMI_NS}}}id": f"{method.id}_comment",
+                        "body": method.description,
+                    },
+                )
+                ET.SubElement(op_vp_ext, "documentation", {"value": method.description})
 
         # Generalizations inside class
         if cls.id in generalizations_by_source:
@@ -289,6 +322,17 @@ class XMIBuilder:
         ET.SubElement(pkg_vp_ext, "modelType", {"value": "Package"})
         ET.SubElement(pkg_vp_ext, "businessModel", {f"{{{XMI_NS}}}value": "false"})
         ET.SubElement(pkg_vp_ext, "qualityScore", {"value": "-1"})
+        if getattr(pkg, "description", ""):
+            ET.SubElement(
+                pkg_elem,
+                "ownedComment",
+                {
+                    f"{{{XMI_NS}}}type": "uml:Comment",
+                    f"{{{XMI_NS}}}id": f"{pkg.id}_comment",
+                    "body": pkg.description,
+                },
+            )
+            ET.SubElement(pkg_vp_ext, "documentation", {"value": pkg.description})
 
         # 1. Nested sub-packages
         for sub_id in pkg.child_package_ids:
@@ -459,12 +503,24 @@ class XMIBuilder:
                 {f"{{{XMI_NS}}}id": create_uuid_id("annot"), "source": "Stereotype"},
             )
             ET.SubElement(e_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "entity", "value": "true"})
+            ET.SubElement(e_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "modelType", "value": "DBTable"})
 
             ent_vp_ext = ET.SubElement(ent_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
             ET.SubElement(ent_vp_ext, "isRoot", {f"{{{XMI_NS}}}value": "false"})
-            ET.SubElement(ent_vp_ext, "modelType", {"value": "Class"})
+            ET.SubElement(ent_vp_ext, "modelType", {"value": "DBTable"})
             ET.SubElement(ent_vp_ext, "businessModel", {f"{{{XMI_NS}}}value": "false"})
             ET.SubElement(ent_vp_ext, "qualityScore", {"value": "-1"})
+            if getattr(ent, "description", ""):
+                ET.SubElement(
+                    ent_elem,
+                    "ownedComment",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Comment",
+                        f"{{{XMI_NS}}}id": f"{ent.id}_comment",
+                        "body": ent.description,
+                    },
+                )
+                ET.SubElement(ent_vp_ext, "documentation", {"value": ent.description})
 
             for col in ent.columns:
                 col_attrs = {
@@ -487,8 +543,20 @@ class XMIBuilder:
                 prop_elem = ET.SubElement(ent_elem, "ownedAttribute", col_attrs)
                 col_vp_ext = ET.SubElement(prop_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
                 ET.SubElement(col_vp_ext, "attribute")
+                ET.SubElement(col_vp_ext, "modelType", {"value": "DBColumn"})
                 ET.SubElement(col_vp_ext, "isVisble", {f"{{{XMI_NS}}}value": "true"})
                 ET.SubElement(col_vp_ext, "qualityScore", {"value": "-1"})
+                if getattr(col, "description", ""):
+                    ET.SubElement(
+                        prop_elem,
+                        "ownedComment",
+                        {
+                            f"{{{XMI_NS}}}type": "uml:Comment",
+                            f"{{{XMI_NS}}}id": f"{col.id}_comment",
+                            "body": col.description,
+                        },
+                    )
+                    ET.SubElement(col_vp_ext, "documentation", {"value": col.description})
 
                 col_annot = ET.SubElement(
                     prop_elem,
@@ -496,6 +564,7 @@ class XMIBuilder:
                     {f"{{{XMI_NS}}}id": create_uuid_id("annot"), "source": "Stereotype"},
                 )
                 ET.SubElement(col_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "column", "value": "true"})
+                ET.SubElement(col_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "modelType", "value": "DBColumn"})
                 if col.is_primary_key:
                     ET.SubElement(col_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "primaryKey", "value": "true"})
                     ET.SubElement(col_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "stereotype", "value": "PK"})
@@ -516,13 +585,14 @@ class XMIBuilder:
             end_src_id = f"{rel.id}_end_src"
             end_tgt_id = f"{rel.id}_end_tgt"
 
+            # In native VP ERD, Foreign Key relations have empty name and empty end names
             assoc_elem = ET.SubElement(
                 self.model,
                 "ownedMember",
                 {
                     f"{{{XMI_NS}}}type": "uml:Association",
                     f"{{{XMI_NS}}}id": rel.id,
-                    "name": rel.name or f"{src.name}_{tgt.name}_{rel.type}",
+                    "name": "",
                     "visibility": "public",
                     "isAbstract": "false",
                     "isDerived": "false",
@@ -536,7 +606,7 @@ class XMIBuilder:
                 {
                     f"{{{XMI_NS}}}type": "uml:Property",
                     f"{{{XMI_NS}}}id": end_src_id,
-                    "name": src.name.lower(),
+                    "name": "",
                     "visibility": "public",
                     "type": src.id,
                     "association": rel.id,
@@ -560,7 +630,7 @@ class XMIBuilder:
                 {
                     f"{{{XMI_NS}}}type": "uml:Property",
                     f"{{{XMI_NS}}}id": end_tgt_id,
-                    "name": tgt.name.lower(),
+                    "name": "",
                     "visibility": "public",
                     "type": tgt.id,
                     "association": rel.id,
@@ -577,18 +647,20 @@ class XMIBuilder:
             ET.SubElement(tgt_end_vp, "associationEnd")
             ET.SubElement(tgt_end_vp, "qualityScore", {"value": "-1"})
 
-            if rel.type == "1:1":
-                self._append_multiplicity(src_end, "1", end_src_id)
-                self._append_multiplicity(tgt_end, "1", end_tgt_id)
-            elif rel.type == "1:N":
-                self._append_multiplicity(src_end, "1", end_src_id)
-                self._append_multiplicity(tgt_end, "*", end_tgt_id)
-            elif rel.type == "M:N":
-                self._append_multiplicity(src_end, "*", end_src_id)
-                self._append_multiplicity(tgt_end, "*", end_tgt_id)
-
             assoc_vp = ET.SubElement(assoc_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(assoc_vp, "modelType", {"value": "DBForeignKey"})
             ET.SubElement(assoc_vp, "qualityScore", {"value": "-1"})
+            if getattr(rel, "description", ""):
+                ET.SubElement(
+                    assoc_elem,
+                    "ownedComment",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Comment",
+                        f"{{{XMI_NS}}}id": f"{rel.id}_comment",
+                        "body": rel.description,
+                    },
+                )
+                ET.SubElement(assoc_vp, "documentation", {"value": rel.description})
 
     def _build_uc_metamodel(self) -> None:
         assert self.model is not None
@@ -611,6 +683,17 @@ class XMIBuilder:
             ET.SubElement(act_vp_ext, "modelType", {"value": "Actor"})
             ET.SubElement(act_vp_ext, "businessModel", {f"{{{XMI_NS}}}value": "false"})
             ET.SubElement(act_vp_ext, "qualityScore", {"value": "-1"})
+            if getattr(actor, "description", ""):
+                ET.SubElement(
+                    act_elem,
+                    "ownedComment",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Comment",
+                        f"{{{XMI_NS}}}id": f"{actor.id}_comment",
+                        "body": actor.description,
+                    },
+                )
+                ET.SubElement(act_vp_ext, "documentation", {"value": actor.description})
 
         # System Boundary container (if defined)
         if self.state.system_boundary:
@@ -661,6 +744,17 @@ class XMIBuilder:
             ET.SubElement(uc_vp_ext, "modelType", {"value": "UseCase"})
             ET.SubElement(uc_vp_ext, "businessModel", {f"{{{XMI_NS}}}value": "false"})
             ET.SubElement(uc_vp_ext, "qualityScore", {"value": "-1"})
+            if getattr(uc, "description", ""):
+                ET.SubElement(
+                    uc_elem,
+                    "ownedComment",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Comment",
+                        f"{{{XMI_NS}}}id": f"{uc.id}_comment",
+                        "body": uc.description,
+                    },
+                )
+                ET.SubElement(uc_vp_ext, "documentation", {"value": uc.description})
 
             if uc.id in includes_by_source:
                 for rel_id, target_id in includes_by_source[uc.id]:
@@ -671,7 +765,7 @@ class XMIBuilder:
                             f"{{{XMI_NS}}}type": "uml:Include",
                             f"{{{XMI_NS}}}id": rel_id,
                             "addition": target_id,
-                            "name": "«include»",
+                            "name": "«Include»",
                         },
                     )
                     inc_vp = ET.SubElement(inc_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
@@ -686,7 +780,7 @@ class XMIBuilder:
                             f"{{{XMI_NS}}}type": "uml:Extend",
                             f"{{{XMI_NS}}}id": rel_id,
                             "extendedCase": target_id,
-                            "name": "«extend»",
+                            "name": "«Extend»",
                         },
                     )
                     ext_vp = ET.SubElement(ext_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
@@ -805,6 +899,17 @@ class XMIBuilder:
                 )
                 st_ext = ET.SubElement(subv, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
                 ET.SubElement(st_ext, "modelType", {"value": "Pseudostate"})
+                if getattr(st, "description", ""):
+                    ET.SubElement(
+                        subv,
+                        "ownedComment",
+                        {
+                            f"{{{XMI_NS}}}type": "uml:Comment",
+                            f"{{{XMI_NS}}}id": f"{st.id}_comment",
+                            "body": st.description,
+                        },
+                    )
+                    ET.SubElement(st_ext, "documentation", {"value": st.description})
             elif st.type == "Final":
                 subv = ET.SubElement(
                     region_elem,
@@ -817,6 +922,17 @@ class XMIBuilder:
                 )
                 st_ext = ET.SubElement(subv, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
                 ET.SubElement(st_ext, "modelType", {"value": "FinalState"})
+                if getattr(st, "description", ""):
+                    ET.SubElement(
+                        subv,
+                        "ownedComment",
+                        {
+                            f"{{{XMI_NS}}}type": "uml:Comment",
+                            f"{{{XMI_NS}}}id": f"{st.id}_comment",
+                            "body": st.description,
+                        },
+                    )
+                    ET.SubElement(st_ext, "documentation", {"value": st.description})
             else:
                 subv = ET.SubElement(
                     region_elem,
@@ -827,8 +943,49 @@ class XMIBuilder:
                         "name": st.name,
                     },
                 )
+                if getattr(st, "entry_action", ""):
+                    ET.SubElement(
+                        subv,
+                        "entry",
+                        {
+                            f"{{{XMI_NS}}}type": "uml:Activity",
+                            f"{{{XMI_NS}}}id": f"{st.id}_entry",
+                            "name": st.entry_action,
+                        },
+                    )
+                if getattr(st, "do_activity", ""):
+                    ET.SubElement(
+                        subv,
+                        "doActivity",
+                        {
+                            f"{{{XMI_NS}}}type": "uml:Activity",
+                            f"{{{XMI_NS}}}id": f"{st.id}_do",
+                            "name": st.do_activity,
+                        },
+                    )
+                if getattr(st, "exit_action", ""):
+                    ET.SubElement(
+                        subv,
+                        "exit",
+                        {
+                            f"{{{XMI_NS}}}type": "uml:Activity",
+                            f"{{{XMI_NS}}}id": f"{st.id}_exit",
+                            "name": st.exit_action,
+                        },
+                    )
                 st_ext = ET.SubElement(subv, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
                 ET.SubElement(st_ext, "modelType", {"value": "State"})
+                if getattr(st, "description", ""):
+                    ET.SubElement(
+                        subv,
+                        "ownedComment",
+                        {
+                            f"{{{XMI_NS}}}type": "uml:Comment",
+                            f"{{{XMI_NS}}}id": f"{st.id}_comment",
+                            "body": st.description,
+                        },
+                    )
+                    ET.SubElement(st_ext, "documentation", {"value": st.description})
 
         for tr in self.state.transitions:
             lbl = tr.trigger_event
@@ -935,15 +1092,17 @@ class XMIBuilder:
             caption_bounds = f"0,{p.height},{p.width},16"
             align = "4"
             az_order = "3"
-            bg_color = "Cr:0,120,215,255"
-            fill_color = "Cr:0,120,215,255"
+            bg_color = "Cr:0,0,0,255"
+            fill_color = "Cr:0,0,0,255"
+            line_color = "Cr:0,0,0,255"
         elif shape_type == "FinalState2":
             effective_caption_side = 1
             caption_bounds = f"0,{p.height},{p.width},16"
             align = "4"
             az_order = "3"
-            bg_color = "Cr:0,120,215,255"
-            fill_color = "Cr:0,120,215,255"
+            bg_color = "Cr:0,0,0,255"
+            fill_color = "Cr:0,0,0,255"
+            line_color = "Cr:0,0,0,255"
         elif shape_type == "State2":
             effective_caption_side = 12
             caption_bounds = f"0,0,{p.width},{p.height}"
@@ -951,6 +1110,16 @@ class XMIBuilder:
             az_order = "2"
             bg_color = "Cr:122,207,245,255"
             fill_color = "Cr:122,207,245,255"
+        elif shape_type == "DBTable":
+            effective_caption_side = 12
+            caption_bounds = f"0,0,{p.width},16"
+            align = "9"
+            az_order = "2"
+            bg_color = "Cr:245,182,122,255"
+            fill_color = "Cr:245,182,122,255"
+            fill_trans = "0"
+            line_color = "Cr:0,0,0,255"
+            line_weight = "1.0"
         else:
             effective_caption_side = caption_side
             caption_bounds = f"0,0,{p.width},16"
@@ -985,6 +1154,9 @@ class XMIBuilder:
             ET.SubElement(props, "ashowPackageNameStyle", {"value": "2"})
         elif shape_type == "Actor":
             ET.SubElement(props, "arequestResetCaption", {"value": "true"})
+        elif shape_type == "State2":
+            ET.SubElement(props, "ashowActionActivities", {"value": "true"})
+            ET.SubElement(props, "ashowInternalTransitions", {"value": "true"})
 
         ET.SubElement(props, "ashowAttributeType", {"value": "1"})
         ET.SubElement(props, "ashowOperationType", {"value": "1"})
@@ -1021,8 +1193,13 @@ class XMIBuilder:
         mid_x = (wp1[0] + wp2[0]) // 2
         mid_y = (wp1[1] + wp2[1]) // 2
 
-        # In Visual Paradigm, StateMachine transitions must use Transition2
-        effective_shape_type = "Transition2" if (is_transition or rel_type in ("Transition", "Transition2")) else rel_type
+        # In Visual Paradigm, StateMachine transitions must use Transition2, and ERD must use DBForeignKey
+        if is_transition or rel_type in ("Transition", "Transition2"):
+            effective_shape_type = "Transition2"
+        elif creator_diag_type == "ERDiagram" or rel_type in ("DBForeignKey", "DBRelationship"):
+            effective_shape_type = "DBForeignKey"
+        else:
+            effective_shape_type = rel_type
 
         # Check if relation name was an auto-generated title or default
         is_auto_name = any(
@@ -1033,6 +1210,9 @@ class XMIBuilder:
         if rel_type in ("Include", "Extend") or is_uc_stereotype:
             show_name_val = "2"
             caption_vis = "true"
+        elif effective_shape_type == "DBForeignKey" or creator_diag_type == "ERDiagram":
+            show_name_val = "0"
+            caption_vis = "false"
         elif is_transition or effective_shape_type == "Transition2":
             show_name_val = "2" if rel_name else "0"
             caption_vis = "true" if rel_name else "false"
@@ -1065,7 +1245,7 @@ class XMIBuilder:
         ET.SubElement(conn_vp, "captionVisible", {"value": caption_vis})
         ET.SubElement(conn_vp, "captionSide", {"value": "1"})
 
-        if src_mult or tgt_mult:
+        if (src_mult or tgt_mult) and creator_diag_type != "ERDiagram":
             ET.SubElement(conn_vp, "roleA", {"multiplicity": f"{wp1[0]},{wp1[1]},30,16"})
             ET.SubElement(conn_vp, "roleB", {"multiplicity": f"{wp2[0]},{wp2[1]},30,16"})
 
@@ -1084,13 +1264,16 @@ class XMIBuilder:
         ET.SubElement(c_props, "ashowFromRoleName", {"value": "false"})
         ET.SubElement(c_props, "ashowToRoleName", {"value": "false"})
 
-        if src_mult or tgt_mult:
+        if (src_mult or tgt_mult) and creator_diag_type != "ERDiagram":
             ET.SubElement(c_props, "amultiplicityARectangle", {"value": f"Re:{wp1[0]}.0,{wp1[1]}.0,30.0,16.0"})
             ET.SubElement(c_props, "amultiplicityBRectangle", {"value": f"Re:{wp2[0]}.0,{wp2[1]}.0,30.0,16.0"})
             ET.SubElement(c_props, "ahasMultiplicityAShape", {"value": "true"})
             ET.SubElement(c_props, "ahasMultiplicityBShape", {"value": "true"})
             ET.SubElement(c_props, "ashowFromMultiplicity", {"value": "true" if src_mult else "false"})
             ET.SubElement(c_props, "ashowToMultiplicity", {"value": "true" if tgt_mult else "false"})
+        else:
+            ET.SubElement(c_props, "ashowFromMultiplicity", {"value": "false"})
+            ET.SubElement(c_props, "ashowToMultiplicity", {"value": "false"})
 
         line_style = "2" if rel_type in ("Include", "Extend", "Dependency", "Realization", "Anchor") else "1"
         line_color = "Cr:120,120,120,255" if rel_type == "Anchor" else "Cr:0,0,0,255"
@@ -1249,7 +1432,7 @@ class XMIBuilder:
 
         # Diagram 2: ER Diagram with FK Dependency Directed Layout
         if self.state.entities:
-            erd_layout = ERDClusterLayout(start_x=60, start_y=60, gap_x=70, gap_y=90)
+            erd_layout = ERDClusterLayout(start_x=60, start_y=60, gap_x=90, gap_y=110)
             er_placements = erd_layout.layout(self.state)
             _, omg_elements = self._create_diagram("omg_diag_erd_1", "Entity Relationship Diagram", "ERDiagram")
 
@@ -1259,7 +1442,7 @@ class XMIBuilder:
                     omg_elements,
                     p,
                     ent_node,
-                    shape_type="Class",
+                    shape_type="DBTable",
                     creator_diag_type="ERDiagram",
                     caption_side=12,
                 )
@@ -1268,18 +1451,16 @@ class XMIBuilder:
                 if rel.source_id in er_placements and rel.target_id in er_placements:
                     src_p = er_placements[rel.source_id]
                     tgt_p = er_placements[rel.target_id]
-                    src_mult = "1" if rel.type in ("1:1", "1:N") else "*"
-                    tgt_mult = "1" if rel.type == "1:1" else "*"
                     self._add_connector_element(
                         omg_elements,
                         rel_id=rel.id,
-                        rel_type="Association",
-                        rel_name=rel.name or rel.type,
+                        rel_type="DBForeignKey",
+                        rel_name="",
                         src_p=src_p,
                         tgt_p=tgt_p,
                         creator_diag_type="ERDiagram",
-                        src_mult=src_mult,
-                        tgt_mult=tgt_mult,
+                        src_mult="",
+                        tgt_mult="",
                     )
 
             # Render Notes for ER Diagram
@@ -1351,7 +1532,7 @@ class XMIBuilder:
                 if rel.source_id in uc_placements and rel.target_id in uc_placements:
                     src_p = uc_placements[rel.source_id]
                     tgt_p = uc_placements[rel.target_id]
-                    rel_lbl = "«include»" if rel.type == "Include" else ("«extend»" if rel.type == "Extend" else (rel.name or ""))
+                    rel_lbl = "«Include»" if rel.type == "Include" else ("«Extend»" if rel.type == "Extend" else (rel.name or ""))
                     self._add_connector_element(
                         omg_elements,
                         rel_id=rel.id,

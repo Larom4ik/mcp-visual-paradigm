@@ -6,9 +6,10 @@ from pydantic import BaseModel, Field, model_validator
 
 # Base Node with auto-generated unique XMI ID
 class BaseNode(BaseModel):
-    """Base architectural node carrying an XML-valid unique XMI ID."""
+    """Base architectural node carrying an XML-valid unique XMI ID and rich documentation."""
 
     id: str = Field(default_factory=lambda: "xmi_" + uuid.uuid4().hex)
+    description: str = Field(default="", description="Description or documentation text for Open Specification")
 
 
 # ---------------------------------------------------------
@@ -184,6 +185,9 @@ class StateNode(BaseNode):
 
     name: str = Field(..., min_length=1, description="State name")
     type: StateType = Field(default="State", description="State vertex type: Initial, State, Final")
+    entry_action: str = Field(default="", description="Behavior executed upon state entry (entry / action)")
+    do_activity: str = Field(default="", description="Ongoing activity executed while in state (do / activity)")
+    exit_action: str = Field(default="", description="Behavior executed upon state exit (exit / action)")
 
 
 # Backwards compatibility alias

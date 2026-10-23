@@ -8,3 +8,5 @@ venv/
 !enterprise_system.xmi
 .idea/
 .vscode/
+*.vpp
+1/
