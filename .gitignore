@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.xmi
+!test_model.xmi
+!enterprise_system.xmi
+.idea/
+.vscode/

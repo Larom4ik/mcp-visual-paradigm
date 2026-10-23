@@ -1,0 +1,753 @@
+"""MCP Tools for UML and ERD modeling with Rules Engine feedback and XMI export."""
+
+from typing import Any, Optional
+from core.models import (
+    ActorModel,
+    AttributeModel,
+    ClassElementType,
+    ClassModel,
+    ClassRelation,
+    ClassRelationType,
+    ColumnModel,
+    EntityModel,
+    ERRelation,
+    ERRelationType,
+    MethodModel,
+    MethodParam,
+    ParamDirectionType,
+    StateModel,
+    StateType,
+    TransitionModel,
+    UCRelation,
+    UCRelationType,
+    UseCaseModel,
+    VisibilityType,
+)
+from core.state import state
+from exporters.xmi_builder import XMIBuilder
+
+
+# ---------------------------------------------------------
+# Normalizers & Type Checkers
+# ---------------------------------------------------------
+
+def _normalize_visibility(vis: str) -> VisibilityType:
+    clean = (vis or "public").strip().lower()
+    mapping: dict[str, VisibilityType] = {
+        "+": "public",
+        "-": "private",
+        "#": "protected",
+        "public": "public",
+        "private": "private",
+        "protected": "protected",
+    }
+    return mapping.get(clean, "public")
+
+
+def _normalize_class_rel_type(rel_type: str) -> ClassRelationType:
+    clean = (rel_type or "").strip().capitalize()
+    allowed: dict[str, ClassRelationType] = {
+        "Association": "Association",
+        "Generalization": "Generalization",
+        "Composition": "Composition",
+        "Aggregation": "Aggregation",
+        "Dependency": "Dependency",
+        "Realization": "Realization",
+    }
+    if clean not in allowed:
+        raise ValueError(
+            f"Invalid class relation type '{rel_type}'. Allowed types: {', '.join(allowed.keys())}"
+        )
+    return allowed[clean]
+
+
+def _normalize_er_rel_type(rel_type: str) -> ERRelationType:
+    clean = (rel_type or "").strip().upper()
+    allowed: dict[str, ERRelationType] = {
+        "1:1": "1:1",
+        "1:N": "1:N",
+        "M:N": "M:N",
+        "1..1": "1:1",
+        "1..N": "1:N",
+        "M..N": "M:N",
+        "N:M": "M:N",
+    }
+    if clean not in allowed:
+        raise ValueError(
+            f"Invalid ER relation type '{rel_type}'. Allowed types: 1:1, 1:N, M:N"
+        )
+    return allowed[clean]
+
+
+def _normalize_uc_rel_type(rel_type: str) -> UCRelationType:
+    clean = (rel_type or "").strip().capitalize()
+    allowed: dict[str, UCRelationType] = {
+        "Association": "Association",
+        "Include": "Include",
+        "Extend": "Extend",
+    }
+    if clean not in allowed:
+        raise ValueError(
+            f"Invalid Use Case relation type '{rel_type}'. Allowed types: Association, Include, Extend"
+        )
+    return allowed[clean]
+
+
+def _normalize_state_type(state_type: str) -> StateType:
+    clean = (state_type or "State").strip().capitalize()
+    allowed: dict[str, StateType] = {
+        "Initial": "Initial",
+        "State": "State",
+        "Final": "Final",
+    }
+    if clean not in allowed:
+        raise ValueError(
+            f"Invalid State type '{state_type}'. Allowed types: Initial, State, Final"
+        )
+    return allowed[clean]
+
+
+# ---------------------------------------------------------
+# Tool Functions
+# ---------------------------------------------------------
+
+def init_project(name: str = "ProjectModel") -> str:
+    """Initialize a new architecture project and reset the in-memory state.
+
+    Call this tool at the beginning of an architectural design session or
+    when starting a new model from scratch. It clears all previously stored
+    classes, entities, use cases, and states.
+
+    Args:
+        name: Name of the project/model (default: 'ProjectModel').
+
+    Returns:
+        Status message confirming project initialization.
+    """
+    try:
+        clean_name = name.strip() or "ProjectModel"
+        state.clear(name=clean_name)
+        return f"Project '{clean_name}' successfully initialized. In-memory state cleared."
+    except Exception as e:
+        return f"ERROR: Failed to initialize project: {str(e)}"
+
+
+# --- UML Class Diagram Tools ---
+
+def add_class(name: str, is_abstract: bool = False, element_type: str = "Class") -> str:
+    """Create a new UML Class or Interface classifier in the model.
+
+    Args:
+        name: Name of the class/interface (e.g., 'OrderService', 'Customer', 'IRepository').
+        is_abstract: Set True if this class is abstract (cannot be directly instantiated).
+        element_type: 'Class' or 'Interface'.
+
+    Returns:
+        Confirmation message with class ID or error description.
+    """
+    try:
+        clean_name = name.strip()
+        if not clean_name:
+            return "ERROR: Class name cannot be empty."
+
+        existing = state.find_class(clean_name)
+        if existing:
+            return f"Class '{clean_name}' already exists with ID: {existing.id}."
+
+        clean_elem_type: ClassElementType = "Interface" if element_type.strip().capitalize() == "Interface" else "Class"
+        new_class = ClassModel(
+            name=clean_name,
+            is_abstract=bool(is_abstract),
+            element_type=clean_elem_type,
+        )
+        state.add_node(new_class)
+        abstract_str = "Abstract " if is_abstract else ""
+        return f"Created UML {abstract_str}{clean_elem_type} '{clean_name}' (ID: {new_class.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create class: {str(e)}"
+
+
+def add_class_attribute(
+    class_name: str,
+    name: str,
+    type: str = "string",
+    visibility: str = "public",
+    multiplicity: str = "",
+) -> str:
+    """Add an attribute (field/property) to an existing UML class.
+
+    Args:
+        class_name: Name or ID of the target UML class.
+        name: Name of the attribute (e.g., 'id', 'email', 'createdAt').
+        type: Data type (e.g., 'string', 'int', 'UUID', 'UserStatus').
+        visibility: Access level ('public', 'private', or 'protected').
+        multiplicity: Multiplicity constraint (e.g., '1', '0..1', '*', '1..*').
+
+    Returns:
+        Confirmation message or error feedback.
+    """
+    try:
+        cls = state.find_class(class_name)
+        if not cls:
+            available = [c.name for c in state.classes.values()]
+            return f"ERROR: Class '{class_name}' not found. Available classes: {available}"
+
+        attr_name = name.strip()
+        if not attr_name:
+            return "ERROR: Attribute name cannot be empty."
+
+        norm_vis = _normalize_visibility(visibility)
+        if cls.element_type == "Interface" and norm_vis == "private":
+            return f"ERROR: UML Rule Violation: Interface '{cls.name}' cannot have private attributes."
+
+        attr = AttributeModel(
+            name=attr_name,
+            type=type.strip(),
+            visibility=norm_vis,
+            multiplicity=multiplicity.strip(),
+        )
+        cls.attributes.append(attr)
+        mult_str = f" [{multiplicity}]" if multiplicity else ""
+        return f"Added attribute '{norm_vis} {attr_name}: {type}'{mult_str} to {cls.element_type} '{cls.name}'."
+    except Exception as e:
+        return f"ERROR: Failed to add attribute: {str(e)}"
+
+
+def add_class_method(
+    class_name: str,
+    name: str,
+    return_type: str = "void",
+    params: Optional[list[dict[str, Any]]] = None,
+) -> str:
+    """Add a method (operation) to an existing UML class.
+
+    Args:
+        class_name: Name or ID of the target UML class.
+        name: Name of the method (e.g., 'authenticate', 'calculateTotal').
+        return_type: Return type (e.g., 'void', 'bool', 'Order', 'List[Item]').
+        params: Optional parameter dicts, e.g. [{"name": "password", "type": "string", "direction": "in"}].
+
+    Returns:
+        Confirmation message with method signature or error feedback.
+    """
+    try:
+        cls = state.find_class(class_name)
+        if not cls:
+            available = [c.name for c in state.classes.values()]
+            return f"ERROR: Class '{class_name}' not found. Available classes: {available}"
+
+        method_name = name.strip()
+        if not method_name:
+            return "ERROR: Method name cannot be empty."
+
+        param_models: list[MethodParam] = []
+        if params:
+            for p in params:
+                p_name = p.get("name", "arg").strip()
+                p_type = p.get("type", "string").strip()
+                p_dir_raw = p.get("direction", "in").strip().lower()
+                p_dir: ParamDirectionType = "in"
+                if p_dir_raw in ("in", "out", "return"):
+                    p_dir = p_dir_raw  # type: ignore
+                param_models.append(MethodParam(name=p_name, type=p_type, direction=p_dir))
+
+        method = MethodModel(name=method_name, return_type=return_type.strip(), params=param_models)
+        cls.methods.append(method)
+
+        params_repr = ", ".join(f"{p.name}: {p.type}" for p in param_models)
+        return f"Added method '+{method_name}({params_repr}): {return_type}' to {cls.element_type} '{cls.name}'."
+    except Exception as e:
+        return f"ERROR: Failed to add method: {str(e)}"
+
+
+def add_class_relation(
+    src_name: str,
+    tgt_name: str,
+    type: str,
+    src_mult: str = "",
+    tgt_mult: str = "",
+) -> str:
+    """Create a UML relationship between two classes with Rules Engine validation.
+
+    Supported types:
+    - 'Association': General relationship between classes
+    - 'Generalization': Inheritance ('is-a', source inherits target)
+    - 'Composition': Strong whole-part link (part lifecycle tied to whole)
+    - 'Aggregation': Shared whole-part link
+    - 'Dependency': Usage dependency (source client depends on target supplier)
+    - 'Realization': Interface implementation (source realizes target interface)
+
+    Args:
+        src_name: Name or ID of the source class.
+        tgt_name: Name or ID of the target class.
+        type: Relationship type (Association, Generalization, Composition, Aggregation, Dependency, Realization).
+        src_mult: Optional multiplicity at source end (e.g. '0..1', '1', '*').
+        tgt_mult: Optional multiplicity at target end (e.g. '0..1', '1', '*').
+
+    Returns:
+        Confirmation message or error explanation.
+    """
+    try:
+        src = state.find_class(src_name)
+        if not src:
+            available = [c.name for c in state.classes.values()]
+            return f"ERROR: Source class '{src_name}' not found. Available: {available}"
+
+        tgt = state.find_class(tgt_name)
+        if not tgt:
+            available = [c.name for c in state.classes.values()]
+            return f"ERROR: Target class '{tgt_name}' not found. Available: {available}"
+
+        norm_type = _normalize_class_rel_type(type)
+
+        # Rules Engine: Check for cyclic inheritance
+        if norm_type == "Generalization":
+            if state.would_cause_inheritance_cycle(src.id, tgt.id):
+                return (
+                    f"ERROR: UML Rule Violation: Cyclic inheritance detected! "
+                    f"Class '{src.name}' cannot inherit from '{tgt.name}' because an inheritance loop would be formed."
+                )
+
+        rel = ClassRelation(
+            source_id=src.id,
+            target_id=tgt.id,
+            type=norm_type,
+            source_multiplicity=src_mult.strip(),
+            target_multiplicity=tgt_mult.strip(),
+        )
+        state.add_relation(rel)
+
+        mult_info = f" [{src_mult}..{tgt_mult}]" if (src_mult or tgt_mult) else ""
+        return f"Created Class relation [{norm_type}]: '{src.name}' -> '{tgt.name}'{mult_info} (ID: {rel.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create class relation: {str(e)}"
+
+
+# --- ER Diagram Tools ---
+
+def add_er_entity(name: str) -> str:
+    """Create an ER Entity (Database Table) in the diagram.
+
+    Args:
+        name: Name of the entity/table (e.g. 'users', 'orders', 'order_items').
+
+    Returns:
+        Confirmation message with Entity ID or error.
+    """
+    try:
+        clean_name = name.strip()
+        if not clean_name:
+            return "ERROR: Entity name cannot be empty."
+
+        existing = state.find_entity(clean_name)
+        if existing:
+            return f"Entity '{clean_name}' already exists with ID: {existing.id}."
+
+        new_entity = EntityModel(name=clean_name)
+        state.add_node(new_entity)
+        return f"Created ER Entity '{clean_name}' (ID: {new_entity.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create entity: {str(e)}"
+
+
+def add_er_column(
+    entity_name: str,
+    name: str,
+    type: str = "VARCHAR",
+    length: Optional[int] = None,
+    is_nullable: bool = True,
+    is_pk: bool = False,
+    is_fk: bool = False,
+) -> str:
+    """Add a column/field to an existing ER Entity.
+
+    Args:
+        entity_name: Name or ID of the target ER Entity.
+        name: Column name (e.g. 'user_id', 'email', 'price').
+        type: Column data type (e.g. 'INT', 'VARCHAR', 'TIMESTAMP', 'DECIMAL').
+        length: Optional column length / precision (e.g. 255).
+        is_nullable: Whether column allows NULL (automatically False if is_pk is True).
+        is_pk: True if column is part of the Primary Key.
+        is_fk: True if column is a Foreign Key.
+
+    Returns:
+        Confirmation message with column flags or error.
+    """
+    try:
+        ent = state.find_entity(entity_name)
+        if not ent:
+            available = [e.name for e in state.entities.values()]
+            return f"ERROR: Entity '{entity_name}' not found. Available: {available}"
+
+        col_name = name.strip()
+        if not col_name:
+            return "ERROR: Column name cannot be empty."
+
+        col = ColumnModel(
+            name=col_name,
+            type=type.strip(),
+            length=length,
+            is_nullable=bool(is_nullable),
+            is_primary_key=bool(is_pk),
+            is_foreign_key=bool(is_fk),
+        )
+        ent.columns.append(col)
+
+        flags = []
+        if col.is_primary_key:
+            flags.append("PK")
+        if col.is_foreign_key:
+            flags.append("FK")
+        if not col.is_nullable:
+            flags.append("NOT NULL")
+        flags_str = f" [{', '.join(flags)}]" if flags else ""
+
+        type_repr = f"{col.type}({col.length})" if col.length else col.type
+        return f"Added column '{col_name}: {type_repr}'{flags_str} to Entity '{ent.name}'."
+    except Exception as e:
+        return f"ERROR: Failed to add column: {str(e)}"
+
+
+def add_er_relation(src_name: str, tgt_name: str, type: str) -> str:
+    """Create an ER cardinality relationship between two entities.
+
+    Enforces ERD integrity rules:
+    - For 1:N relations, the child/target entity MUST have at least one Foreign Key column defined.
+
+    Args:
+        src_name: Name or ID of the source entity (Parent in 1:N).
+        tgt_name: Name or ID of the target entity (Child in 1:N).
+        type: Cardinality ('1:1', '1:N', 'M:N').
+
+    Returns:
+        Confirmation message or error feedback.
+    """
+    try:
+        src = state.find_entity(src_name)
+        if not src:
+            available = [e.name for e in state.entities.values()]
+            return f"ERROR: Source entity '{src_name}' not found. Available: {available}"
+
+        tgt = state.find_entity(tgt_name)
+        if not tgt:
+            available = [e.name for e in state.entities.values()]
+            return f"ERROR: Target entity '{tgt_name}' not found. Available: {available}"
+
+        norm_type = _normalize_er_rel_type(type)
+
+        # Rules Engine: 1:N requires FK in target entity
+        if norm_type == "1:N":
+            if not state.validate_er_1_to_n(tgt.id):
+                return (
+                    f"ERROR: ERD Rule Violation: Relation 1:N from '{src.name}' to '{tgt.name}' "
+                    f"requires target entity '{tgt.name}' to have at least one column marked as Foreign Key (is_fk=True). "
+                    f"Please add a foreign key column to '{tgt.name}' first using add_er_column()."
+                )
+
+        rel = ERRelation(source_id=src.id, target_id=tgt.id, type=norm_type)
+        state.add_relation(rel)
+        return f"Created ER relation [{norm_type}]: '{src.name}' -> '{tgt.name}' (ID: {rel.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create ER relation: {str(e)}"
+
+
+# --- Use Case Diagram Tools ---
+
+def add_actor(name: str) -> str:
+    """Create a UML Actor in the Use Case diagram.
+
+    Args:
+        name: Name of the actor (e.g. 'Customer', 'Admin', 'PaymentGateway').
+
+    Returns:
+        Confirmation message with Actor ID or error.
+    """
+    try:
+        clean_name = name.strip()
+        if not clean_name:
+            return "ERROR: Actor name cannot be empty."
+
+        existing = state.find_actor(clean_name)
+        if existing:
+            return f"Actor '{clean_name}' already exists with ID: {existing.id}."
+
+        actor = ActorModel(name=clean_name)
+        state.add_node(actor)
+        return f"Created Actor '{clean_name}' (ID: {actor.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create actor: {str(e)}"
+
+
+def add_use_case(name: str) -> str:
+    """Create a UML Use Case in the diagram.
+
+    Args:
+        name: Name of the use case (e.g. 'Login', 'PlaceOrder', 'GenerateInvoice').
+
+    Returns:
+        Confirmation message with Use Case ID or error.
+    """
+    try:
+        clean_name = name.strip()
+        if not clean_name:
+            return "ERROR: Use Case name cannot be empty."
+
+        existing = state.find_use_case(clean_name)
+        if existing:
+            return f"Use Case '{clean_name}' already exists with ID: {existing.id}."
+
+        uc = UseCaseModel(name=clean_name)
+        state.add_node(uc)
+        return f"Created Use Case '{clean_name}' (ID: {uc.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create use case: {str(e)}"
+
+
+def add_uc_relation(src_name: str, tgt_name: str, type: str) -> str:
+    """Create a relationship in the Use Case diagram with UML 2.5 integrity checks.
+
+    Rules:
+    - 'Include' and 'Extend' are ONLY allowed between two Use Cases (not Actors).
+    - 'Association' is used to connect an Actor with a Use Case.
+
+    Args:
+        src_name: Name or ID of source (Actor or UseCase).
+        tgt_name: Name or ID of target (Actor or UseCase).
+        type: Relation type ('Association', 'Include', 'Extend').
+
+    Returns:
+        Confirmation message or error feedback.
+    """
+    try:
+        norm_type = _normalize_uc_rel_type(type)
+
+        if norm_type in ("Include", "Extend"):
+            src_uc = state.find_use_case(src_name)
+            if not src_uc:
+                return (
+                    f"ERROR: UML 2.5 Rule Violation: '{norm_type}' relationship source must be a Use Case. "
+                    f"'{src_name}' was not found in Use Cases."
+                )
+            tgt_uc = state.find_use_case(tgt_name)
+            if not tgt_uc:
+                return (
+                    f"ERROR: UML 2.5 Rule Violation: '{norm_type}' relationship target must be a Use Case. "
+                    f"'{tgt_name}' was not found in Use Cases."
+                )
+            if src_uc.id == tgt_uc.id:
+                return f"ERROR: UML 2.5 Rule Violation: Use Case '{src_uc.name}' cannot '{norm_type}' itself."
+
+            rel = UCRelation(source_id=src_uc.id, target_id=tgt_uc.id, type=norm_type)
+            state.add_relation(rel)
+            return f"Created Use Case relation [{norm_type}]: '{src_uc.name}' -> '{tgt_uc.name}' (ID: {rel.id})."
+        else:
+            src_node = state.find_uc_node(src_name)
+            if not src_node:
+                return f"ERROR: Source node '{src_name}' not found in Actors or Use Cases."
+            tgt_node = state.find_uc_node(tgt_name)
+            if not tgt_node:
+                return f"ERROR: Target node '{tgt_name}' not found in Actors or Use Cases."
+
+            rel = UCRelation(source_id=src_node.id, target_id=tgt_node.id, type=norm_type)
+            state.add_relation(rel)
+            return f"Created Use Case relation [Association]: '{src_node.name}' -> '{tgt_node.name}' (ID: {rel.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create use case relation: {str(e)}"
+
+
+# --- State Machine Diagram Tools ---
+
+def add_state(name: str, type: str = "State") -> str:
+    """Create a state vertex in the UML State Machine diagram.
+
+    Args:
+        name: Name of the state (e.g. 'InitialState', 'Draft', 'Processing', 'Finished').
+        type: Vertex type:
+              - 'Initial': Initial pseudo-state (start of the machine)
+              - 'State': Normal operational state
+              - 'Final': Final state (termination of the machine)
+
+    Returns:
+        Confirmation message with State ID or error.
+    """
+    try:
+        clean_name = name.strip()
+        if not clean_name:
+            return "ERROR: State name cannot be empty."
+
+        norm_type = _normalize_state_type(type)
+        existing = state.find_state(clean_name)
+        if existing:
+            return f"State '{clean_name}' already exists with ID: {existing.id}."
+
+        st = StateModel(name=clean_name, type=norm_type)
+        state.add_node(st)
+        return f"Created State [{norm_type}] '{clean_name}' (ID: {st.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create state: {str(e)}"
+
+
+def add_state_transition(src_name: str, tgt_name: str, trigger: str = "") -> str:
+    """Create a transition between two states in the State Machine.
+
+    Args:
+        src_name: Name or ID of the source state vertex.
+        tgt_name: Name or ID of the target state vertex.
+        trigger: Optional event/condition triggering this transition (e.g. 'paySuccess', 'cancelOrder').
+
+    Returns:
+        Confirmation message with Transition ID or error.
+    """
+    try:
+        src = state.find_state(src_name)
+        if not src:
+            available = [s.name for s in state.states.values()]
+            return f"ERROR: Source state '{src_name}' not found. Available: {available}"
+
+        tgt = state.find_state(tgt_name)
+        if not tgt:
+            available = [s.name for s in state.states.values()]
+            return f"ERROR: Target state '{tgt_name}' not found. Available: {available}"
+
+        if src.type == "Final":
+            return f"ERROR: UML 2.5 Rule Violation: Final state '{src.name}' cannot have outgoing transitions."
+
+        tr = TransitionModel(
+            source_id=src.id,
+            target_id=tgt.id,
+            type="Transition",
+            trigger_event=(trigger or "").strip(),
+        )
+        state.add_relation(tr)
+
+        trig_str = f" on trigger '{tr.trigger_event}'" if tr.trigger_event else ""
+        return f"Created State Transition: '{src.name}' -> '{tgt.name}'{trig_str} (ID: {tr.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create transition: {str(e)}"
+
+
+# --- Export and Summary Tools ---
+
+def export_xmi(filepath: str) -> str:
+    """Export the architecture to a complete OMG XMI 2.1 file with Visual Paradigm diagram layout.
+
+    Generates the UML Metamodel and the Visual Layout Layer (Shapes, Coordinates,
+    Connectors, Waypoints) so that all diagrams are immediately drawn on the canvas
+    when imported into Visual Paradigm via 'Project > Import > XMI...'.
+
+    Args:
+        filepath: Destination file path (e.g. './architecture.xmi' or 'C:/models/project.xmi').
+
+    Returns:
+        Status summary with file path and diagram statistics.
+    """
+    try:
+        clean_path = filepath.strip()
+        if not clean_path.lower().endswith(".xmi"):
+            clean_path = f"{clean_path}.xmi"
+
+        builder = XMIBuilder(state)
+        abs_path = builder.export(clean_path)
+
+        stats = (
+            f"Classes: {len(state.classes)} (Relations: {len(state.class_relations)}) | "
+            f"Entities: {len(state.entities)} (Relations: {len(state.er_relations)}) | "
+            f"Use Cases: {len(state.use_cases)}, Actors: {len(state.actors)} (Relations: {len(state.uc_relations)}) | "
+            f"States: {len(state.states)} (Transitions: {len(state.transitions)})"
+        )
+
+        return (
+            f"Successfully exported XMI 2.1 with Visual Layout Engine to: {abs_path}\n"
+            f"Diagram Statistics: {stats}\n"
+            f"Ready for Visual Paradigm: Project > Import > XMI..."
+        )
+    except Exception as e:
+        return f"ERROR: Failed to export XMI: {str(e)}"
+
+
+def get_project_summary() -> str:
+    """Return a detailed text overview of the current project state across all 4 diagrams.
+
+    Useful for LLM self-reflection and validation before continuing or exporting.
+
+    Returns:
+        Structured breakdown of all classes, entities, use cases, and state machine nodes.
+    """
+    lines = [f"=== Project: {state.name} ==="]
+
+    lines.append(f"\n1. UML Classes ({len(state.classes)}):")
+    for c in state.classes.values():
+        lines.append(f"  {c.element_type}: {c.name} (abstract={c.is_abstract})")
+        for a in c.attributes:
+            lines.append(f"    - {a.visibility} {a.name}: {a.type}")
+        for m in c.methods:
+            p_str = ", ".join(f"{p.name}: {p.type}" for p in m.params)
+            lines.append(f"    - +{m.name}({p_str}): {m.return_type}")
+    for cr in state.class_relations:
+        s = state.find_class(cr.source_id)
+        t = state.find_class(cr.target_id)
+        m_str = f" [{cr.source_multiplicity}..{cr.target_multiplicity}]" if cr.source_multiplicity or cr.target_multiplicity else ""
+        lines.append(f"  Relation [{cr.type}{m_str}]: {s.name if s else cr.source_id} -> {t.name if t else cr.target_id}")
+
+    lines.append(f"\n2. ER Entities ({len(state.entities)}):")
+    for e in state.entities.values():
+        lines.append(f"  Entity: {e.name}")
+        for col in e.columns:
+            flags = []
+            if col.is_primary_key:
+                flags.append("PK")
+            if col.is_foreign_key:
+                flags.append("FK")
+            if not col.is_nullable:
+                flags.append("NOT NULL")
+            flag_str = f" [{', '.join(flags)}]" if flags else ""
+            t_str = f"{col.type}({col.length})" if col.length else col.type
+            lines.append(f"    - {col.name}: {t_str}{flag_str}")
+    for er in state.er_relations:
+        s = state.find_entity(er.source_id)
+        t = state.find_entity(er.target_id)
+        lines.append(f"  Relation [{er.type}]: {s.name if s else er.source_id} -> {t.name if t else er.target_id}")
+
+    lines.append(f"\n3. Use Case Diagram (Actors: {len(state.actors)}, UseCases: {len(state.use_cases)}):")
+    for a in state.actors.values():
+        lines.append(f"  Actor: {a.name}")
+    for uc in state.use_cases.values():
+        lines.append(f"  UseCase: {uc.name}")
+    for ucr in state.uc_relations:
+        s = state.find_uc_node(ucr.source_id)
+        t = state.find_uc_node(ucr.target_id)
+        lines.append(f"  Relation [{ucr.type}]: {s.name if s else ucr.source_id} -> {t.name if t else ucr.target_id}")
+
+    lines.append(f"\n4. State Machine (States: {len(state.states)}, Transitions: {len(state.transitions)}):")
+    for st in state.states.values():
+        lines.append(f"  State [{st.type}]: {st.name}")
+    for tr in state.transitions:
+        s = state.find_state(tr.source_id)
+        t = state.find_state(tr.target_id)
+        trig = f" (trigger: {tr.trigger_event})" if tr.trigger_event else ""
+        lines.append(f"  Transition: {s.name if s else tr.source_id} -> {t.name if t else tr.target_id}{trig}")
+
+    return "\n".join(lines)
+
+
+def register_all_tools(mcp: Any) -> None:
+    """Register all architecture tools with the provided FastMCP or MCPServer instance."""
+    tools = [
+        init_project,
+        add_class,
+        add_class_attribute,
+        add_class_method,
+        add_class_relation,
+        add_er_entity,
+        add_er_column,
+        add_er_relation,
+        add_actor,
+        add_use_case,
+        add_uc_relation,
+        add_state,
+        add_state_transition,
+        export_xmi,
+        get_project_summary,
+    ]
+    for tool_fn in tools:
+        mcp.tool()(tool_fn)
