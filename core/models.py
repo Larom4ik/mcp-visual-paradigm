@@ -204,6 +204,7 @@ class RelationModel(BaseNode):
     source_multiplicity: str = Field(default="", description="Multiplicity at source end (e.g. '0..1', '1', '*')")
     target_multiplicity: str = Field(default="", description="Multiplicity at target end (e.g. '0..1', '1', '*')")
     trigger_event: str = Field(default="", description="Trigger event name for state transitions")
+    guard_condition: str = Field(default="", description="Optional guard condition expression, e.g. '[balance >= total]'")
 
     @model_validator(mode="after")
     def validate_rules(self) -> "RelationModel":
@@ -259,8 +260,29 @@ class RelationModel(BaseNode):
         return self
 
 
+# ---------------------------------------------------------
+# 6. Universal Diagram Elements (Notes & Boundaries)
+# ---------------------------------------------------------
+
+class NoteNode(BaseNode):
+    """Represents an architectural annotation Note (yellow sticky comment) on diagrams."""
+
+    name: str = Field(default="Note", description="Note label")
+    text: str = Field(..., min_length=1, description="Text content of the note")
+    target_id: Optional[str] = Field(default=None, description="Optional ID of model element linked via Anchor")
+
+
+class SystemBoundaryNode(BaseNode):
+    """Represents a System Boundary box on a Use Case Diagram enclosing use cases."""
+
+    name: str = Field(default="System", min_length=1, description="Name/title of the system boundary")
+    use_case_ids: list[str] = Field(default_factory=list, description="IDs of use cases inside this boundary")
+
+
 # Backwards compatibility aliases
 ClassRelation = RelationModel
 ERRelation = RelationModel
 UCRelation = RelationModel
 TransitionModel = RelationModel
+NoteModel = NoteNode
+SystemBoundaryModel = SystemBoundaryNode

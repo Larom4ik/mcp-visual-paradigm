@@ -7,9 +7,11 @@ from core.models import (
     BaseNode,
     ClassNode,
     EntityNode,
+    NoteNode,
     PackageNode,
     RelationModel,
     StateNode,
+    SystemBoundaryNode,
     UseCaseNode,
 )
 
@@ -51,6 +53,8 @@ class ProjectState:
             self.actors: dict[str, ActorNode] = {}
             self.use_cases: dict[str, UseCaseNode] = {}
             self.states: dict[str, StateNode] = {}
+            self.notes: dict[str, NoteNode] = {}
+            self.system_boundary: Optional[SystemBoundaryNode] = None
             self.relations: list[RelationModel] = []
             self._initialized = True
 
@@ -64,6 +68,8 @@ class ProjectState:
             self.actors.clear()
             self.use_cases.clear()
             self.states.clear()
+            self.notes.clear()
+            self.system_boundary = None
             self.relations.clear()
 
     # ---------------------------------------------------------
@@ -85,6 +91,10 @@ class ProjectState:
                 self.use_cases[node.id] = node
             elif isinstance(node, StateNode):
                 self.states[node.id] = node
+            elif isinstance(node, NoteNode):
+                self.notes[node.id] = node
+            elif isinstance(node, SystemBoundaryNode):
+                self.system_boundary = node
 
     def add_relation(self, rel: RelationModel) -> None:
         """Add a relationship into the in-memory relations collection."""
@@ -110,22 +120,30 @@ class ProjectState:
                 return self.use_cases[node_id]
             if node_id in self.states:
                 return self.states[node_id]
+            if node_id in self.notes:
+                return self.notes[node_id]
+            if self.system_boundary and self.system_boundary.id == node_id:
+                return self.system_boundary
             return None
 
     def find_node_by_name(self, name: str) -> Optional[BaseNode]:
         """Find any node by exact or case-insensitive name across all collections."""
         with self._lock:
             # 1. Exact match
-            for collection in (self.packages, self.classes, self.entities, self.actors, self.use_cases, self.states):
+            for collection in (self.packages, self.classes, self.entities, self.actors, self.use_cases, self.states, self.notes):
                 for item in collection.values():
                     if item.name == name:
                         return item
+            if self.system_boundary and self.system_boundary.name == name:
+                return self.system_boundary
             # 2. Case-insensitive match
             name_lower = name.lower()
-            for collection in (self.packages, self.classes, self.entities, self.actors, self.use_cases, self.states):
+            for collection in (self.packages, self.classes, self.entities, self.actors, self.use_cases, self.states, self.notes):
                 for item in collection.values():
                     if item.name.lower() == name_lower:
                         return item
+            if self.system_boundary and self.system_boundary.name.lower() == name_lower:
+                return self.system_boundary
             return None
 
     def find_package(self, identifier: str) -> Optional[PackageNode]:
@@ -317,6 +335,45 @@ class ProjectState:
                 return False
             return entity.has_foreign_key()
 
+    def add_note(self, text: str, target: Optional[str] = None) -> NoteNode:
+        """Create a Note (yellow comment) and optionally connect it via Anchor to a target node."""
+        with self._lock:
+            tgt_id = None
+            if target:
+                tgt_node = self.find_node_by_name(target) or self.find_node_by_id(target)
+                if tgt_node:
+                    tgt_id = tgt_node.id
+                else:
+                    tgt_id = target
+
+            note = NoteNode(text=text, target_id=tgt_id)
+            self.notes[note.id] = note
+            if tgt_id:
+                anchor_rel = RelationModel(
+                    source_id=note.id,
+                    target_id=tgt_id,
+                    type="Anchor",
+                )
+                self.relations.append(anchor_rel)
+            return note
+
+    def set_system_boundary(self, name: str, use_cases: Optional[list[str]] = None) -> SystemBoundaryNode:
+        """Define or update the System Boundary enclosing Use Cases."""
+        with self._lock:
+            uc_ids: list[str] = []
+            if use_cases:
+                for uc_ref in use_cases:
+                    uc_obj = self.find_uc_node(uc_ref)
+                    if uc_obj:
+                        uc_ids.append(uc_obj.id)
+            else:
+                uc_ids = list(self.use_cases.keys())
+
+            boundary = SystemBoundaryNode(name=name, use_case_ids=uc_ids)
+            self.system_boundary = boundary
+            return boundary
+
 
 # Global Singleton Instance
 state = ProjectState()
+
