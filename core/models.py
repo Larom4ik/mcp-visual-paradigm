@@ -60,6 +60,7 @@ class ClassNode(BaseNode):
     name: str = Field(..., min_length=1, description="Class name")
     is_abstract: bool = Field(default=False, description="Whether the class is abstract")
     element_type: ClassElementType = Field(default="Class", description="Class or Interface")
+    package_id: Optional[str] = Field(default=None, description="Optional parent package ID")
     attributes: list[AttributeModel] = Field(default_factory=list, description="Class attributes")
     methods: list[MethodModel] = Field(default_factory=list, description="Class operations")
 
@@ -74,8 +75,18 @@ class ClassNode(BaseNode):
         return self
 
 
+class PackageNode(BaseNode):
+    """Represents a UML Package namespace that can contain classes and subpackages."""
+
+    name: str = Field(..., min_length=1, description="Package name")
+    parent_package_id: Optional[str] = Field(default=None, description="ID of parent package if nested")
+    child_package_ids: list[str] = Field(default_factory=list, description="IDs of nested packages")
+    class_ids: list[str] = Field(default_factory=list, description="IDs of classes contained in this package")
+
+
 # Backwards compatibility alias
 ClassModel = ClassNode
+PackageModel = PackageNode
 
 
 # ---------------------------------------------------------

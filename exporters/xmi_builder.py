@@ -1,11 +1,15 @@
 """XMI 2.1 Builder with OMG Diagram Interchange and Visual Paradigm Native Data Binding.
 
-Ensures:
+Features:
 1. Exact matching IDs: DiagramElement.subject == ownedMember.xmi:id.
-2. Native Visual Paradigm Model Structure: All elements in <uml:Model> are <ownedMember xmi:type="..."> (Class, DataType, Association, Dependency, Realization, Actor, UseCase, StateMachine).
-3. Strict encapsulation: <ownedAttribute> and <ownedOperation> are placed strictly inside <ownedMember xmi:type="uml:Class">.
-4. Clean Diagram Rendering: Diagrams are rendered purely via OMG <uml:Diagram> with Visual Paradigm extensions. No freehand drawing shapes.
-5. ERD stereotypes: entities have <details key="entity" value="true"/> and columns have <details key="column" value="true"/>.
+2. Native Visual Paradigm Model Structure: All elements in <uml:Model> are <ownedMember xmi:type="...">.
+3. Recursive Nested Packages: Packages inside Packages, Classes inside Packages with dynamic bounding box calculation.
+4. Smart Specialized Layout Engines:
+   - HierarchicalClassLayout (Layered DAG for inheritance hierarchies and package containment).
+   - UseCaseTierLayout (3-tier columnar architecture: Actors -> Core Use Cases -> Sub-cases/Secondary Actors).
+   - ERDClusterLayout (Topological order by Foreign-Key dependencies).
+   - StateMachineFlowLayout (Horizontal pipeline flow with loopback offsets).
+5. Clean Diagram Rendering: Pure OMG <uml:Diagram> and <uml:DiagramElement> with Visual Paradigm extensions.
 """
 
 import math
@@ -19,14 +23,23 @@ from core.models import (
     ClassNode,
     EntityNode,
     MethodModel,
+    PackageNode,
     RelationModel,
     UseCaseNode,
 )
 from core.state import ProjectState
+from exporters.layout_engine import (
+    BoundingBoxCalculator,
+    ERDClusterLayout,
+    HierarchicalClassLayout,
+    NodePlacement,
+    StateMachineFlowLayout,
+    UseCaseTierLayout,
+    WaypointRoutingEngine,
+)
 
 XMI_NS = "http://schema.omg.org/spec/XMI/2.1"
 UML_NS = "http://schema.omg.org/spec/UML/2.0"
-XSI_NS = "http://www.w3.org/2001/XMLSchema-instance"
 
 
 def sanitize_id(raw_str: str) -> str:
@@ -42,106 +55,14 @@ def create_uuid_id(prefix: str = "xmi") -> str:
     return f"{prefix}_{uuid.uuid4().hex}"
 
 
-class NodePlacement:
-    """Calculated layout coordinates and dimensions for a diagram shape."""
-
-    def __init__(self, node_id: str, shape_id: str, x: int, y: int, width: int = 160, height: int = 90):
-        self.node_id = node_id
-        self.shape_id = shape_id
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-
-    @property
-    def center_x(self) -> int:
-        return self.x + self.width // 2
-
-    @property
-    def center_y(self) -> int:
-        return self.y + self.height // 2
-
-    @property
-    def geometry_str(self) -> str:
-        return f"{self.x},{self.y},{self.width},{self.height}"
-
-
-class GridAutoLayout:
-    """Calculates non-overlapping grid positions and edge connection waypoints for diagram elements."""
-
-    def __init__(self, start_x: int = 50, start_y: int = 50, gap_x: int = 250, gap_y: int = 160):
-        self.start_x = start_x
-        self.start_y = start_y
-        self.gap_x = gap_x
-        self.gap_y = gap_y
-
-    def layout_nodes(self, nodes: list[BaseNode]) -> dict[str, NodePlacement]:
-        """Compute grid coordinates for a list of nodes with dynamic dimension calculation."""
-        placements: dict[str, NodePlacement] = {}
-        if not nodes:
-            return placements
-
-        cols = max(3, int(math.ceil(math.sqrt(len(nodes)))))
-        for i, node in enumerate(nodes):
-            col = i % cols
-            row = i // cols
-            x = self.start_x + col * self.gap_x
-            y = self.start_y + row * self.gap_y
-
-            # Dynamically size the shape so attributes and methods are fully visible
-            attr_count = len(getattr(node, "attributes", [])) + len(getattr(node, "columns", []))
-            method_count = len(getattr(node, "methods", []))
-            calc_height = max(80, 40 + 18 * attr_count + 18 * method_count)
-            calc_width = 160
-
-            shape_id = f"shape_{node.id}"
-            placements[node.id] = NodePlacement(
-                node_id=node.id,
-                shape_id=shape_id,
-                x=x,
-                y=y,
-                width=calc_width,
-                height=calc_height,
-            )
-        return placements
-
-    @staticmethod
-    def calculate_waypoints(src: NodePlacement, tgt: NodePlacement) -> tuple[tuple[int, int], tuple[int, int]]:
-        """Calculate start and end boundary connection points between two shapes."""
-        # Source boundary connection point
-        if tgt.center_x > src.center_x + (src.width // 4):
-            wp1_x = src.x + src.width
-            wp1_y = src.center_y
-        elif tgt.center_x < src.center_x - (src.width // 4):
-            wp1_x = src.x
-            wp1_y = src.center_y
-        else:
-            wp1_x = src.center_x
-            wp1_y = (src.y + src.height) if tgt.center_y >= src.center_y else src.y
-
-        # Target boundary connection point
-        if src.center_x < tgt.center_x - (tgt.width // 4):
-            wp2_x = tgt.x
-            wp2_y = tgt.center_y
-        elif src.center_x > tgt.center_x + (tgt.width // 4):
-            wp2_x = tgt.x + tgt.width
-            wp2_y = tgt.center_y
-        else:
-            wp2_x = tgt.center_x
-            wp2_y = tgt.y if src.center_y <= tgt.center_y else (tgt.y + tgt.height)
-
-        return (wp1_x, wp1_y), (wp2_x, wp2_y)
-
-
 class XMIBuilder:
-    """Generates standard UML 2.x XMI 2.1 with verified Data Binding and Diagram Interchange."""
+    """Generates standard UML 2.x XMI 2.1 with verified Data Binding and Smart Diagram Interchange."""
 
     def __init__(self, state: ProjectState) -> None:
         self.state = state
         self.root: Optional[ET.Element] = None
         self.model: Optional[ET.Element] = None
         self.known_primitive_ids: dict[str, str] = {}
-        self.layout_engine = GridAutoLayout(start_x=50, start_y=50, gap_x=250, gap_y=160)
 
     def _get_or_create_type_id(self, type_name: str) -> Optional[str]:
         cleaned = (type_name or "").strip()
@@ -212,6 +133,175 @@ class XMIBuilder:
     # Metamodel Builders (ownedMember tags, public visibility, full VP metadata)
     # ---------------------------------------------------------
 
+    def _emit_class_element(
+        self,
+        parent_elem: ET.Element,
+        cls: ClassNode,
+        generalizations_by_source: dict[str, list[tuple[str, str]]],
+    ) -> ET.Element:
+        """Emit a single UML Class or Interface classifier into the specified parent element."""
+        class_elem = ET.SubElement(
+            parent_elem,
+            "ownedMember",
+            {
+                f"{{{XMI_NS}}}type": "uml:Class",
+                f"{{{XMI_NS}}}id": cls.id,
+                "name": cls.name,
+                "visibility": "public",
+                "isAbstract": "true" if cls.is_abstract else "false",
+                "isActive": "false",
+                "isLeaf": "false",
+            },
+        )
+
+        if cls.element_type == "Interface":
+            annot = ET.SubElement(
+                class_elem,
+                "eAnnotations",
+                {f"{{{XMI_NS}}}id": create_uuid_id("annot"), "source": "Stereotype"},
+            )
+            ET.SubElement(annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "interface", "value": "true"})
+
+        cls_vp_ext = ET.SubElement(class_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+        ET.SubElement(cls_vp_ext, "isRoot", {f"{{{XMI_NS}}}value": "false"})
+        ET.SubElement(cls_vp_ext, "modelType", {"value": cls.element_type})
+        ET.SubElement(cls_vp_ext, "businessModel", {f"{{{XMI_NS}}}value": "false"})
+        ET.SubElement(cls_vp_ext, "qualityScore", {"value": "-1"})
+
+        # Attributes STRICTLY inside class
+        for attr in cls.attributes:
+            attr_dict = {
+                f"{{{XMI_NS}}}type": "uml:Property",
+                f"{{{XMI_NS}}}id": attr.id,
+                "name": attr.name,
+                "visibility": attr.visibility or "public",
+                "aggregation": "none",
+                "isDerived": "false",
+                "isDerivedUnion": "false",
+                "isID": "false",
+                "isLeaf": "false",
+                "isReadOnly": "false",
+                "isStatic": "false",
+            }
+            type_id = self._get_or_create_type_id(attr.type)
+            if type_id:
+                attr_dict["type"] = type_id
+
+            prop_elem = ET.SubElement(class_elem, "ownedAttribute", attr_dict)
+            attr_vp_ext = ET.SubElement(prop_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(attr_vp_ext, "attribute")
+            ET.SubElement(attr_vp_ext, "isAbstract", {f"{{{XMI_NS}}}value": "false"})
+            ET.SubElement(attr_vp_ext, "isVisble", {f"{{{XMI_NS}}}value": "true"})
+            ET.SubElement(attr_vp_ext, "qualityScore", {"value": "-1"})
+
+            if attr.multiplicity:
+                self._append_multiplicity(prop_elem, attr.multiplicity, attr.id)
+
+        # Methods STRICTLY inside class
+        for method in cls.methods:
+            op_elem = ET.SubElement(
+                class_elem,
+                "ownedOperation",
+                {
+                    f"{{{XMI_NS}}}type": "uml:Operation",
+                    f"{{{XMI_NS}}}id": method.id,
+                    "name": method.name,
+                    "visibility": "public",
+                    "isAbstract": "false",
+                    "isLeaf": "false",
+                    "isOrdered": "false",
+                    "isQuery": "false",
+                    "isStatic": "false",
+                    "isUnique": "true",
+                },
+            )
+            ret_type_id = self._get_or_create_type_id(method.return_type)
+            if ret_type_id:
+                ET.SubElement(
+                    op_elem,
+                    "ownedParameter",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Parameter",
+                        f"{{{XMI_NS}}}id": f"{method.id}_return",
+                        "kind": "return",
+                        "type": ret_type_id,
+                    },
+                )
+            for param in method.params:
+                p_dict = {
+                    f"{{{XMI_NS}}}type": "uml:Parameter",
+                    f"{{{XMI_NS}}}id": param.id,
+                    "name": param.name,
+                    "kind": param.direction or "in",
+                }
+                p_type_id = self._get_or_create_type_id(param.type)
+                if p_type_id:
+                    p_dict["type"] = p_type_id
+                ET.SubElement(op_elem, "ownedParameter", p_dict)
+
+            op_vp_ext = ET.SubElement(op_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(op_vp_ext, "returnTypeDocumentation", {f"{{{XMI_NS}}}value": ""})
+            props = ET.SubElement(op_vp_ext, "properties")
+            ET.SubElement(props, "property", {"name": "visible", "type": "boolean", "value": "true"})
+            ET.SubElement(props, "property", {"name": "qualityScore", "type": "int", "value": "-1"})
+            ET.SubElement(op_vp_ext, "qualityScore", {"value": "-1"})
+
+        # Generalizations inside class
+        if cls.id in generalizations_by_source:
+            for rel_id, parent_id in generalizations_by_source[cls.id]:
+                gen_elem = ET.SubElement(
+                    class_elem,
+                    "generalization",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Generalization",
+                        f"{{{XMI_NS}}}id": rel_id,
+                        "general": parent_id,
+                    },
+                )
+                gen_vp = ET.SubElement(gen_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+                ET.SubElement(gen_vp, "qualityScore", {"value": "-1"})
+
+        return class_elem
+
+    def _emit_package_element(
+        self,
+        parent_elem: ET.Element,
+        pkg: PackageNode,
+        generalizations_by_source: dict[str, list[tuple[str, str]]],
+    ) -> ET.Element:
+        """Emit a Package and recursively nest child packages and member classes."""
+        pkg_elem = ET.SubElement(
+            parent_elem,
+            "ownedMember",
+            {
+                f"{{{XMI_NS}}}type": "uml:Package",
+                f"{{{XMI_NS}}}id": pkg.id,
+                "name": pkg.name,
+                "visibility": "public",
+                "isAbstract": "false",
+                "isLeaf": "false",
+            },
+        )
+        pkg_vp_ext = ET.SubElement(pkg_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+        ET.SubElement(pkg_vp_ext, "isRoot", {f"{{{XMI_NS}}}value": "false"})
+        ET.SubElement(pkg_vp_ext, "modelType", {"value": "Package"})
+        ET.SubElement(pkg_vp_ext, "businessModel", {f"{{{XMI_NS}}}value": "false"})
+        ET.SubElement(pkg_vp_ext, "qualityScore", {"value": "-1"})
+
+        # 1. Nested sub-packages
+        for sub_id in pkg.child_package_ids:
+            if sub_id in self.state.packages:
+                sub_pkg = self.state.packages[sub_id]
+                self._emit_package_element(pkg_elem, sub_pkg, generalizations_by_source)
+
+        # 2. Member classes inside this package
+        for cid in pkg.class_ids:
+            if cid in self.state.classes:
+                cls_obj = self.state.classes[cid]
+                self._emit_class_element(pkg_elem, cls_obj, generalizations_by_source)
+
+        return pkg_elem
+
     def _build_class_metamodel(self) -> None:
         assert self.model is not None
 
@@ -224,129 +314,17 @@ class XMIBuilder:
             else:
                 top_level_relations.append(rel)
 
+        # 1. Emit Packages hierarchy (starting from root packages that have no parent_package_id)
+        root_packages = [p for p in self.state.packages.values() if not p.parent_package_id]
+        for pkg in root_packages:
+            self._emit_package_element(self.model, pkg, generalizations_by_source)
+
+        # 2. Emit Top-Level Classes (classes not assigned to any package)
         for cls in self.state.classes.values():
-            class_elem = ET.SubElement(
-                self.model,
-                "ownedMember",
-                {
-                    f"{{{XMI_NS}}}type": "uml:Class",
-                    f"{{{XMI_NS}}}id": cls.id,
-                    "name": cls.name,
-                    "visibility": "public",
-                    "isAbstract": "true" if cls.is_abstract else "false",
-                    "isActive": "false",
-                    "isLeaf": "false",
-                },
-            )
+            if not cls.package_id:
+                self._emit_class_element(self.model, cls, generalizations_by_source)
 
-            if cls.element_type == "Interface":
-                annot = ET.SubElement(
-                    class_elem,
-                    "eAnnotations",
-                    {f"{{{XMI_NS}}}id": create_uuid_id("annot"), "source": "Stereotype"},
-                )
-                ET.SubElement(annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "interface", "value": "true"})
-
-            cls_vp_ext = ET.SubElement(class_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
-            ET.SubElement(cls_vp_ext, "isRoot", {f"{{{XMI_NS}}}value": "false"})
-            ET.SubElement(cls_vp_ext, "modelType", {"value": cls.element_type})
-            ET.SubElement(cls_vp_ext, "businessModel", {f"{{{XMI_NS}}}value": "false"})
-            ET.SubElement(cls_vp_ext, "qualityScore", {"value": "-1"})
-
-            # Attributes STRICTLY inside class
-            for attr in cls.attributes:
-                attr_dict = {
-                    f"{{{XMI_NS}}}type": "uml:Property",
-                    f"{{{XMI_NS}}}id": attr.id,
-                    "name": attr.name,
-                    "visibility": attr.visibility or "public",
-                    "aggregation": "none",
-                    "isDerived": "false",
-                    "isDerivedUnion": "false",
-                    "isID": "false",
-                    "isLeaf": "false",
-                    "isReadOnly": "false",
-                    "isStatic": "false",
-                }
-                type_id = self._get_or_create_type_id(attr.type)
-                if type_id:
-                    attr_dict["type"] = type_id
-
-                prop_elem = ET.SubElement(class_elem, "ownedAttribute", attr_dict)
-                attr_vp_ext = ET.SubElement(prop_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
-                ET.SubElement(attr_vp_ext, "attribute")
-                ET.SubElement(attr_vp_ext, "isAbstract", {f"{{{XMI_NS}}}value": "false"})
-                ET.SubElement(attr_vp_ext, "isVisble", {f"{{{XMI_NS}}}value": "true"})
-                ET.SubElement(attr_vp_ext, "qualityScore", {"value": "-1"})
-
-                if attr.multiplicity:
-                    self._append_multiplicity(prop_elem, attr.multiplicity, attr.id)
-
-            # Methods STRICTLY inside class
-            for method in cls.methods:
-                op_elem = ET.SubElement(
-                    class_elem,
-                    "ownedOperation",
-                    {
-                        f"{{{XMI_NS}}}type": "uml:Operation",
-                        f"{{{XMI_NS}}}id": method.id,
-                        "name": method.name,
-                        "visibility": "public",
-                        "isAbstract": "false",
-                        "isLeaf": "false",
-                        "isOrdered": "false",
-                        "isQuery": "false",
-                        "isStatic": "false",
-                        "isUnique": "true",
-                    },
-                )
-                ret_type_id = self._get_or_create_type_id(method.return_type)
-                if ret_type_id:
-                    ET.SubElement(
-                        op_elem,
-                        "ownedParameter",
-                        {
-                            f"{{{XMI_NS}}}type": "uml:Parameter",
-                            f"{{{XMI_NS}}}id": f"{method.id}_return",
-                            "kind": "return",
-                            "type": ret_type_id,
-                        },
-                    )
-                for param in method.params:
-                    p_dict = {
-                        f"{{{XMI_NS}}}type": "uml:Parameter",
-                        f"{{{XMI_NS}}}id": param.id,
-                        "name": param.name,
-                        "kind": param.direction or "in",
-                    }
-                    p_type_id = self._get_or_create_type_id(param.type)
-                    if p_type_id:
-                        p_dict["type"] = p_type_id
-                    ET.SubElement(op_elem, "ownedParameter", p_dict)
-
-                op_vp_ext = ET.SubElement(op_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
-                ET.SubElement(op_vp_ext, "returnTypeDocumentation", {f"{{{XMI_NS}}}value": ""})
-                props = ET.SubElement(op_vp_ext, "properties")
-                ET.SubElement(props, "property", {"name": "visible", "type": "boolean", "value": "true"})
-                ET.SubElement(props, "property", {"name": "qualityScore", "type": "int", "value": "-1"})
-                ET.SubElement(op_vp_ext, "qualityScore", {"value": "-1"})
-
-            # Generalization STRICTLY inside child class with exact rel.id match
-            if cls.id in generalizations_by_source:
-                for rel_id, parent_id in generalizations_by_source[cls.id]:
-                    gen_elem = ET.SubElement(
-                        class_elem,
-                        "generalization",
-                        {
-                            f"{{{XMI_NS}}}type": "uml:Generalization",
-                            f"{{{XMI_NS}}}id": rel_id,
-                            "general": parent_id,
-                        },
-                    )
-                    gen_vp = ET.SubElement(gen_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
-                    ET.SubElement(gen_vp, "qualityScore", {"value": "-1"})
-
-        # Top-level class relations (Association, Composition, Dependency, Realization)
+        # 3. Top-level class relations (Association, Composition, Dependency, Realization)
         for rel in top_level_relations:
             src = self.state.find_class(rel.source_id)
             tgt = self.state.find_class(rel.target_id)
@@ -473,7 +451,6 @@ class XMIBuilder:
                 },
             )
 
-            # VP Stereotype: entity
             e_annot = ET.SubElement(
                 ent_elem,
                 "eAnnotations",
@@ -487,7 +464,6 @@ class XMIBuilder:
             ET.SubElement(ent_vp_ext, "businessModel", {f"{{{XMI_NS}}}value": "false"})
             ET.SubElement(ent_vp_ext, "qualityScore", {"value": "-1"})
 
-            # Columns STRICTLY inside entity class
             for col in ent.columns:
                 col_attrs = {
                     f"{{{XMI_NS}}}type": "uml:Property",
@@ -512,7 +488,6 @@ class XMIBuilder:
                 ET.SubElement(col_vp_ext, "isVisble", {f"{{{XMI_NS}}}value": "true"})
                 ET.SubElement(col_vp_ext, "qualityScore", {"value": "-1"})
 
-                # Annotations for column, primaryKey, foreignKey
                 col_annot = ET.SubElement(
                     prop_elem,
                     "eAnnotations",
@@ -867,7 +842,11 @@ class XMIBuilder:
         caption_side: int = 12,
     ) -> None:
         """Add fully-styled OMG DiagramElement with Visual Paradigm data binding."""
-        if shape_type == "Actor":
+        if shape_type == "Package":
+            effective_caption_side = 12
+            caption_bounds = f"0,20,{p.width},{max(20, p.height - 20)}"
+            align = "1"
+        elif shape_type == "Actor":
             effective_caption_side = 1
             caption_bounds = f"0,{p.height},{p.width},18"
             align = "4"
@@ -904,14 +883,22 @@ class XMIBuilder:
         ET.SubElement(props, "acreatorDiagramType", {"value": creator_diag_type})
         ET.SubElement(props, "aselectable", {"value": "true"})
         ET.SubElement(props, "amodelElementNameAlignment", {"value": align})
-        if shape_type == "Actor":
+
+        if shape_type == "Package":
+            ET.SubElement(props, "ashowPackageNameStyle", {"value": "2"})
+        elif shape_type == "Actor":
             ET.SubElement(props, "arequestResetCaption", {"value": "true"})
+
         ET.SubElement(props, "ashowAttributeType", {"value": "1"})
         ET.SubElement(props, "ashowOperationType", {"value": "1"})
         ET.SubElement(props, "ashowReceptionType", {"value": "1"})
         ET.SubElement(props, "ashowEmptyCompartments", {"value": "0"})
         ET.SubElement(props, "ashowOperationSignature", {"value": "true"})
         ET.SubElement(props, "ashowInitialAttributeValue", {"value": "true"})
+
+        # If shape is inside a parent package, establish visual containment
+        if p.parent_shape_id:
+            ET.SubElement(shape_vp, "parentDiagramElement", {"idref": p.parent_shape_id})
 
         ET.SubElement(omg_elem, "elementFill", {"color1": "Cr:122,207,245,255", "color2": "", "style": "1", "transparency": "0", "type": "1"})
         ET.SubElement(omg_elem, "elementFont", {"bold": "false", "color": "Cr:0,0,0,255", "italic": "false", "name": "Dialog", "size": "11", "style": "0"})
@@ -931,7 +918,7 @@ class XMIBuilder:
         tgt_mult: str = "",
     ) -> None:
         """Add fully-styled OMG DiagramElement connector with Visual Paradigm data binding."""
-        wp1, wp2 = GridAutoLayout.calculate_waypoints(src_p, tgt_p)
+        wp1, wp2 = WaypointRoutingEngine.calculate_waypoints(src_p, tgt_p)
         mid_x = (wp1[0] + wp2[0]) // 2
         mid_y = (wp1[1] + wp2[1]) // 2
 
@@ -1019,27 +1006,43 @@ class XMIBuilder:
         return omg_diag, omg_elements
 
     def _build_visual_layers(self) -> None:
-        """Inject OMG <uml:Diagram> and <uml:DiagramElement> for all active diagrams."""
+        """Inject OMG <uml:Diagram> and <uml:DiagramElement> using Smart Layout Engines."""
         assert self.root is not None
 
-        # Diagram 1: Class Diagram
-        if self.state.classes:
-            class_nodes: list[BaseNode] = list(self.state.classes.values())
-            class_placements = self.layout_engine.layout_nodes(class_nodes)
+        # Diagram 1: Class Diagram with Hierarchical DAG & Nested Package Layout
+        if self.state.classes or self.state.packages:
+            class_layout = HierarchicalClassLayout(start_x=60, start_y=60, gap_x=60, gap_y=100)
+            class_placements = class_layout.layout(self.state)
             _, omg_elements = self._create_diagram("omg_diag_class_1", "Class Diagram", "ClassDiagram")
 
-            for p in class_placements.values():
-                cls_node = self.state.classes[p.node_id]
-                shape_type = "Interface" if cls_node.element_type == "Interface" else "Class"
-                self._add_shape_element(
-                    omg_elements,
-                    p,
-                    cls_node,
-                    shape_type=shape_type,
-                    creator_diag_type="ClassDiagram",
-                    caption_side=12,
-                )
+            # 1. Add Package shapes
+            for pid, pkg in self.state.packages.items():
+                if pid in class_placements:
+                    p = class_placements[pid]
+                    self._add_shape_element(
+                        omg_elements,
+                        p,
+                        pkg,
+                        shape_type="Package",
+                        creator_diag_type="ClassDiagram",
+                        caption_side=12,
+                    )
 
+            # 2. Add Class shapes
+            for cid, cls_node in self.state.classes.items():
+                if cid in class_placements:
+                    p = class_placements[cid]
+                    shape_type = "Interface" if cls_node.element_type == "Interface" else "Class"
+                    self._add_shape_element(
+                        omg_elements,
+                        p,
+                        cls_node,
+                        shape_type=shape_type,
+                        creator_diag_type="ClassDiagram",
+                        caption_side=12,
+                    )
+
+            # 3. Add Connectors
             for rel in self.state.class_relations:
                 if rel.source_id in class_placements and rel.target_id in class_placements:
                     src_p = class_placements[rel.source_id]
@@ -1056,10 +1059,10 @@ class XMIBuilder:
                         tgt_mult=rel.target_multiplicity,
                     )
 
-        # Diagram 2: ER Diagram
+        # Diagram 2: ER Diagram with FK Dependency Directed Layout
         if self.state.entities:
-            er_nodes: list[BaseNode] = list(self.state.entities.values())
-            er_placements = self.layout_engine.layout_nodes(er_nodes)
+            erd_layout = ERDClusterLayout(start_x=60, start_y=60, gap_x=70, gap_y=90)
+            er_placements = erd_layout.layout(self.state)
             _, omg_elements = self._create_diagram("omg_diag_erd_1", "Entity Relationship Diagram", "ERDiagram")
 
             for p in er_placements.values():
@@ -1091,16 +1094,16 @@ class XMIBuilder:
                         tgt_mult=tgt_mult,
                     )
 
-        # Diagram 3: Use Case Diagram
+        # Diagram 3: Use Case Diagram with 3-Tier Columnar Layout
         if self.state.actors or self.state.use_cases:
-            uc_nodes: list[BaseNode] = list(self.state.actors.values()) + list(self.state.use_cases.values())
-            uc_placements = self.layout_engine.layout_nodes(uc_nodes)
+            uc_layout = UseCaseTierLayout(col1_x=60, col2_x=360, col3_x=680, start_y=60, gap_y=130)
+            uc_placements = uc_layout.layout(self.state)
             _, omg_elements = self._create_diagram("omg_diag_uc_1", "Use Case Diagram", "UseCaseDiagram")
 
             for p in uc_placements.values():
                 is_actor = p.node_id in self.state.actors
                 shape_type = "Actor" if is_actor else "UseCase"
-                caption_side = 7 if is_actor else 12
+                caption_side = 1 if is_actor else 12
                 uc_node = self.state.actors[p.node_id] if is_actor else self.state.use_cases[p.node_id]
                 self._add_shape_element(
                     omg_elements,
@@ -1125,10 +1128,10 @@ class XMIBuilder:
                         creator_diag_type="UseCaseDiagram",
                     )
 
-        # Diagram 4: State Machine Diagram
+        # Diagram 4: State Machine Diagram with Horizontal Flow Pipeline Layout
         if self.state.states:
-            sm_nodes: list[BaseNode] = list(self.state.states.values())
-            sm_placements = self.layout_engine.layout_nodes(sm_nodes)
+            sm_layout = StateMachineFlowLayout(start_x=60, start_y=150, gap_x=160)
+            sm_placements = sm_layout.layout(self.state)
             _, omg_elements = self._create_diagram("omg_diag_sm_1", "State Machine Diagram", "StateDiagram")
 
             for p in sm_placements.values():
@@ -1161,7 +1164,6 @@ class XMIBuilder:
         """Construct full XML ElementTree with Metamodel and Visual Layout."""
         ET.register_namespace("xmi", XMI_NS)
         ET.register_namespace("uml", UML_NS)
-        ET.register_namespace("xsi", XSI_NS)
 
         self.root = ET.Element(
             f"{{{XMI_NS}}}XMI",
@@ -1195,7 +1197,7 @@ class XMIBuilder:
             },
         )
 
-        # 1. Logical Metamodel (pure native ownedMember elements)
+        # 1. Logical Metamodel (pure native ownedMember elements with packages)
         self._build_class_metamodel()
         self._build_er_metamodel()
         self._build_uc_metamodel()

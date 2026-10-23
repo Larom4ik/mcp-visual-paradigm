@@ -7,6 +7,7 @@ from core.models import (
     BaseNode,
     ClassNode,
     EntityNode,
+    PackageNode,
     RelationModel,
     StateNode,
     UseCaseNode,
@@ -44,6 +45,7 @@ class ProjectState:
             if getattr(self, "_initialized", False):
                 return
             self.name: str = name
+            self.packages: dict[str, PackageNode] = {}
             self.classes: dict[str, ClassNode] = {}
             self.entities: dict[str, EntityNode] = {}
             self.actors: dict[str, ActorNode] = {}
@@ -56,6 +58,7 @@ class ProjectState:
         """Reset all storage collections and update project name."""
         with self._lock:
             self.name = name
+            self.packages.clear()
             self.classes.clear()
             self.entities.clear()
             self.actors.clear()
@@ -70,7 +73,9 @@ class ProjectState:
     def add_node(self, node: BaseNode) -> None:
         """Add any BaseNode subtype into the appropriate dictionary collection."""
         with self._lock:
-            if isinstance(node, ClassNode):
+            if isinstance(node, PackageNode):
+                self.packages[node.id] = node
+            elif isinstance(node, ClassNode):
                 self.classes[node.id] = node
             elif isinstance(node, EntityNode):
                 self.entities[node.id] = node
@@ -93,6 +98,8 @@ class ProjectState:
     def find_node_by_id(self, node_id: str) -> Optional[BaseNode]:
         """Find any node by its unique XMI ID."""
         with self._lock:
+            if node_id in self.packages:
+                return self.packages[node_id]
             if node_id in self.classes:
                 return self.classes[node_id]
             if node_id in self.entities:
@@ -109,17 +116,73 @@ class ProjectState:
         """Find any node by exact or case-insensitive name across all collections."""
         with self._lock:
             # 1. Exact match
-            for collection in (self.classes, self.entities, self.actors, self.use_cases, self.states):
+            for collection in (self.packages, self.classes, self.entities, self.actors, self.use_cases, self.states):
                 for item in collection.values():
                     if item.name == name:
                         return item
             # 2. Case-insensitive match
             name_lower = name.lower()
-            for collection in (self.classes, self.entities, self.actors, self.use_cases, self.states):
+            for collection in (self.packages, self.classes, self.entities, self.actors, self.use_cases, self.states):
                 for item in collection.values():
                     if item.name.lower() == name_lower:
                         return item
             return None
+
+    def find_package(self, identifier: str) -> Optional[PackageNode]:
+        """Find a Package by ID or exact/case-insensitive Name."""
+        with self._lock:
+            if identifier in self.packages:
+                return self.packages[identifier]
+            for pkg in self.packages.values():
+                if pkg.name == identifier:
+                    return pkg
+            norm = identifier.lower()
+            for pkg in self.packages.values():
+                if pkg.name.lower() == norm:
+                    return pkg
+            return None
+
+    def create_package(self, name: str, parent_package: Optional[str] = None) -> PackageNode:
+        """Create a package or return existing one, optionally nesting under a parent package."""
+        with self._lock:
+            existing = self.find_package(name)
+            if existing is not None:
+                pkg = existing
+            else:
+                pkg = PackageNode(name=name)
+                self.packages[pkg.id] = pkg
+
+            if parent_package:
+                parent = self.find_package(parent_package)
+                if parent is None:
+                    parent = PackageNode(name=parent_package)
+                    self.packages[parent.id] = parent
+                if pkg.id not in parent.child_package_ids:
+                    parent.child_package_ids.append(pkg.id)
+                pkg.parent_package_id = parent.id
+
+            return pkg
+
+    def move_class_to_package(self, class_name: str, package_name: str) -> tuple[ClassNode, PackageNode]:
+        """Move an existing class into a package, updating bidirectional containment."""
+        with self._lock:
+            cls_obj = self.find_class(class_name)
+            if cls_obj is None:
+                raise ValueError(f"Class '{class_name}' not found.")
+            pkg_obj = self.find_package(package_name)
+            if pkg_obj is None:
+                pkg_obj = self.create_package(package_name)
+
+            if cls_obj.package_id and cls_obj.package_id in self.packages:
+                old_pkg = self.packages[cls_obj.package_id]
+                if cls_obj.id in old_pkg.class_ids:
+                    old_pkg.class_ids.remove(cls_obj.id)
+
+            cls_obj.package_id = pkg_obj.id
+            if cls_obj.id not in pkg_obj.class_ids:
+                pkg_obj.class_ids.append(cls_obj.id)
+
+            return cls_obj, pkg_obj
 
     def find_class(self, identifier: str) -> Optional[ClassNode]:
         """Find a Class by ID or exact/case-insensitive Name."""

@@ -1,7 +1,15 @@
 """Comprehensive end-to-end verification of all 4 diagram types and XMI export."""
 
 import os
+import sys
 import xml.etree.ElementTree as ET
+
+if sys.platform == "win32":
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 from mcp_tools.tools import (
     add_actor,
     add_class,
@@ -11,6 +19,7 @@ from mcp_tools.tools import (
     add_er_column,
     add_er_entity,
     add_er_relation,
+    add_package,
     add_state,
     add_state_transition,
     add_uc_relation,
@@ -18,6 +27,9 @@ from mcp_tools.tools import (
     export_xmi,
     get_project_summary,
     init_project,
+    move_class_to_package,
+    smart_add_relation,
+    suggest_relation,
 )
 from core.state import state
 
@@ -26,40 +38,55 @@ def run_tests():
     print(init_project("EnterpriseSystem"))
     assert state.name == "EnterpriseSystem"
 
-    print("\n=== 2. UML Class Diagram Setup ===")
-    print(add_class("BaseEntity"))
+    print("\n=== 2. UML Package Hierarchy Setup ===")
+    print(add_package("CoreDomain"))
+    print(add_package("Ordering", parent_package="CoreDomain"))
+    print(add_package("PaymentSubsystem"))
+
+    print("\n=== 3. UML Class Diagram Setup with Packages ===")
+    print(add_class("BaseEntity", package="CoreDomain"))
     print(add_class_attribute("BaseEntity", "id", "UUID", "public"))
     print(add_class_attribute("BaseEntity", "createdAt", "DateTime", "protected"))
 
-    print(add_class("User"))
+    print(add_class("User", package="CoreDomain"))
     print(add_class_attribute("User", "email", "string", "private"))
     print(add_class_attribute("User", "passwordHash", "string", "private"))
     print(add_class_method("User", "authenticate", "bool", [{"name": "password", "type": "string", "direction": "in"}]))
 
-    print(add_class("Customer"))
+    print(add_class("Customer", package="CoreDomain"))
     print(add_class_attribute("Customer", "loyaltyPoints", "int", "public"))
 
-    print(add_class("Order"))
+    print(add_class("Order", package="Ordering"))
     print(add_class_attribute("Order", "total", "float", "public"))
     print(add_class_method("Order", "recalculate", "void", []))
 
-    print(add_class("OrderItem"))
+    print(add_class("OrderItem", package="Ordering"))
     print(add_class_attribute("OrderItem", "quantity", "int", "public"))
 
-    print(add_class("IPaymentGateway"))
+    print(add_class("IPaymentGateway", element_type="Interface", package="PaymentSubsystem"))
     print(add_class_method("IPaymentGateway", "charge", "bool", [{"name": "amount", "type": "float"}]))
 
-    print(add_class("StripePaymentGateway"))
+    print(add_class("StripePaymentGateway", package="PaymentSubsystem"))
 
-    # Relations
-    print(add_class_relation("User", "BaseEntity", "Generalization"))
-    print(add_class_relation("Customer", "User", "Generalization"))
-    print(add_class_relation("Customer", "Order", "Aggregation"))
-    print(add_class_relation("Order", "OrderItem", "Composition"))
-    print(add_class_relation("Order", "IPaymentGateway", "Dependency"))
-    print(add_class_relation("StripePaymentGateway", "IPaymentGateway", "Realization"))
+    print("\n=== 4. Semantic Relationship Decision Engine Testing ===")
+    # 4.1 Test suggest_relation
+    sugg_comp = suggest_relation("Order", "OrderItem", "Order exclusively owns OrderItems and destroys them together")
+    print(sugg_comp)
+    assert "Composition" in sugg_comp, "Should recommend Composition for exclusive whole-part"
 
-    print("\n=== 3. ER Diagram Setup ===")
+    sugg_real = suggest_relation("StripePaymentGateway", "IPaymentGateway", "implements payment interface contract")
+    print("\n" + sugg_real)
+    assert "Realization" in sugg_real, "Should recommend Realization for interface implementation"
+
+    # 4.2 Test smart_add_relation
+    print("\n" + smart_add_relation("User", "BaseEntity", "inherits identity and timestamps (is a)"))
+    print(smart_add_relation("Customer", "User", "subclass of User"))
+    print(smart_add_relation("Customer", "Order", "aggregates orders (customer has orders)"))
+    print(smart_add_relation("Order", "OrderItem", "owns exclusively (composition)"))
+    print(smart_add_relation("Order", "IPaymentGateway", "uses payment gateway parameter"))
+    print(smart_add_relation("StripePaymentGateway", "IPaymentGateway", "implements interface contract"))
+
+    print("\n=== 5. ER Diagram Setup ===")
     print(add_er_entity("users"))
     print(add_er_column("users", "id", "BIGINT", is_pk=True))
     print(add_er_column("users", "email", "VARCHAR(255)"))
@@ -127,6 +154,7 @@ def run_tests():
 
     XMI_NS = "http://schema.omg.org/spec/XMI/2.1"
     UML_NS = "http://schema.omg.org/spec/UML/2.0"
+    UML_DI_NS = UML_NS
 
     print("Root tag:", root.tag)
     assert root.tag == f"{{{XMI_NS}}}XMI"
@@ -137,13 +165,47 @@ def run_tests():
     assert model.attrib.get(f"{{{XMI_NS}}}id") == "model_1"
     assert model.attrib.get("name") == "EnterpriseSystem"
 
-    # Validate Class Diagram
-    user_elem = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "User")
+    # Validate Package Hierarchy & Metamodel Containment
+    core_pkg = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "CoreDomain")
+    assert core_pkg.attrib.get(f"{{{XMI_NS}}}type") == "uml:Package"
+    print("Top-level Package 'CoreDomain' verified.")
+
+    ordering_pkg = next(el for el in core_pkg.findall("ownedMember") if el.attrib.get("name") == "Ordering")
+    assert ordering_pkg.attrib.get(f"{{{XMI_NS}}}type") == "uml:Package"
+    print("Nested Package 'Ordering' inside 'CoreDomain' verified.")
+
+    payment_pkg = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "PaymentSubsystem")
+    assert payment_pkg.attrib.get(f"{{{XMI_NS}}}type") == "uml:Package"
+    print("Top-level Package 'PaymentSubsystem' verified.")
+
+    # Validate Class inside Package & Generalization
+    user_elem = next(el for el in core_pkg.findall("ownedMember") if el.attrib.get("name") == "User")
     assert user_elem.attrib.get(f"{{{XMI_NS}}}type") == "uml:Class"
     user_gen = user_elem.find("generalization")
     assert user_gen is not None
     assert user_gen.attrib.get(f"{{{XMI_NS}}}type") == "uml:Generalization"
-    print("Class Generalization verified inside User.")
+    print("Class Generalization verified inside User (contained in CoreDomain).")
+
+    # Validate Visual Package Shapes & Containment
+    omg_diagrams = root.findall(f"{{{UML_NS}}}Diagram")
+    class_diag = next(d for d in omg_diagrams if d.attrib.get("diagramType") == "ClassDiagram")
+    elems = class_diag.find(f"{{{UML_NS}}}Diagram.element")
+    assert elems is not None
+    diag_elems = elems.findall(f"{{{UML_NS}}}DiagramElement")
+
+    pkg_shapes = [el for el in diag_elems if el.attrib.get("preferredShapeType") == "Package"]
+    assert len(pkg_shapes) == 3, f"Expected 3 package shapes, got {len(pkg_shapes)}"
+    print(f"Visual Package shapes verified: {len(pkg_shapes)} package containers.")
+
+    user_shape = next(el for el in diag_elems if el.attrib.get("subject") == user_elem.attrib.get(f"{{{XMI_NS}}}id"))
+    user_vp = user_shape.find(f"{{{XMI_NS}}}Extension")
+    assert user_vp is not None
+    parent_ref = user_vp.find("parentDiagramElement")
+    assert parent_ref is not None, "User shape must have parentDiagramElement pointing to CoreDomain"
+    assert parent_ref.attrib.get("idref") == f"shape_{core_pkg.attrib.get(f'{{{XMI_NS}}}id')}"
+    print("Visual parentDiagramElement containment verified: User is visually inside CoreDomain shape.")
+
+
 
     # Validate ER Entities & eAnnotations
     users_table = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "users")

@@ -3,28 +3,36 @@
 from typing import Any, Optional
 from core.models import (
     ActorModel,
+    ActorNode,
     AttributeModel,
     ClassElementType,
     ClassModel,
+    ClassNode,
     ClassRelation,
     ClassRelationType,
     ColumnModel,
     EntityModel,
+    EntityNode,
     ERRelation,
     ERRelationType,
     MethodModel,
     MethodParam,
+    PackageModel,
+    PackageNode,
     ParamDirectionType,
     StateModel,
+    StateNode,
     StateType,
     TransitionModel,
     UCRelation,
     UCRelationType,
     UseCaseModel,
+    UseCaseNode,
     VisibilityType,
 )
 from core.state import state
 from exporters.xmi_builder import XMIBuilder
+
 
 
 # ---------------------------------------------------------
@@ -132,15 +140,66 @@ def init_project(name: str = "ProjectModel") -> str:
         return f"ERROR: Failed to initialize project: {str(e)}"
 
 
-# --- UML Class Diagram Tools ---
+# --- UML Package & Class Diagram Tools ---
 
-def add_class(name: str, is_abstract: bool = False, element_type: str = "Class") -> str:
+def add_package(name: str, parent_package: Optional[str] = None) -> str:
+    """Create a UML Package (namespace container) to group classes and subpackages.
+
+    Packages provide modular domain organization. Visual Paradigm renders them as container
+    boxes with tabs, dynamically sized so all child elements fit neatly inside without overflowing.
+
+    Args:
+        name: Name of the package (e.g., 'Domain', 'Billing', 'Controllers').
+        parent_package: Optional name or ID of a parent package for hierarchical nesting.
+
+    Returns:
+        Confirmation message with Package ID and nesting hierarchy.
+    """
+    try:
+        clean_name = name.strip()
+        if not clean_name:
+            return "ERROR: Package name cannot be empty."
+
+        clean_parent = parent_package.strip() if parent_package else None
+        pkg = state.create_package(clean_name, clean_parent)
+        parent_info = f" nested under '{clean_parent}'" if clean_parent else ""
+        return f"Created UML Package '{pkg.name}'{parent_info} (ID: {pkg.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create package: {str(e)}"
+
+
+def move_class_to_package(class_name: str, package_name: str) -> str:
+    """Assign or move an existing UML class into a specified Package container.
+
+    Args:
+        class_name: Name or ID of the class to move.
+        package_name: Name or ID of the destination package.
+
+    Returns:
+        Confirmation message or error feedback.
+    """
+    try:
+        clean_cls = class_name.strip()
+        clean_pkg = package_name.strip()
+        cls_obj, pkg_obj = state.move_class_to_package(clean_cls, clean_pkg)
+        return f"Moved Class '{cls_obj.name}' into Package '{pkg_obj.name}'."
+    except Exception as e:
+        return f"ERROR: Failed to move class to package: {str(e)}"
+
+
+def add_class(
+    name: str,
+    is_abstract: bool = False,
+    element_type: str = "Class",
+    package: Optional[str] = None,
+) -> str:
     """Create a new UML Class or Interface classifier in the model.
 
     Args:
         name: Name of the class/interface (e.g., 'OrderService', 'Customer', 'IRepository').
         is_abstract: Set True if this class is abstract (cannot be directly instantiated).
         element_type: 'Class' or 'Interface'.
+        package: Optional name of the package container to place this class into.
 
     Returns:
         Confirmation message with class ID or error description.
@@ -161,8 +220,14 @@ def add_class(name: str, is_abstract: bool = False, element_type: str = "Class")
             element_type=clean_elem_type,
         )
         state.add_node(new_class)
+
+        pkg_msg = ""
+        if package and package.strip():
+            cls_obj, pkg_obj = state.move_class_to_package(clean_name, package.strip())
+            pkg_msg = f" inside Package '{pkg_obj.name}'"
+
         abstract_str = "Abstract " if is_abstract else ""
-        return f"Created UML {abstract_str}{clean_elem_type} '{clean_name}' (ID: {new_class.id})."
+        return f"Created UML {abstract_str}{clean_elem_type} '{clean_name}'{pkg_msg} (ID: {new_class.id})."
     except Exception as e:
         return f"ERROR: Failed to create class: {str(e)}"
 
@@ -321,6 +386,356 @@ def add_class_relation(
         return f"Created Class relation [{norm_type}]: '{src.name}' -> '{tgt.name}'{mult_info} (ID: {rel.id})."
     except Exception as e:
         return f"ERROR: Failed to create class relation: {str(e)}"
+
+
+# --- Semantic Relationship Decision Engine ---
+
+def _resolve_semantic_relation(src_obj: Any, tgt_obj: Any, intent: str) -> dict[str, Any]:
+    """Helper to deduce OMG UML relationship type, visual notation, and multiplicities based on semantics."""
+    intent_lower = intent.lower()
+
+    # Case A: UML Class Diagram
+    if isinstance(src_obj, ClassNode) and isinstance(tgt_obj, ClassNode):
+        # 1. Realization (implements interface)
+        if (
+            tgt_obj.element_type == "Interface"
+            or any(w in intent_lower for w in ["implement", "realiz", "contract"])
+        ):
+            return {
+                "diagram": "Class",
+                "type": "Realization",
+                "visual": "Dashed line with hollow closed triangular arrow pointing to interface: [Class] - - - |> [Interface]",
+                "src_mult": "",
+                "tgt_mult": "",
+                "rationale": f"Class '{src_obj.name}' implements interface contract '{tgt_obj.name}'. In OMG UML, realization is represented by a dashed line with a hollow closed triangle pointing to the interface.",
+                "action": "ClassRelation",
+            }
+
+        # 2. Generalization (is a / inheritance)
+        if any(w in intent_lower for w in ["is a", "is-a", "inherits", "extends", "subclass", "derived", "child of", "generalization"]):
+            return {
+                "diagram": "Class",
+                "type": "Generalization",
+                "visual": "Solid line with hollow closed triangular arrow pointing to parent: [Child] -----|> [Parent]",
+                "src_mult": "",
+                "tgt_mult": "",
+                "rationale": f"Class '{src_obj.name}' is a child/specialization of '{tgt_obj.name}' (IS-A relationship). Inherits attributes and operations, sharing polymorphic identity.",
+                "action": "ClassRelation",
+            }
+
+        # 3. Composition (exclusive whole-part, strictly tied lifecycle)
+        if any(w in intent_lower for w in [
+            "composed of", "owns exclusively", "owns", "exclusive", "part of",
+            "cascade delete", "destroy together", "cannot exist without",
+            "lifecycle tied", "composition", "strictly contains"
+        ]):
+            return {
+                "diagram": "Class",
+                "type": "Composition",
+                "visual": "Solid line with filled diamond <#> at Owner: [Owner] <#>----- [Part]",
+                "src_mult": "1",
+                "tgt_mult": "1..*",
+                "rationale": f"Strong whole-part ownership. '{src_obj.name}' exclusively owns '{tgt_obj.name}'. If '{src_obj.name}' is destroyed, '{tgt_obj.name}' ceases to exist.",
+                "action": "ClassRelation",
+            }
+
+        # 4. Aggregation (shared whole-part, independent lifecycles)
+        if any(w in intent_lower for w in [
+            "aggregat", "has a", "has-a", "shared", "collection of",
+            "can exist without", "independent", "loose collection", "aggregation", "member of"
+        ]):
+            return {
+                "diagram": "Class",
+                "type": "Aggregation",
+                "visual": "Solid line with hollow diamond <> at Whole: [Whole] <>----- [Part]",
+                "src_mult": "1",
+                "tgt_mult": "*",
+                "rationale": f"Shared whole-part aggregation. '{src_obj.name}' aggregates '{tgt_obj.name}', but parts can exist independently if '{src_obj.name}' is destroyed.",
+                "action": "ClassRelation",
+            }
+
+        # 5. Dependency (transient usage / parameter / invocation)
+        if any(w in intent_lower for w in ["uses", "depends", "parameter", "temporary", "invokes", "calls", "transient", "dependency"]):
+            return {
+                "diagram": "Class",
+                "type": "Dependency",
+                "visual": "Dashed line with open arrowhead pointing to supplier: [Client] - - - > [Supplier]",
+                "src_mult": "",
+                "tgt_mult": "",
+                "rationale": f"Usage dependency. '{src_obj.name}' calls or uses '{tgt_obj.name}' as a parameter or transient helper without holding a persistent member field.",
+                "action": "ClassRelation",
+            }
+
+        # 6. Default: Association (persistent structural link)
+        return {
+            "diagram": "Class",
+            "type": "Association",
+            "visual": "Solid line: [Source] ---------- [Target]",
+            "src_mult": "0..1",
+            "tgt_mult": "*",
+            "rationale": f"Structural association. '{src_obj.name}' holds a persistent reference to '{tgt_obj.name}'.",
+            "action": "ClassRelation",
+        }
+
+    # Case B: Use Case Diagram
+    if isinstance(src_obj, (ActorNode, UseCaseNode)) and isinstance(tgt_obj, (ActorNode, UseCaseNode)):
+        if isinstance(src_obj, ActorNode) or isinstance(tgt_obj, ActorNode):
+            return {
+                "diagram": "UseCase",
+                "type": "Association",
+                "visual": "Solid line without arrowheads: [Actor] ---------- (Use Case)",
+                "src_mult": "",
+                "tgt_mult": "",
+                "rationale": f"Actor '{src_obj.name}' participates in or initiates Use Case '{tgt_obj.name}'.",
+                "action": "UCRelation",
+            }
+
+        if any(w in intent_lower for w in ["mandatory", "always", "include", "includes", "required", "sub-routine", "step"]):
+            return {
+                "diagram": "UseCase",
+                "type": "Include",
+                "visual": "Dashed arrow with <<include>>: (Base) - - <<include>> - -> (Included)",
+                "src_mult": "",
+                "tgt_mult": "",
+                "rationale": f"Use Case '{src_obj.name}' unconditionally includes the execution of '{tgt_obj.name}'.",
+                "action": "UCRelation",
+            }
+        elif any(w in intent_lower for w in ["optional", "conditional", "extend", "extends", "exception", "hook", "special case"]):
+            return {
+                "diagram": "UseCase",
+                "type": "Extend",
+                "visual": "Dashed arrow with <<extend>>: (Extension) - - <<extend>> - -> (Base)",
+                "src_mult": "",
+                "tgt_mult": "",
+                "rationale": f"Extension Use Case '{src_obj.name}' conditionally augments Base Use Case '{tgt_obj.name}'.",
+                "action": "UCRelation",
+            }
+        else:
+            return {
+                "diagram": "UseCase",
+                "type": "Include",
+                "visual": "Dashed arrow with <<include>>: (Base) - - <<include>> - -> (Included)",
+                "src_mult": "",
+                "tgt_mult": "",
+                "rationale": f"Sub-routine execution from '{src_obj.name}' to '{tgt_obj.name}'.",
+                "action": "UCRelation",
+            }
+
+    # Case C: ER Diagram
+    if isinstance(src_obj, EntityNode) and isinstance(tgt_obj, EntityNode):
+        if any(w in intent_lower for w in ["m:n", "many-to-many", "m..n", "junction", "cross table", "tags", "roles"]):
+            return {
+                "diagram": "ERD",
+                "type": "M:N",
+                "visual": "Crow's foot many-to-many relationship: [Entity1] }|----------|{ [Entity2]",
+                "src_mult": "M",
+                "tgt_mult": "N",
+                "rationale": f"Many-to-Many relationship between table '{src_obj.name}' and table '{tgt_obj.name}'.",
+                "action": "ERRelation",
+            }
+        elif any(w in intent_lower for w in ["1:1", "one-to-one", "1..1", "unique profile"]):
+            return {
+                "diagram": "ERD",
+                "type": "1:1",
+                "visual": "One-to-one relationship: [Entity1] ||----------|| [Entity2]",
+                "src_mult": "1",
+                "tgt_mult": "1",
+                "rationale": f"One-to-One relationship between table '{src_obj.name}' and table '{tgt_obj.name}'.",
+                "action": "ERRelation",
+            }
+        else:
+            return {
+                "diagram": "ERD",
+                "type": "1:N",
+                "visual": "One-to-many relationship: [Entity1] ||----------<{ [Entity2]",
+                "src_mult": "1",
+                "tgt_mult": "N",
+                "rationale": f"One-to-Many relationship from parent table '{src_obj.name}' to child table '{tgt_obj.name}'. Target requires FK.",
+                "action": "ERRelation",
+            }
+
+    # Case D: State Machine Diagram
+    if isinstance(src_obj, StateNode) and isinstance(tgt_obj, StateNode):
+        return {
+            "diagram": "StateMachine",
+            "type": "Transition",
+            "visual": "Directed arrow: [State1] ----------> [State2]",
+            "src_mult": "",
+            "tgt_mult": "",
+            "rationale": f"State transition from '{src_obj.name}' to '{tgt_obj.name}'.",
+            "action": "Transition",
+        }
+
+    raise ValueError(f"Cannot relate elements of different or unknown diagram types: '{getattr(src_obj, 'name', src_obj)}' and '{getattr(tgt_obj, 'name', tgt_obj)}'")
+
+
+def suggest_relation(source: str, target: str, description: str) -> str:
+    """Analyze the semantic intent between two elements and recommend the exact OMG UML/ERD relation.
+
+    Explains OMG arrowhead notation, lifecycle semantics, recommended multiplicities,
+    and provides the exact tool command.
+
+    Args:
+        source: Name or ID of the source element.
+        target: Name or ID of the target element.
+        description: Plain text describing how they relate (e.g. 'Order exclusively owns OrderItems',
+                     'UserRepository implements IRepository', 'Customer inherits from User').
+
+    Returns:
+        Structured recommendation with relation type, OMG visual notation, and execution command.
+    """
+    try:
+        src = state.find_node_by_name(source) or state.find_node_by_id(source)
+        if not src:
+            return f"ERROR: Source element '{source}' not found."
+
+        tgt = state.find_node_by_name(target) or state.find_node_by_id(target)
+        if not tgt:
+            return f"ERROR: Target element '{target}' not found."
+
+        rec = _resolve_semantic_relation(src, tgt, description)
+
+        lines = [
+            f"=== OMG Architecture Relation Recommendation ===",
+            f"Source: {src.name}  -->  Target: {tgt.name}",
+            f"Diagram Domain: {rec['diagram']}",
+            f"Recommended Relation Type: {rec['type']}",
+            f"OMG Visual Notation: {rec['visual']}",
+            f"Semantic Rationale: {rec['rationale']}",
+        ]
+        if rec['src_mult'] or rec['tgt_mult']:
+            lines.append(f"Recommended Multiplicities: Source [{rec['src_mult']}], Target [{rec['tgt_mult']}]")
+
+        lines.append(f"\nTo apply this relationship, call:")
+        if rec['diagram'] == "Class":
+            lines.append(f"  smart_add_relation('{src.name}', '{tgt.name}', '{rec['type']}', mult_source='{rec['src_mult']}', mult_target='{rec['tgt_mult']}')")
+        elif rec['diagram'] == "UseCase":
+            lines.append(f"  add_uc_relation('{src.name}', '{tgt.name}', '{rec['type']}')")
+        elif rec['diagram'] == "ERD":
+            lines.append(f"  add_er_relation('{src.name}', '{tgt.name}', '{rec['type']}')")
+        elif rec['diagram'] == "StateMachine":
+            lines.append(f"  add_state_transition('{src.name}', '{tgt.name}', trigger='{description}')")
+
+        return "\n".join(lines)
+    except Exception as e:
+        return f"ERROR: Failed to analyze relation: {str(e)}"
+
+
+def smart_add_relation(
+    source: str,
+    target: str,
+    intent: str,
+    mult_source: str = "",
+    mult_target: str = "",
+) -> str:
+    """Intelligently deduce and create the appropriate architectural relationship between two nodes.
+
+    Uses the Semantic Relationship Engine to determine the exact OMG UML/ERD relation
+    type, validates architectural rules, and updates the model.
+
+    Args:
+        source: Name or ID of the source element.
+        target: Name or ID of the target element.
+        intent: Description of intent or explicit relation type (e.g. 'owns exclusively', 'implements',
+                'is a', 'temporary helper', '1:N', 'Include', 'Composition').
+        mult_source: Optional source multiplicity override (e.g., '1', '0..1', '*').
+        mult_target: Optional target multiplicity override (e.g., '1', '1..*', '*').
+
+    Returns:
+        Confirmation message with chosen relation type, OMG visual notation, and relation ID.
+    """
+    try:
+        src = state.find_node_by_name(source) or state.find_node_by_id(source)
+        if not src:
+            return f"ERROR: Source element '{source}' not found."
+
+        tgt = state.find_node_by_name(target) or state.find_node_by_id(target)
+        if not tgt:
+            return f"ERROR: Target element '{target}' not found."
+
+        rec = _resolve_semantic_relation(src, tgt, intent)
+        rel_type = rec["type"]
+        s_mult = mult_source.strip() if mult_source else rec["src_mult"]
+        t_mult = mult_target.strip() if mult_target else rec["tgt_mult"]
+
+        if rec["diagram"] == "Class":
+            norm_type = _normalize_class_rel_type(rel_type)
+            if norm_type == "Generalization":
+                if state.would_cause_inheritance_cycle(src.id, tgt.id):
+                    return (
+                        f"ERROR: UML Rule Violation: Cyclic inheritance detected! "
+                        f"Class '{src.name}' cannot inherit from '{tgt.name}' because an inheritance loop would be formed."
+                    )
+            rel = ClassRelation(
+                source_id=src.id,
+                target_id=tgt.id,
+                type=norm_type,
+                source_multiplicity=s_mult,
+                target_multiplicity=t_mult,
+            )
+            state.add_relation(rel)
+            mult_str = f" [{s_mult}..{t_mult}]" if (s_mult or t_mult) else ""
+            return (
+                f"Smart Relation Applied [{norm_type}]: '{src.name}' -> '{tgt.name}'{mult_str} (ID: {rel.id})\n"
+                f"OMG Visual: {rec['visual']}\n"
+                f"Semantics: {rec['rationale']}"
+            )
+
+        elif rec["diagram"] == "UseCase":
+            norm_type = _normalize_uc_rel_type(rel_type)
+            if norm_type in ("Include", "Extend"):
+                if not isinstance(src, UseCaseNode):
+                    return f"ERROR: UML 2.5 Rule Violation: '{norm_type}' source must be a Use Case."
+                if not isinstance(tgt, UseCaseNode):
+                    return f"ERROR: UML 2.5 Rule Violation: '{norm_type}' target must be a Use Case."
+            rel = UCRelation(
+                source_id=src.id,
+                target_id=tgt.id,
+                type=norm_type,
+            )
+            state.add_relation(rel)
+            return (
+                f"Smart Relation Applied [{norm_type}]: '{src.name}' -> '{tgt.name}' (ID: {rel.id})\n"
+                f"OMG Visual: {rec['visual']}\n"
+                f"Semantics: {rec['rationale']}"
+            )
+
+        elif rec["diagram"] == "ERD":
+            norm_type = _normalize_er_rel_type(rel_type)
+            if norm_type == "1:N":
+                has_fk = any(c.is_foreign_key for c in tgt.columns)
+                if not has_fk:
+                    return (
+                        f"ERROR: ERD Rule Violation: Relation 1:N from '{src.name}' to '{tgt.name}' requires target "
+                        f"entity '{tgt.name}' to have at least one column marked as Foreign Key (is_fk=True)."
+                    )
+            rel = ERRelation(
+                source_id=src.id,
+                target_id=tgt.id,
+                type=norm_type,
+            )
+            state.add_relation(rel)
+            return (
+                f"Smart Relation Applied [{norm_type}]: '{src.name}' -> '{tgt.name}' (ID: {rel.id})\n"
+                f"Visual: {rec['visual']}\n"
+                f"Semantics: {rec['rationale']}"
+            )
+
+        elif rec["diagram"] == "StateMachine":
+            tr = TransitionModel(
+                source_id=src.id,
+                target_id=tgt.id,
+                trigger_event=intent,
+            )
+            state.add_relation(tr)
+            return (
+                f"Smart Transition Applied: '{src.name}' -> '{tgt.name}' (ID: {tr.id})\n"
+                f"Trigger: {intent}"
+            )
+
+        return f"ERROR: Unknown diagram category for smart relation."
+    except Exception as e:
+        return f"ERROR: Failed to add smart relation: {str(e)}"
 
 
 # --- ER Diagram Tools ---
@@ -671,13 +1086,22 @@ def get_project_summary() -> str:
     Useful for LLM self-reflection and validation before continuing or exporting.
 
     Returns:
-        Structured breakdown of all classes, entities, use cases, and state machine nodes.
+        Structured breakdown of all packages, classes, entities, use cases, and state machine nodes.
     """
     lines = [f"=== Project: {state.name} ==="]
 
+    if state.packages:
+        lines.append(f"\n0. UML Packages ({len(state.packages)}):")
+        for p in state.packages.values():
+            parent_info = f" (parent: {state.packages[p.parent_package_id].name})" if (p.parent_package_id and p.parent_package_id in state.packages) else ""
+            contained_classes = [state.classes[cid].name for cid in p.class_ids if cid in state.classes]
+            c_str = f" | Contained classes: [{', '.join(contained_classes)}]" if contained_classes else ""
+            lines.append(f"  Package: {p.name}{parent_info}{c_str}")
+
     lines.append(f"\n1. UML Classes ({len(state.classes)}):")
     for c in state.classes.values():
-        lines.append(f"  {c.element_type}: {c.name} (abstract={c.is_abstract})")
+        pkg_info = f" [in Package: {state.packages[c.package_id].name}]" if (c.package_id and c.package_id in state.packages) else ""
+        lines.append(f"  {c.element_type}: {c.name}{pkg_info} (abstract={c.is_abstract})")
         for a in c.attributes:
             lines.append(f"    - {a.visibility} {a.name}: {a.type}")
         for m in c.methods:
@@ -734,10 +1158,14 @@ def register_all_tools(mcp: Any) -> None:
     """Register all architecture tools with the provided FastMCP or MCPServer instance."""
     tools = [
         init_project,
+        add_package,
+        move_class_to_package,
         add_class,
         add_class_attribute,
         add_class_method,
         add_class_relation,
+        suggest_relation,
+        smart_add_relation,
         add_er_entity,
         add_er_column,
         add_er_relation,
