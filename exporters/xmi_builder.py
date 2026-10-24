@@ -132,7 +132,15 @@ class XMIBuilder:
             )
 
     def _map_sql_type_to_vp(self, type_str: str) -> tuple[int, str, int]:
-        """Map SQL data type string (VARCHAR, BIGINT, NUMERIC, TIMESTAMP, etc.) to (vp_type_int, type_name, length)."""
+        """Map SQL data type string to (vp_type_int, type_name, length).
+
+        Supports all native Visual Paradigm ERD types from the standard palette:
+        bigint, binary, bit, blob, char, clob, date, decimal, double, float,
+        integer, numeric, real, smallint, time, timestamp, tinyint, varbinary, varchar.
+
+        Also retains key DBMS / PostgreSQL types (int8, int4, int2, bool, uuid) as requested.
+        Superfluous types (money, timestamptz, timetz, interval) are normalized.
+        """
         import re
         t_upper = (type_str or "VARCHAR").upper().strip()
         length = 0
@@ -144,64 +152,76 @@ class XMIBuilder:
                 length = 0
 
         # 1. Integer / Serial types
-        if "BIGINT" in t_upper or "INT8" in t_upper or "BIGSERIAL" in t_upper or "SERIAL8" in t_upper:
+        if "BIGINT" in t_upper or "BIGSERIAL" in t_upper or "SERIAL8" in t_upper:
+            return 9, "bigint", length or 19
+        elif "INT8" in t_upper:
             return 9, "int8", length or 19
-        elif "SMALLINT" in t_upper or "INT2" in t_upper or "TINYINT" in t_upper:
+        elif "TINYINT" in t_upper:
+            return 8, "tinyint", length or 3
+        elif "SMALLINT" in t_upper:
+            return 8, "smallint", length or 5
+        elif "INT2" in t_upper:
             return 8, "int2", length or 5
-        elif any(k in t_upper for k in ("INT", "INTEGER", "INT4")):
+        elif "INT4" in t_upper:
             return 9, "int4", length or 10
+        elif re.search(r'\b(INTEGER|INT)\b', t_upper):
+            return 9, "integer", length or 10
         elif any(k in t_upper for k in ("SERIAL", "SERIAL4")):
             return 9, "serial4", length or 10
 
         # 2. Floating-point & Fixed-point types
-        elif any(k in t_upper for k in ("DOUBLE", "FLOAT8")):
+        elif "DOUBLE" in t_upper:
+            return 13, "double", 0
+        elif "FLOAT8" in t_upper:
             return 13, "float8", 0
-        elif any(k in t_upper for k in ("FLOAT", "REAL", "FLOAT4")):
+        elif "REAL" in t_upper:
+            return 12, "real", 0
+        elif "FLOAT4" in t_upper:
             return 12, "float4", 0
+        elif "FLOAT" in t_upper:
+            return 12, "float", 0
         elif "NUMERIC" in t_upper:
             return 11, "numeric", length or 10
-        elif any(k in t_upper for k in ("DECIMAL", "DEC")):
+        elif any(k in t_upper for k in ("DECIMAL", "DEC", "MONEY")):
             return 11, "decimal", length or 10
-        elif "MONEY" in t_upper:
-            return 14, "money", 0
 
         # 3. String & Character types
-        elif "VARCHAR" in t_upper or "VARYING" in t_upper:
+        elif "VARCHAR" in t_upper or "VARYING" in t_upper or "INTERVAL" in t_upper:
             return 27, "varchar", length or 255
         elif "CHAR" in t_upper or "BPCHAR" in t_upper:
             return 27, "char", length or 1
-        elif any(k in t_upper for k in ("TEXT", "CLOB", "STRING")):
-            return 27, "text", 0
+        elif "CLOB" in t_upper:
+            return 27, "clob", 0
+        elif any(k in t_upper for k in ("TEXT", "STRING", "JSONB", "JSON")):
+            return 27, "clob", 0
 
-        # 4. Date & Time types
-        elif "TIMESTAMPTZ" in t_upper:
-            return 17, "timestamptz", 0
-        elif "TIMESTAMP" in t_upper:
+        # 4. Date & Time types (timestamptz -> timestamp, timetz -> time)
+        elif "TIMESTAMP" in t_upper or "DATETIME" in t_upper:
             return 17, "timestamp", 0
-        elif "TIMETZ" in t_upper:
-            return 16, "timetz", 0
         elif "TIME" in t_upper:
             return 16, "time", 0
         elif "DATE" in t_upper:
             return 15, "date", 0
-        elif "INTERVAL" in t_upper:
-            return 18, "interval", 0
 
-        # 5. Boolean
+        # 5. Boolean & Bit
+        elif "BIT" in t_upper:
+            return 3, "bit", length or 1
         elif any(k in t_upper for k in ("BOOL", "BOOLEAN")):
             return 3, "bool", 0
 
         # 6. Binary / Large Objects
-        elif any(k in t_upper for k in ("BYTEA", "BLOB", "BINARY", "VARBINARY")):
+        elif "BLOB" in t_upper:
+            return 25, "blob", 0
+        elif "VARBINARY" in t_upper:
+            return 25, "varbinary", length or 255
+        elif "BINARY" in t_upper:
+            return 25, "binary", length or 1
+        elif "BYTEA" in t_upper:
             return 25, "bytea", length or 0
 
         # 7. Identifiers & Structured types
         elif "UUID" in t_upper:
             return 28, "uuid", 0
-        elif "JSONB" in t_upper:
-            return 29, "jsonb", 0
-        elif "JSON" in t_upper:
-            return 29, "json", 0
 
         # Default fallback
         else:

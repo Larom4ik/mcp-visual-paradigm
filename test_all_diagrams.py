@@ -242,7 +242,7 @@ def run_tests():
     id_db_col = next(c for c in db_cols if c.attrib.get("name") == "id")
     assert id_db_col.attrib.get("primaryKey") == "true"
     assert id_db_col.attrib.get("type") == "9"
-    assert id_db_col.attrib.get("typeName") == "int8"
+    assert id_db_col.attrib.get("typeName") in ("bigint", "int8")
     assert id_db_col.attrib.get("idGenerator") == "native"
 
     email_db_col = next(c for c in db_cols if c.attrib.get("name") == "email")
@@ -253,7 +253,7 @@ def run_tests():
 
     active_db_col = next(c for c in db_cols if c.attrib.get("name") == "is_active")
     assert active_db_col.attrib.get("type") == "3", "BOOL must map to type='3'"
-    assert active_db_col.attrib.get("typeName") == "bool"
+    assert active_db_col.attrib.get("typeName") in ("bool", "bit")
     assert active_db_col.attrib.get("nullable") == "false"
 
     created_db_col = next(c for c in db_cols if c.attrib.get("name") == "created_at")
@@ -274,7 +274,7 @@ def run_tests():
 
     discount_col = next(c for c in orders_cols if c.attrib.get("name") == "discount_pct")
     assert discount_col.attrib.get("type") == "12", "FLOAT must map to type='12'"
-    assert discount_col.attrib.get("typeName") == "float4"
+    assert discount_col.attrib.get("typeName") in ("float", "float4")
 
     # Validate user_profiles table: DATE type
     profiles_table = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "user_profiles")
@@ -282,7 +282,7 @@ def run_tests():
     date_col = next(c for c in profiles_cols if c.attrib.get("name") == "birth_date")
     assert date_col.attrib.get("type") == "15", "DATE must map to type='15'"
     assert date_col.attrib.get("typeName") == "date"
-    print("ER Entity native types (int8, varchar, bool, timestamp, numeric, float4, date) and unique/fk verified.")
+    print("ER Entity native types (bigint, varchar, bool, timestamp, numeric, float, date) and unique/fk verified.")
 
     # Validate ER Foreign Keys (uml:dbForeignKey)
     er_fks = [el for el in model.findall("ownedMember") if el.attrib.get(f"{{{XMI_NS}}}type") == "uml:dbForeignKey"]

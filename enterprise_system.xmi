@@ -8,31 +8,31 @@
 	<xmi:Extension extender="Visual Paradigm">
 		<projectProperties>
 			<projectProperty name="author" value="Architect" />
-			<vpumlModel id="anchor_xmi_40907f6aa7f5411b92a427ba12786af1" modelType="Anchor">
+			<vpumlModel id="anchor_xmi_26ff5a6f515f402399a500e199892999" modelType="Anchor">
 				<properties>
 					<property name="modelType" type="string" value="Anchor" />
-					<property name="from" type="fromTo" modelRef="xmi_40907f6aa7f5411b92a427ba12786af1" />
-					<property name="to" type="fromTo" modelRef="xmi_dbf0729c916c4ca2ade3e40c2b7693ad" />
+					<property name="from" type="fromTo" modelRef="xmi_26ff5a6f515f402399a500e199892999" />
+					<property name="to" type="fromTo" modelRef="xmi_d52eb400d9a64562ada203bf6cb66fca" />
 				</properties>
 			</vpumlModel>
 		</projectProperties>
 	</xmi:Extension>
 	<uml:Model xmi:id="model_1" name="EnterpriseSystem" visibility="public">
-		<ownedMember xmi:type="uml:Package" xmi:id="xmi_233fcb15b1bb4048803dbe268c360356" name="CoreDomain" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:Package" xmi:id="xmi_fe9afd13e3c9405b8c2ad152d7654a24" name="CoreDomain" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="Package" />
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<ownedMember xmi:type="uml:Package" xmi:id="xmi_3841185d60ee48e4a9d5ef5369d477c5" name="Ordering" visibility="public" isAbstract="false" isLeaf="false">
+			<ownedMember xmi:type="uml:Package" xmi:id="xmi_22152c1c6d80468ba09fd62c618933da" name="Ordering" visibility="public" isAbstract="false" isLeaf="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
 					<modelType value="Package" />
 					<businessModel xmi:value="false" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<ownedMember xmi:type="uml:Class" xmi:id="xmi_dbf0729c916c4ca2ade3e40c2b7693ad" name="Order" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+				<ownedMember xmi:type="uml:Class" xmi:id="xmi_d52eb400d9a64562ada203bf6cb66fca" name="Order" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 					<xmi:Extension extender="Visual Paradigm">
 						<isRoot xmi:value="false" />
 						<modelType value="Class" />
@@ -40,8 +40,8 @@
 						<qualityScore value="-1" />
 						<documentation value="Customer commercial order with financial totals." />
 					</xmi:Extension>
-					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_dbf0729c916c4ca2ade3e40c2b7693ad_comment" body="Customer commercial order with financial totals." />
-					<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_efbd4c1f20f545d797c8657e1441f584" name="total" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="float_id">
+					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_d52eb400d9a64562ada203bf6cb66fca_comment" body="Customer commercial order with financial totals." />
+					<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_d994c7248881497a92e8073550f44637" name="total" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="float_id">
 						<xmi:Extension extender="Visual Paradigm">
 							<attribute />
 							<isAbstract xmi:value="false" />
@@ -49,7 +49,7 @@
 							<qualityScore value="-1" />
 						</xmi:Extension>
 					</ownedAttribute>
-					<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_ec8fa661b5894a1b96a0d409246aa0b4" name="recalculate" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
+					<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_d0aab4b289a24f3584e00544a488efa1" name="recalculate" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
 						<xmi:Extension extender="Visual Paradigm">
 							<returnTypeDocumentation xmi:value="" />
 							<properties>
@@ -60,14 +60,14 @@
 						</xmi:Extension>
 					</ownedOperation>
 				</ownedMember>
-				<ownedMember xmi:type="uml:Class" xmi:id="xmi_458bd78f23714dabaff0e8511df7d5de" name="OrderItem" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+				<ownedMember xmi:type="uml:Class" xmi:id="xmi_cd43cd1ec8f44f12bc958138a4d1e9ed" name="OrderItem" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 					<xmi:Extension extender="Visual Paradigm">
 						<isRoot xmi:value="false" />
 						<modelType value="Class" />
 						<businessModel xmi:value="false" />
 						<qualityScore value="-1" />
 					</xmi:Extension>
-					<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_6f63349e9f754a92894cfc8631798c90" name="quantity" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="int_id">
+					<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_4bd1a3cb8bed4b93a51782a3f77183c9" name="quantity" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="int_id">
 						<xmi:Extension extender="Visual Paradigm">
 							<attribute />
 							<isAbstract xmi:value="false" />
@@ -77,7 +77,7 @@
 					</ownedAttribute>
 				</ownedMember>
 			</ownedMember>
-			<ownedMember xmi:type="uml:Class" xmi:id="xmi_9818bf25ffad4ce0890b8527c3d4d8cc" name="BaseEntity" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<ownedMember xmi:type="uml:Class" xmi:id="xmi_c86930da465a406e926677451620aaa7" name="BaseEntity" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
 					<modelType value="Class" />
@@ -85,8 +85,8 @@
 					<qualityScore value="-1" />
 					<documentation value="Root entity with UUID identifier and audit timestamps." />
 				</xmi:Extension>
-				<ownedComment xmi:type="uml:Comment" xmi:id="xmi_9818bf25ffad4ce0890b8527c3d4d8cc_comment" body="Root entity with UUID identifier and audit timestamps." />
-				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_a7b3747fb9df4c64b43bbaaa0d7e1d84" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="uuid_id">
+				<ownedComment xmi:type="uml:Comment" xmi:id="xmi_c86930da465a406e926677451620aaa7_comment" body="Root entity with UUID identifier and audit timestamps." />
+				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_fa1beec7e45844fc9ba141c23a2a3192" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="uuid_id">
 					<xmi:Extension extender="Visual Paradigm">
 						<attribute />
 						<isAbstract xmi:value="false" />
@@ -94,9 +94,9 @@
 						<qualityScore value="-1" />
 						<documentation value="Primary unique identifier" />
 					</xmi:Extension>
-					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_a7b3747fb9df4c64b43bbaaa0d7e1d84_comment" body="Primary unique identifier" />
+					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_fa1beec7e45844fc9ba141c23a2a3192_comment" body="Primary unique identifier" />
 				</ownedAttribute>
-				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_663cca851293406c96f8b4b50dede29f" name="createdAt" visibility="protected" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="datetime_id">
+				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_66cee562265c48f48c633d2e15073ce8" name="createdAt" visibility="protected" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="datetime_id">
 					<xmi:Extension extender="Visual Paradigm">
 						<attribute />
 						<isAbstract xmi:value="false" />
@@ -105,7 +105,7 @@
 					</xmi:Extension>
 				</ownedAttribute>
 			</ownedMember>
-			<ownedMember xmi:type="uml:Class" xmi:id="xmi_d27f6de9b879464fb24318824218961d" name="User" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<ownedMember xmi:type="uml:Class" xmi:id="xmi_3a4442d70565406db765f3643ffff689" name="User" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
 					<modelType value="Class" />
@@ -113,8 +113,8 @@
 					<qualityScore value="-1" />
 					<documentation value="Represents a registered user in the enterprise application." />
 				</xmi:Extension>
-				<ownedComment xmi:type="uml:Comment" xmi:id="xmi_d27f6de9b879464fb24318824218961d_comment" body="Represents a registered user in the enterprise application." />
-				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_8af0ad95bdd640d3af43513c50e4409c" name="email" visibility="private" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="string_id">
+				<ownedComment xmi:type="uml:Comment" xmi:id="xmi_3a4442d70565406db765f3643ffff689_comment" body="Represents a registered user in the enterprise application." />
+				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_a5e26d8da98d4f3d9a12476ba693ad66" name="email" visibility="private" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="string_id">
 					<xmi:Extension extender="Visual Paradigm">
 						<attribute />
 						<isAbstract xmi:value="false" />
@@ -122,7 +122,7 @@
 						<qualityScore value="-1" />
 					</xmi:Extension>
 				</ownedAttribute>
-				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_237432e04f104ff7b3d822172a253b4d" name="passwordHash" visibility="private" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="string_id">
+				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_df9029dc34ca4a8c92192b9a5aef4926" name="passwordHash" visibility="private" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="string_id">
 					<xmi:Extension extender="Visual Paradigm">
 						<attribute />
 						<isAbstract xmi:value="false" />
@@ -130,9 +130,9 @@
 						<qualityScore value="-1" />
 					</xmi:Extension>
 				</ownedAttribute>
-				<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_86507a748b424af3a4433b759b07e24f" name="authenticate" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
-					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_86507a748b424af3a4433b759b07e24f_return" kind="return" type="bool_id" />
-					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_073bb34f95df4b35acf2f620336a22bf" name="password" kind="in" type="string_id" />
+				<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_27cc59e557fc47dcb879a2cbb898a78e" name="authenticate" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
+					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_27cc59e557fc47dcb879a2cbb898a78e_return" kind="return" type="bool_id" />
+					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_98898d403a464ab1bb8c783443a6e397" name="password" kind="in" type="string_id" />
 					<xmi:Extension extender="Visual Paradigm">
 						<returnTypeDocumentation xmi:value="" />
 						<properties>
@@ -142,22 +142,22 @@
 						<qualityScore value="-1" />
 						<documentation value="Verify credentials and generate JWT token." />
 					</xmi:Extension>
-					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_86507a748b424af3a4433b759b07e24f_comment" body="Verify credentials and generate JWT token." />
+					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_27cc59e557fc47dcb879a2cbb898a78e_comment" body="Verify credentials and generate JWT token." />
 				</ownedOperation>
-				<generalization xmi:type="uml:Generalization" xmi:id="xmi_2b96fb14d94b46f2b5213cee5a43ba04" general="xmi_9818bf25ffad4ce0890b8527c3d4d8cc">
+				<generalization xmi:type="uml:Generalization" xmi:id="xmi_8692d01965aa472a9e807c636fdf3d14" general="xmi_c86930da465a406e926677451620aaa7">
 					<xmi:Extension extender="Visual Paradigm">
 						<qualityScore value="-1" />
 					</xmi:Extension>
 				</generalization>
 			</ownedMember>
-			<ownedMember xmi:type="uml:Class" xmi:id="xmi_d71e47ea7e49434fb0425aa0bc143db2" name="Customer" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<ownedMember xmi:type="uml:Class" xmi:id="xmi_b4f34f4382484828a822022e5e8b243d" name="Customer" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
 					<modelType value="Class" />
 					<businessModel xmi:value="false" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_6c82189d9e254713b087bd5b877dc47d" name="loyaltyPoints" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="int_id">
+				<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_83d0dd667c634e49a3c489bf14d2650f" name="loyaltyPoints" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="int_id">
 					<xmi:Extension extender="Visual Paradigm">
 						<attribute />
 						<isAbstract xmi:value="false" />
@@ -165,7 +165,7 @@
 						<qualityScore value="-1" />
 					</xmi:Extension>
 				</ownedAttribute>
-				<generalization xmi:type="uml:Generalization" xmi:id="xmi_9ec7593df4ff4e389574ff46704c26bf" general="xmi_d27f6de9b879464fb24318824218961d">
+				<generalization xmi:type="uml:Generalization" xmi:id="xmi_35af84a02801445099475bcdd80faa77" general="xmi_3a4442d70565406db765f3643ffff689">
 					<xmi:Extension extender="Visual Paradigm">
 						<qualityScore value="-1" />
 					</xmi:Extension>
@@ -178,16 +178,16 @@
 		<ownedMember xmi:type="uml:DataType" xmi:id="datetime_id" name="DateTime" visibility="public" />
 		<ownedMember xmi:type="uml:DataType" xmi:id="string_id" name="string" visibility="public" />
 		<ownedMember xmi:type="uml:DataType" xmi:id="bool_id" name="bool" visibility="public" />
-		<ownedMember xmi:type="uml:Package" xmi:id="xmi_69c60330fa3a4ac1b2b92b62f45a1335" name="PaymentSubsystem" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:Package" xmi:id="xmi_314080e6ae474b2482a28021e321a61b" name="PaymentSubsystem" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="Package" />
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<ownedMember xmi:type="uml:Class" xmi:id="xmi_030d9c1a8cfe4da482a2ac61023a25d9" name="IPaymentGateway" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
-				<eAnnotations xmi:id="annot_b3816e84498a48ce90cb426b3c5e4e4b" source="Stereotype">
-					<details xmi:id="det_3da4c3bb0e6e446798458cab6c797dd2" key="interface" value="true" />
+			<ownedMember xmi:type="uml:Class" xmi:id="xmi_49cbce9504ca4377b936f0119e4e8e8f" name="IPaymentGateway" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+				<eAnnotations xmi:id="annot_b397b1ffa15a439197cf03222bf80d20" source="Stereotype">
+					<details xmi:id="det_fe386b7d41504ebfa454b0e212e62145" key="interface" value="true" />
 				</eAnnotations>
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
@@ -196,10 +196,10 @@
 					<qualityScore value="-1" />
 					<documentation value="Contract for processing third-party financial charges." />
 				</xmi:Extension>
-				<ownedComment xmi:type="uml:Comment" xmi:id="xmi_030d9c1a8cfe4da482a2ac61023a25d9_comment" body="Contract for processing third-party financial charges." />
-				<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_283a597ebe58446b9b32bfd03d7e9997" name="charge" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
-					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_283a597ebe58446b9b32bfd03d7e9997_return" kind="return" type="bool_id" />
-					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_c3de0c2836664deaba6acc370435fd3b" name="amount" kind="in" type="float_id" />
+				<ownedComment xmi:type="uml:Comment" xmi:id="xmi_49cbce9504ca4377b936f0119e4e8e8f_comment" body="Contract for processing third-party financial charges." />
+				<ownedOperation xmi:type="uml:Operation" xmi:id="xmi_5e4b9cc4e75b4148a63ce160df12ddcc" name="charge" visibility="public" isAbstract="false" isLeaf="false" isOrdered="false" isQuery="false" isStatic="false" isUnique="true">
+					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_5e4b9cc4e75b4148a63ce160df12ddcc_return" kind="return" type="bool_id" />
+					<ownedParameter xmi:type="uml:Parameter" xmi:id="xmi_4bce1ddb4a4c404a889f13e8d9b5c3c9" name="amount" kind="in" type="float_id" />
 					<xmi:Extension extender="Visual Paradigm">
 						<returnTypeDocumentation xmi:value="" />
 						<properties>
@@ -210,7 +210,7 @@
 					</xmi:Extension>
 				</ownedOperation>
 			</ownedMember>
-			<ownedMember xmi:type="uml:Class" xmi:id="xmi_d7db7201e42c447fb56bcb1fe4fa5c06" name="StripePaymentGateway" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
+			<ownedMember xmi:type="uml:Class" xmi:id="xmi_6f0e8bde94234e3ea2d1be8086398ea8" name="StripePaymentGateway" visibility="public" isAbstract="false" isActive="false" isLeaf="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<isRoot xmi:value="false" />
 					<modelType value="Class" />
@@ -219,64 +219,64 @@
 				</xmi:Extension>
 			</ownedMember>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d" name="Customer_Order_Aggregation" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d_end_src" name="customer" visibility="public" type="xmi_d71e47ea7e49434fb0425aa0bc143db2" association="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d" aggregation="shared" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94" name="Customer_Order_Aggregation" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94_end_src" name="customer" visibility="public" type="xmi_b4f34f4382484828a822022e5e8b243d" association="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94" aggregation="shared" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d_end_src_multiplicity_lowerValue" value="1" />
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94_end_src_multiplicity_lowerValue" value="1" />
 			</ownedEnd>
-			<memberEnd xmi:idref="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d_end_tgt" name="order" visibility="public" type="xmi_dbf0729c916c4ca2ade3e40c2b7693ad" association="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+			<memberEnd xmi:idref="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94_end_tgt" name="order" visibility="public" type="xmi_d52eb400d9a64562ada203bf6cb66fca" association="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d_end_tgt_multiplicity_lowerValue" value="0" />
-				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d_end_tgt_multiplicity_upperValue" value="*" />
-			</ownedEnd>
-			<xmi:Extension extender="Visual Paradigm">
-				<qualityScore value="-1" />
-			</xmi:Extension>
-		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b" name="Order_OrderItem_Composition" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b_end_src" name="order" visibility="public" type="xmi_dbf0729c916c4ca2ade3e40c2b7693ad" association="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b" aggregation="composite" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
-				<xmi:Extension extender="Visual Paradigm">
-					<associationEnd />
-					<qualityScore value="-1" />
-				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b_end_src_multiplicity_lowerValue" value="1" />
-			</ownedEnd>
-			<memberEnd xmi:idref="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b_end_tgt" name="orderitem" visibility="public" type="xmi_458bd78f23714dabaff0e8511df7d5de" association="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
-				<xmi:Extension extender="Visual Paradigm">
-					<associationEnd />
-					<qualityScore value="-1" />
-				</xmi:Extension>
-				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b_end_tgt_multiplicity_lowerValue" value="1" />
-				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b_end_tgt_multiplicity_upperValue" value="*" />
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94_end_tgt_multiplicity_lowerValue" value="0" />
+				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94_end_tgt_multiplicity_upperValue" value="*" />
 			</ownedEnd>
 			<xmi:Extension extender="Visual Paradigm">
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Realization" xmi:id="xmi_5eb2ab2e9d71499da3257eeae8b406ac" name="Order_realizes_IPaymentGateway" visibility="public" client="xmi_dbf0729c916c4ca2ade3e40c2b7693ad" supplier="xmi_030d9c1a8cfe4da482a2ac61023a25d9" realizingClassifier="xmi_030d9c1a8cfe4da482a2ac61023a25d9">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_aceec159eeec4ecd85a8b725bd535f89" name="Order_OrderItem_Composition" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_aceec159eeec4ecd85a8b725bd535f89_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_aceec159eeec4ecd85a8b725bd535f89_end_src" name="order" visibility="public" type="xmi_d52eb400d9a64562ada203bf6cb66fca" association="xmi_aceec159eeec4ecd85a8b725bd535f89" aggregation="composite" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+				<xmi:Extension extender="Visual Paradigm">
+					<associationEnd />
+					<qualityScore value="-1" />
+				</xmi:Extension>
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_aceec159eeec4ecd85a8b725bd535f89_end_src_multiplicity_lowerValue" value="1" />
+			</ownedEnd>
+			<memberEnd xmi:idref="xmi_aceec159eeec4ecd85a8b725bd535f89_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_aceec159eeec4ecd85a8b725bd535f89_end_tgt" name="orderitem" visibility="public" type="xmi_cd43cd1ec8f44f12bc958138a4d1e9ed" association="xmi_aceec159eeec4ecd85a8b725bd535f89" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+				<xmi:Extension extender="Visual Paradigm">
+					<associationEnd />
+					<qualityScore value="-1" />
+				</xmi:Extension>
+				<lowerValue xmi:type="uml:LiteralString" xmi:id="xmi_aceec159eeec4ecd85a8b725bd535f89_end_tgt_multiplicity_lowerValue" value="1" />
+				<upperValue xmi:type="uml:LiteralString" xmi:id="xmi_aceec159eeec4ecd85a8b725bd535f89_end_tgt_multiplicity_upperValue" value="*" />
+			</ownedEnd>
 			<xmi:Extension extender="Visual Paradigm">
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Realization" xmi:id="xmi_df055b9fa65e4e5b92c307bf27267b85" name="StripePaymentGateway_realizes_IPaymentGateway" visibility="public" client="xmi_d7db7201e42c447fb56bcb1fe4fa5c06" supplier="xmi_030d9c1a8cfe4da482a2ac61023a25d9" realizingClassifier="xmi_030d9c1a8cfe4da482a2ac61023a25d9">
+		<ownedMember xmi:type="uml:Realization" xmi:id="xmi_329c1b938c0048feba4f6b1884b2be43" name="Order_realizes_IPaymentGateway" visibility="public" client="xmi_d52eb400d9a64562ada203bf6cb66fca" supplier="xmi_49cbce9504ca4377b936f0119e4e8e8f" realizingClassifier="xmi_49cbce9504ca4377b936f0119e4e8e8f">
 			<xmi:Extension extender="Visual Paradigm">
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:dbTable" xmi:id="xmi_e498dd5aee7b45628c2706742b2f90bf" name="users" visibility="public" isAbstract="false" isActive="false" isLeaf="false" syncType="1" type="0" ormSyncState="1">
-			<eAnnotations xmi:id="annot_8bb4e6264755405b994ca1692b236411" source="Stereotype">
-				<details xmi:id="det_8cdfb9828b7948d39b8cfd3fbe451a50" key="entity" value="true" />
-				<details xmi:id="det_f6b0d7cbb5b24bd6ba40e771e04d6d7f" key="modelType" value="DBTable" />
+		<ownedMember xmi:type="uml:Realization" xmi:id="xmi_964988b0e63b442b9fe8bc81c49aeb93" name="StripePaymentGateway_realizes_IPaymentGateway" visibility="public" client="xmi_6f0e8bde94234e3ea2d1be8086398ea8" supplier="xmi_49cbce9504ca4377b936f0119e4e8e8f" realizingClassifier="xmi_49cbce9504ca4377b936f0119e4e8e8f">
+			<xmi:Extension extender="Visual Paradigm">
+				<qualityScore value="-1" />
+			</xmi:Extension>
+		</ownedMember>
+		<ownedMember xmi:type="uml:dbTable" xmi:id="xmi_d533f19b366f4a1fbf047f058d3a4f70" name="users" visibility="public" isAbstract="false" isActive="false" isLeaf="false" syncType="1" type="0" ormSyncState="1">
+			<eAnnotations xmi:id="annot_67cd3e7f6b2a4743a5a5e8ce5e1bd5ca" source="Stereotype">
+				<details xmi:id="det_83b917a9e7b04255a9cfb16aa5dd3a35" key="entity" value="true" />
+				<details xmi:id="det_e0748de0e4244f74921ce74252ac64ea" key="modelType" value="DBTable" />
 			</eAnnotations>
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
@@ -285,9 +285,9 @@
 				<qualityScore value="-1" />
 				<documentation value="Stores core authentication and user profile data." />
 			</xmi:Extension>
-			<ownedComment xmi:type="uml:Comment" xmi:id="xmi_e498dd5aee7b45628c2706742b2f90bf_comment" body="Stores core authentication and user profile data." />
+			<ownedComment xmi:type="uml:Comment" xmi:id="xmi_d533f19b366f4a1fbf047f058d3a4f70_comment" body="Stores core authentication and user profile data." />
 			<childrens>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_d1ef966fc4e1439aa3573fafa1ce640d" name="id" type="9" typeName="int8" length="19" scale="0" nullable="false" unique="true" primaryKey="true" foreignKey="false" syncType="1" idGenerator="native">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_486b4dc262d34421862d6f21b6f16399" name="id" type="9" typeName="bigint" length="19" scale="0" nullable="false" unique="true" primaryKey="true" foreignKey="false" syncType="1" idGenerator="native">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="false" />
@@ -296,7 +296,7 @@
 						<foreignKey value="false" />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_b2aa2c3543a94eafb0ed124eed373db3" name="email" type="27" typeName="varchar" length="255" scale="0" nullable="false" unique="true" primaryKey="false" foreignKey="false" syncType="1">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_98efa9e1ab3041a1b128c2e427130789" name="email" type="27" typeName="varchar" length="255" scale="0" nullable="false" unique="true" primaryKey="false" foreignKey="false" syncType="1">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="false" />
@@ -306,7 +306,7 @@
 						<documentation value="Unique user login email address." />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_4926e007ac4f459fbd0c4f1f83a86bd4" name="is_active" type="3" typeName="bool" length="0" scale="0" nullable="false" unique="false" primaryKey="false" foreignKey="false" syncType="1">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_5b431baded1b40e0b668795c67eef28f" name="is_active" type="3" typeName="bool" length="0" scale="0" nullable="false" unique="false" primaryKey="false" foreignKey="false" syncType="1">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="false" />
@@ -315,7 +315,7 @@
 						<foreignKey value="false" />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_3709623dc2de489b90652c58217b9651" name="created_at" type="17" typeName="timestamp" length="0" scale="0" nullable="true" unique="false" primaryKey="false" foreignKey="false" syncType="1">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_46f62e6c609f4984aa2d6f3fa8ed50e3" name="created_at" type="17" typeName="timestamp" length="0" scale="0" nullable="true" unique="false" primaryKey="false" foreignKey="false" syncType="1">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="true" />
@@ -325,7 +325,7 @@
 					</xmi:Extension>
 				</dbColumn>
 			</childrens>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_d1ef966fc4e1439aa3573fafa1ce640d_attr" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_486b4dc262d34421862d6f21b6f16399_attr" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -333,17 +333,17 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_2e2881fd1bd04ffd87a604a6be4a71a6" source="Stereotype">
-					<details xmi:id="det_968bb6f7c6604a39bb735f31c8c24e4f" key="column" value="true" />
-					<details xmi:id="det_3fc382b2c4894df7a1914da0172be41b" key="modelType" value="DBColumn" />
-					<details xmi:id="det_6135768c04ae4b73b6f6b260fc185c64" key="primaryKey" value="true" />
-					<details xmi:id="det_020a625724904ca78ae4f1064b94536b" key="stereotype" value="PK" />
-					<details xmi:id="det_dc53d2fec36849d4be0a78b24ad91848" key="unique" value="true" />
-					<details xmi:id="det_7c245e0370d2499db8bd4674897b9d5d" key="uniqueConstraint" value="true" />
-					<details xmi:id="det_191f0d2a0f1a47f8a19d9c147601d082" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_1b35faa4662c412baa523d8d975a65a7" source="Stereotype">
+					<details xmi:id="det_b52aa0880a0e4b2c90a711c2f6cbf675" key="column" value="true" />
+					<details xmi:id="det_7f32c69890af4e5b9a1f7aa764634276" key="modelType" value="DBColumn" />
+					<details xmi:id="det_4c49d2da889646c98dd746f13a3bf20a" key="primaryKey" value="true" />
+					<details xmi:id="det_7bd48721650546b2a289f13da4220411" key="stereotype" value="PK" />
+					<details xmi:id="det_9086ca43963e4ea5a79313a5465700e9" key="unique" value="true" />
+					<details xmi:id="det_27bfae08ec3748dd92dd23fbeb1a43ff" key="uniqueConstraint" value="true" />
+					<details xmi:id="det_6992d781ac054673a081c72e1534d516" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_b2aa2c3543a94eafb0ed124eed373db3_attr" name="email" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_255__id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_98efa9e1ab3041a1b128c2e427130789_attr" name="email" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_255__id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -352,17 +352,17 @@
 					<qualityScore value="-1" />
 					<documentation value="Unique user login email address." />
 				</xmi:Extension>
-				<ownedComment xmi:type="uml:Comment" xmi:id="xmi_b2aa2c3543a94eafb0ed124eed373db3_comment" body="Unique user login email address." />
-				<eAnnotations xmi:id="annot_e1afcdafd463482381f59bd4eca739fd" source="Stereotype">
-					<details xmi:id="det_3b007f29d86448e2833e21776984d075" key="column" value="true" />
-					<details xmi:id="det_2934be87a5994b9aa6c3ebef0bb736af" key="modelType" value="DBColumn" />
-					<details xmi:id="det_10fa83975b534fc1ab6e94d83078adc9" key="unique" value="true" />
-					<details xmi:id="det_aa3ad8f38c584829a9e7359765502328" key="uniqueConstraint" value="true" />
-					<details xmi:id="det_1e45fa7bb36641c38d34e3aed8ed7adb" key="stereotype" value="U" />
-					<details xmi:id="det_2ecf1796323b49bbbf16437129905c56" key="nullable" value="false" />
+				<ownedComment xmi:type="uml:Comment" xmi:id="xmi_98efa9e1ab3041a1b128c2e427130789_comment" body="Unique user login email address." />
+				<eAnnotations xmi:id="annot_c2fa7d58802b41e2b0d69a631c051989" source="Stereotype">
+					<details xmi:id="det_587a6a941b5243078d9381f2dbfe8a34" key="column" value="true" />
+					<details xmi:id="det_435cfd88f2b34693b009703d027efce7" key="modelType" value="DBColumn" />
+					<details xmi:id="det_af802d7d63dc42769a455eca9f7bfb1f" key="unique" value="true" />
+					<details xmi:id="det_96ae6e7c1f604d6f80b035ab447cbee8" key="uniqueConstraint" value="true" />
+					<details xmi:id="det_719c267b6a3b4f4582fab554e2c990b3" key="stereotype" value="U" />
+					<details xmi:id="det_3fe8f8a5c91145bbb749db4a428ffed1" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_4926e007ac4f459fbd0c4f1f83a86bd4_attr" name="is_active" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bool_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_5b431baded1b40e0b668795c67eef28f_attr" name="is_active" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bool_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -370,13 +370,13 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_7d92b4fcaa9740089a0120e45686d052" source="Stereotype">
-					<details xmi:id="det_b27d10441cc540c3ad6f4b8ad7778c4c" key="column" value="true" />
-					<details xmi:id="det_c406ac5e1c4641e6bd99482559967e5b" key="modelType" value="DBColumn" />
-					<details xmi:id="det_8161803de4e74cb8a4f4f4193dacdd78" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_540b6e97a3944675bb1318d48a1e2f2c" source="Stereotype">
+					<details xmi:id="det_85e79d5604384624844070a5ff7232f3" key="column" value="true" />
+					<details xmi:id="det_3b28c2441d894c4e8dfe3b542184ac96" key="modelType" value="DBColumn" />
+					<details xmi:id="det_42747f785c554daf9d4da86b5b3e6c0a" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_3709623dc2de489b90652c58217b9651_attr" name="created_at" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="timestamp_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_46f62e6c609f4984aa2d6f3fa8ed50e3_attr" name="created_at" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="timestamp_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -384,19 +384,19 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_f7b38e0d902f4742bb7f8a2589e0b4fa" source="Stereotype">
-					<details xmi:id="det_46558927c3574eceb20b8c3892259c1c" key="column" value="true" />
-					<details xmi:id="det_5ccdf820587e45a6a58b1b8fba5f6e0a" key="modelType" value="DBColumn" />
+				<eAnnotations xmi:id="annot_dc44b0a3ade04f1fb6a6f6898c18b0ba" source="Stereotype">
+					<details xmi:id="det_892554265ac54ab8b1f4e8dcc352d8bf" key="column" value="true" />
+					<details xmi:id="det_be9311c6d2c54f038c66f9916215574b" key="modelType" value="DBColumn" />
 				</eAnnotations>
 			</ownedAttribute>
 		</ownedMember>
 		<ownedMember xmi:type="uml:DataType" xmi:id="bigint_id" name="BIGINT" visibility="public" />
 		<ownedMember xmi:type="uml:DataType" xmi:id="varchar_255__id" name="VARCHAR(255)" visibility="public" />
 		<ownedMember xmi:type="uml:DataType" xmi:id="timestamp_id" name="TIMESTAMP" visibility="public" />
-		<ownedMember xmi:type="uml:dbTable" xmi:id="xmi_6020fdba346d4a5fbc45112dc31df615" name="user_profiles" visibility="public" isAbstract="false" isActive="false" isLeaf="false" syncType="1" type="0" ormSyncState="1">
-			<eAnnotations xmi:id="annot_c0c77af966454ef880ef4fee3272426e" source="Stereotype">
-				<details xmi:id="det_cb92e134bdea49d893d530f889b13dec" key="entity" value="true" />
-				<details xmi:id="det_6aa4f4ec552f48eb970808de6b03863d" key="modelType" value="DBTable" />
+		<ownedMember xmi:type="uml:dbTable" xmi:id="xmi_290fd1d7fdf94b9f86d73f6b1a987074" name="user_profiles" visibility="public" isAbstract="false" isActive="false" isLeaf="false" syncType="1" type="0" ormSyncState="1">
+			<eAnnotations xmi:id="annot_a9da7bfd5d604bc085827e14347734b8" source="Stereotype">
+				<details xmi:id="det_ad828027edc04f56833332edad9dccfa" key="entity" value="true" />
+				<details xmi:id="det_c0341177422045b98f7b090c5bf1ecf4" key="modelType" value="DBTable" />
 			</eAnnotations>
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
@@ -405,7 +405,7 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 			<childrens>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_506d30a517824409b2860af8e9325408" name="id" type="9" typeName="int8" length="19" scale="0" nullable="false" unique="true" primaryKey="true" foreignKey="false" syncType="1" idGenerator="native">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_943fda943398496eaaf96162f38e1da8" name="id" type="9" typeName="bigint" length="19" scale="0" nullable="false" unique="true" primaryKey="true" foreignKey="false" syncType="1" idGenerator="native">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="false" />
@@ -414,17 +414,17 @@
 						<foreignKey value="false" />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_002c102b1be247c2bcf3e9dd2ca026a4" name="user_id" type="9" typeName="int8" length="19" scale="0" nullable="false" unique="true" primaryKey="false" foreignKey="true" syncType="1" foreignKeyConstraints="xmi_fc66335cb95c4f49befab3933b871423">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_a893a122ffd64feb86d05c07bc734f59" name="user_id" type="9" typeName="bigint" length="19" scale="0" nullable="false" unique="true" primaryKey="false" foreignKey="true" syncType="1" foreignKeyConstraints="xmi_cf483a8893a64f46a540da10dcc0f4ae">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="false" />
 						<unique value="true" />
 						<primaryKey value="false" />
 						<foreignKey value="true" />
-						<foreignKeyConstraints value="xmi_fc66335cb95c4f49befab3933b871423" />
+						<foreignKeyConstraints value="xmi_cf483a8893a64f46a540da10dcc0f4ae" />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_49ed57c9c6bb40b08d00be00234e83fe" name="birth_date" type="15" typeName="date" length="0" scale="0" nullable="true" unique="false" primaryKey="false" foreignKey="false" syncType="1">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_a441b8ce9903492d98cdfd831efae0e3" name="birth_date" type="15" typeName="date" length="0" scale="0" nullable="true" unique="false" primaryKey="false" foreignKey="false" syncType="1">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="true" />
@@ -433,7 +433,7 @@
 						<foreignKey value="false" />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_f6c385a4a4554311aae3e9308deaf479" name="avatar_url" type="27" typeName="text" length="0" scale="0" nullable="true" unique="false" primaryKey="false" foreignKey="false" syncType="1">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_24f56386e97c4aa39e3b03b70b35d6a5" name="avatar_url" type="27" typeName="clob" length="0" scale="0" nullable="true" unique="false" primaryKey="false" foreignKey="false" syncType="1">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="true" />
@@ -443,7 +443,7 @@
 					</xmi:Extension>
 				</dbColumn>
 			</childrens>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_506d30a517824409b2860af8e9325408_attr" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_943fda943398496eaaf96162f38e1da8_attr" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -451,17 +451,17 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_b17b1fe15b3f48b5889542082795b9e0" source="Stereotype">
-					<details xmi:id="det_d5ec5d46ff964a4390afd288ad32bf6b" key="column" value="true" />
-					<details xmi:id="det_ff7c822de60e48f18d9074725fb88b1e" key="modelType" value="DBColumn" />
-					<details xmi:id="det_8dc4ff994fcc470fa1abd7f2ac4f98e3" key="primaryKey" value="true" />
-					<details xmi:id="det_1c51097df46a454b93add60fad345704" key="stereotype" value="PK" />
-					<details xmi:id="det_4485554622f84933a4aca333d673c5d8" key="unique" value="true" />
-					<details xmi:id="det_91a204cb05884b27a1471c7289696691" key="uniqueConstraint" value="true" />
-					<details xmi:id="det_21bbf530fed94ad58fbd0b79bdef4498" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_4017fb0faf4a4359af99c9e5fd9461c2" source="Stereotype">
+					<details xmi:id="det_6f4c822298f9468f8481a2dd80c17b76" key="column" value="true" />
+					<details xmi:id="det_d66d12352d9d4340ba78d67d9c0c716d" key="modelType" value="DBColumn" />
+					<details xmi:id="det_c84039287dc64fe09e516aa63b90c5d8" key="primaryKey" value="true" />
+					<details xmi:id="det_3e71854712864a1da998960d5cb16737" key="stereotype" value="PK" />
+					<details xmi:id="det_1e5b948210e64aad9f26df5e1a6f3523" key="unique" value="true" />
+					<details xmi:id="det_319712100ae74a28afe64c44a8a0a759" key="uniqueConstraint" value="true" />
+					<details xmi:id="det_067b74ccc4274f9791d6bbe44a5f49d5" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_002c102b1be247c2bcf3e9dd2ca026a4_attr" name="user_id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_a893a122ffd64feb86d05c07bc734f59_attr" name="user_id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -469,18 +469,18 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_e2bb1b14a8c54294ac910b28f471c4b6" source="Stereotype">
-					<details xmi:id="det_9270f37f9e084dbda8b7e3f14c6e9f5c" key="column" value="true" />
-					<details xmi:id="det_6c34a173b22f493bb01111e034b6736c" key="modelType" value="DBColumn" />
-					<details xmi:id="det_39c11bbb43744e7192880417871e5000" key="foreignKey" value="true" />
-					<details xmi:id="det_f5d756957df04e0eb445f9105102645e" key="stereotype" value="FK" />
-					<details xmi:id="det_820f26d99a3846b2a2f57774e4555a2d" key="unique" value="true" />
-					<details xmi:id="det_a3cf57f66a62456a9597860836ccdf6d" key="uniqueConstraint" value="true" />
-					<details xmi:id="det_dd084c870bb848a7a453f5bb201f4204" key="stereotype" value="U" />
-					<details xmi:id="det_c32ddd1f380f426a98dbfabf30c50d83" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_4a93a653ad6b4e91a287340243b0cb09" source="Stereotype">
+					<details xmi:id="det_c0ed031381214baf99bcb8ce16ade34c" key="column" value="true" />
+					<details xmi:id="det_c357494ac71f4ea1b314bc6d1c83d005" key="modelType" value="DBColumn" />
+					<details xmi:id="det_4297ecad7e764ed4b9f491612887e461" key="foreignKey" value="true" />
+					<details xmi:id="det_d3cbbc8fdaff4ef685fbc4d124595530" key="stereotype" value="FK" />
+					<details xmi:id="det_af2d4f6ca5d645cd8ffb474eee02b047" key="unique" value="true" />
+					<details xmi:id="det_5974b2009f7c454f9261349fd1f60382" key="uniqueConstraint" value="true" />
+					<details xmi:id="det_e44bc23ac3cd4d84a2d534cebafcf2c2" key="stereotype" value="U" />
+					<details xmi:id="det_73f50df1448449f5856499efe21cc22f" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_49ed57c9c6bb40b08d00be00234e83fe_attr" name="birth_date" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="date_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_a441b8ce9903492d98cdfd831efae0e3_attr" name="birth_date" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="date_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -488,12 +488,12 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_d38e8cf9df9d4642b592ffb935e74205" source="Stereotype">
-					<details xmi:id="det_e452e34b6f9848ddb1fa6974bfd78d1a" key="column" value="true" />
-					<details xmi:id="det_8f15aaaf99f746f58858460b58a14e84" key="modelType" value="DBColumn" />
+				<eAnnotations xmi:id="annot_6cd3f00095e44d2d808644b0766d9eea" source="Stereotype">
+					<details xmi:id="det_32bc24d7b6eb499bbe2a8ef9f4622b84" key="column" value="true" />
+					<details xmi:id="det_9fddb738859d441691e166cf089af554" key="modelType" value="DBColumn" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_f6c385a4a4554311aae3e9308deaf479_attr" name="avatar_url" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="text_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_24f56386e97c4aa39e3b03b70b35d6a5_attr" name="avatar_url" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="text_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -501,18 +501,18 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_7ec576277198450fa75564f00d260eed" source="Stereotype">
-					<details xmi:id="det_6a2d79587347485fb6f1ce2ec7d0a5f3" key="column" value="true" />
-					<details xmi:id="det_73c581fd8acd4587aab7a41d6e02c520" key="modelType" value="DBColumn" />
+				<eAnnotations xmi:id="annot_e163ac9415f5465ab4df979710270978" source="Stereotype">
+					<details xmi:id="det_711d1e2bc6734692addabc33e5e0bd9f" key="column" value="true" />
+					<details xmi:id="det_46b98efcd6254f22a1e5da9cc4ef0a18" key="modelType" value="DBColumn" />
 				</eAnnotations>
 			</ownedAttribute>
 		</ownedMember>
 		<ownedMember xmi:type="uml:DataType" xmi:id="date_id" name="DATE" visibility="public" />
 		<ownedMember xmi:type="uml:DataType" xmi:id="text_id" name="TEXT" visibility="public" />
-		<ownedMember xmi:type="uml:dbTable" xmi:id="xmi_872b77fece9e4aafad477c359d006410" name="orders" visibility="public" isAbstract="false" isActive="false" isLeaf="false" syncType="1" type="0" ormSyncState="1">
-			<eAnnotations xmi:id="annot_31b8ea475ce940c39af82f3caf8190b2" source="Stereotype">
-				<details xmi:id="det_dcd3e894aaa84d92acac24059722e793" key="entity" value="true" />
-				<details xmi:id="det_7e0a517152154b1385438c8f51dde8ad" key="modelType" value="DBTable" />
+		<ownedMember xmi:type="uml:dbTable" xmi:id="xmi_36aa02d737744e6aa46734f3f891f00a" name="orders" visibility="public" isAbstract="false" isActive="false" isLeaf="false" syncType="1" type="0" ormSyncState="1">
+			<eAnnotations xmi:id="annot_8cae645853154b4388a7c30f53b0a610" source="Stereotype">
+				<details xmi:id="det_6ee087492f68472c806fba590038a565" key="entity" value="true" />
+				<details xmi:id="det_16e42d60209e466cb7bd4cff9c1cc61f" key="modelType" value="DBTable" />
 			</eAnnotations>
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
@@ -521,7 +521,7 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 			<childrens>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_c694023a02ba4aac96f7a45f9ee6dcf6" name="id" type="9" typeName="int8" length="19" scale="0" nullable="false" unique="true" primaryKey="true" foreignKey="false" syncType="1" idGenerator="native">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_008b705a246746429db80ae2388d89a1" name="id" type="9" typeName="bigint" length="19" scale="0" nullable="false" unique="true" primaryKey="true" foreignKey="false" syncType="1" idGenerator="native">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="false" />
@@ -530,17 +530,17 @@
 						<foreignKey value="false" />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_808684a831414280a461972fcaa18295" name="user_id" type="9" typeName="int8" length="19" scale="0" nullable="false" unique="false" primaryKey="false" foreignKey="true" syncType="1" foreignKeyConstraints="xmi_487f48c5705749e2bb595270e7178e56">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_43608f7d47914f74b7431aa7a4fee583" name="user_id" type="9" typeName="bigint" length="19" scale="0" nullable="false" unique="false" primaryKey="false" foreignKey="true" syncType="1" foreignKeyConstraints="xmi_eb0eb928ed404ae3befa583b6fafbdcf">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="false" />
 						<unique value="false" />
 						<primaryKey value="false" />
 						<foreignKey value="true" />
-						<foreignKeyConstraints value="xmi_487f48c5705749e2bb595270e7178e56" />
+						<foreignKeyConstraints value="xmi_eb0eb928ed404ae3befa583b6fafbdcf" />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_60dffc64a9ae4a8692c84f1ea2c6b447" name="total_amount" type="11" typeName="numeric" length="10" scale="0" nullable="false" unique="false" primaryKey="false" foreignKey="false" syncType="1">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_e5c7aca4110e4ba2ba9f3fcdf593f070" name="total_amount" type="11" typeName="numeric" length="10" scale="0" nullable="false" unique="false" primaryKey="false" foreignKey="false" syncType="1">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="false" />
@@ -549,7 +549,7 @@
 						<foreignKey value="false" />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_6bd7e6dd854d4fedada0c509eaeeabdf" name="discount_pct" type="12" typeName="float4" length="0" scale="0" nullable="true" unique="false" primaryKey="false" foreignKey="false" syncType="1">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_be0f24e7f883416698bf213c558fc9b8" name="discount_pct" type="12" typeName="float" length="0" scale="0" nullable="true" unique="false" primaryKey="false" foreignKey="false" syncType="1">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="true" />
@@ -558,7 +558,7 @@
 						<foreignKey value="false" />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_45fb2667c1934c64a203083a7429c59b" name="status" type="27" typeName="varchar" length="50" scale="0" nullable="true" unique="false" primaryKey="false" foreignKey="false" syncType="1">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_ee3fb477a03f446fa6b9c0ae0a3cc0bc" name="status" type="27" typeName="varchar" length="50" scale="0" nullable="true" unique="false" primaryKey="false" foreignKey="false" syncType="1">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="true" />
@@ -568,7 +568,7 @@
 					</xmi:Extension>
 				</dbColumn>
 			</childrens>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_c694023a02ba4aac96f7a45f9ee6dcf6_attr" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_008b705a246746429db80ae2388d89a1_attr" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -576,17 +576,17 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_cd7e0c2d6fa144f4958f5500432add31" source="Stereotype">
-					<details xmi:id="det_86346567f863483083ca4439ff59a631" key="column" value="true" />
-					<details xmi:id="det_dfca2e54d8764a5cb3b2721d102e9b7b" key="modelType" value="DBColumn" />
-					<details xmi:id="det_8ca11116776e4ae19c9ecf63e2f74603" key="primaryKey" value="true" />
-					<details xmi:id="det_c5fbeaaefaf1463baeb0dbf74c9db015" key="stereotype" value="PK" />
-					<details xmi:id="det_d542dda5bf1e4120bed9ed35941d8858" key="unique" value="true" />
-					<details xmi:id="det_52717d059c3c4ee993176380c1667bc3" key="uniqueConstraint" value="true" />
-					<details xmi:id="det_284add4c485446dd83be2fa9f7ce70b6" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_3f3db7a8048942b6a1196d6c0681496f" source="Stereotype">
+					<details xmi:id="det_74edae7d977e412bbe66e50530a5f8d5" key="column" value="true" />
+					<details xmi:id="det_6443b9bab9324b70bc97ac829a712adf" key="modelType" value="DBColumn" />
+					<details xmi:id="det_04d28baddba24ede9e303e99b2843cac" key="primaryKey" value="true" />
+					<details xmi:id="det_ce8b5bb38fcf43ecb4a566982c278836" key="stereotype" value="PK" />
+					<details xmi:id="det_ec9084a2758f458fa382abbdce266005" key="unique" value="true" />
+					<details xmi:id="det_c2bf01d76bd948ecaa3bfefa816add60" key="uniqueConstraint" value="true" />
+					<details xmi:id="det_386546ecc7224ff7bc657a222df4b34e" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_808684a831414280a461972fcaa18295_attr" name="user_id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_43608f7d47914f74b7431aa7a4fee583_attr" name="user_id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -594,15 +594,15 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_4aaa64a3ebae4997a7161db809b37c7c" source="Stereotype">
-					<details xmi:id="det_b3da25504d364ad1ab6db7aa8b99e9b3" key="column" value="true" />
-					<details xmi:id="det_9f8e2c18d0424bf4b28b6e94ca19ce2c" key="modelType" value="DBColumn" />
-					<details xmi:id="det_e76bd378d2484d5197f4a41a16db056b" key="foreignKey" value="true" />
-					<details xmi:id="det_3cf70fb582704b8dbe4118c39fb5d867" key="stereotype" value="FK" />
-					<details xmi:id="det_2945ce9640b7418595030a3a66824a95" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_c390907f5a154d97b42654c5a0d70008" source="Stereotype">
+					<details xmi:id="det_a2241619e88c494ca3d70e0bb1f1e454" key="column" value="true" />
+					<details xmi:id="det_43043aeeee0d4eebb2fa1b65f0f2419f" key="modelType" value="DBColumn" />
+					<details xmi:id="det_9f1076eb8a8c41feac317e08d5982720" key="foreignKey" value="true" />
+					<details xmi:id="det_ff41f137bcb44d8784f5fff919dc6fee" key="stereotype" value="FK" />
+					<details xmi:id="det_9d984351d01d40e2b6ae477c7b226e81" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_60dffc64a9ae4a8692c84f1ea2c6b447_attr" name="total_amount" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="numeric_10__2__id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_e5c7aca4110e4ba2ba9f3fcdf593f070_attr" name="total_amount" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="numeric_10__2__id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -610,13 +610,13 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_1b22d1183ab0413c810518f775ebe0ac" source="Stereotype">
-					<details xmi:id="det_4c2a3c72c1a34e3eb0452f08bb403554" key="column" value="true" />
-					<details xmi:id="det_2fed9b0d8e2b444881400cc532c0c0ff" key="modelType" value="DBColumn" />
-					<details xmi:id="det_ed8b0e484de646ec8329c91505910345" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_13203d35db14483083a1cf8c76d461fe" source="Stereotype">
+					<details xmi:id="det_33dcd08b39db44978565e0ed4216cd19" key="column" value="true" />
+					<details xmi:id="det_c686c9641b8245968258bb05ea56fa84" key="modelType" value="DBColumn" />
+					<details xmi:id="det_c8230efb6e32405a8f059c2aa077a209" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_6bd7e6dd854d4fedada0c509eaeeabdf_attr" name="discount_pct" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="float_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_be0f24e7f883416698bf213c558fc9b8_attr" name="discount_pct" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="float_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -624,12 +624,12 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_2b3d4ea457b14e079ee5922f3fb2df15" source="Stereotype">
-					<details xmi:id="det_ccd7e69d28b7455d9ff0f170ac006d6d" key="column" value="true" />
-					<details xmi:id="det_4217707ed5214837bf219ed45b496348" key="modelType" value="DBColumn" />
+				<eAnnotations xmi:id="annot_bbd5d2a5ab7a433084fd3ee1b0f4e37b" source="Stereotype">
+					<details xmi:id="det_e1b2e137a683408d8b4b2931dbaf30c8" key="column" value="true" />
+					<details xmi:id="det_88a075ea9b0e4a27b8bde269e9b68f61" key="modelType" value="DBColumn" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_45fb2667c1934c64a203083a7429c59b_attr" name="status" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_50__id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_ee3fb477a03f446fa6b9c0ae0a3cc0bc_attr" name="status" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_50__id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -637,18 +637,18 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_ac69d2c4498e40a692358983beb3e662" source="Stereotype">
-					<details xmi:id="det_93c7075ec3ea4efc801f1df852e2271a" key="column" value="true" />
-					<details xmi:id="det_6727560e421241aa9c700f0f573f69e2" key="modelType" value="DBColumn" />
+				<eAnnotations xmi:id="annot_84d75efd79c248b7b6ca6179bc5e8f38" source="Stereotype">
+					<details xmi:id="det_7da56f741f2340978609f0a40361f279" key="column" value="true" />
+					<details xmi:id="det_30072e1ae1e8436988876ca2637547e0" key="modelType" value="DBColumn" />
 				</eAnnotations>
 			</ownedAttribute>
 		</ownedMember>
 		<ownedMember xmi:type="uml:DataType" xmi:id="numeric_10__2__id" name="NUMERIC(10, 2)" visibility="public" />
 		<ownedMember xmi:type="uml:DataType" xmi:id="varchar_50__id" name="VARCHAR(50)" visibility="public" />
-		<ownedMember xmi:type="uml:dbTable" xmi:id="xmi_33133de3978c41afb0c6686a155cbf00" name="tags" visibility="public" isAbstract="false" isActive="false" isLeaf="false" syncType="1" type="0" ormSyncState="1">
-			<eAnnotations xmi:id="annot_3bac81c01cdb450594ce1c7872a95280" source="Stereotype">
-				<details xmi:id="det_00bb36bb56744b31ae4ef53bcc404a20" key="entity" value="true" />
-				<details xmi:id="det_4e77ef9954f8438f9fbccd36150bfdf9" key="modelType" value="DBTable" />
+		<ownedMember xmi:type="uml:dbTable" xmi:id="xmi_c636e42f18f8426aaca96661437c64b9" name="tags" visibility="public" isAbstract="false" isActive="false" isLeaf="false" syncType="1" type="0" ormSyncState="1">
+			<eAnnotations xmi:id="annot_2355e81b1f7c422dabf64786614a612b" source="Stereotype">
+				<details xmi:id="det_c79c9d7f281d406da44298814f5b52ec" key="entity" value="true" />
+				<details xmi:id="det_94e3f088cd6c4c0ea676dcc3b9f4ba0f" key="modelType" value="DBTable" />
 			</eAnnotations>
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
@@ -657,7 +657,7 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 			<childrens>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_05334f756693417a84fbaaed43bbb868" name="id" type="9" typeName="int8" length="19" scale="0" nullable="false" unique="true" primaryKey="true" foreignKey="false" syncType="1" idGenerator="native">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_e73218eda4a449a8a9dc905b3579798a" name="id" type="9" typeName="bigint" length="19" scale="0" nullable="false" unique="true" primaryKey="true" foreignKey="false" syncType="1" idGenerator="native">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="false" />
@@ -666,7 +666,7 @@
 						<foreignKey value="false" />
 					</xmi:Extension>
 				</dbColumn>
-				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_cef8a7c03b454bdabf3890e882b93aa6" name="name" type="27" typeName="varchar" length="50" scale="0" nullable="false" unique="true" primaryKey="false" foreignKey="false" syncType="1">
+				<dbColumn xmi:type="uml:dbColumn" xmi:id="xmi_344557a4b3774033a7bb91aa54dd488b" name="name" type="27" typeName="varchar" length="50" scale="0" nullable="false" unique="true" primaryKey="false" foreignKey="false" syncType="1">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="DBColumn" />
 						<nullable value="false" />
@@ -676,7 +676,7 @@
 					</xmi:Extension>
 				</dbColumn>
 			</childrens>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_05334f756693417a84fbaaed43bbb868_attr" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_e73218eda4a449a8a9dc905b3579798a_attr" name="id" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="bigint_id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -684,17 +684,17 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_f991128c83a04506838107490fead0b1" source="Stereotype">
-					<details xmi:id="det_95e36b3a68c64309a3dfd7c509efc4c0" key="column" value="true" />
-					<details xmi:id="det_0cdd5985c32d456fa43c958a8696f001" key="modelType" value="DBColumn" />
-					<details xmi:id="det_c319881ecec6467fa57bafe2e797e6e6" key="primaryKey" value="true" />
-					<details xmi:id="det_0e580746751749d992c21f7673dbe9be" key="stereotype" value="PK" />
-					<details xmi:id="det_c62a5e8fedb14ad79a479689d5616aa3" key="unique" value="true" />
-					<details xmi:id="det_5f2c419ff4a446cbbc0f0a9fab4c0fd1" key="uniqueConstraint" value="true" />
-					<details xmi:id="det_75fe1a8e447b4868b439d38b50300b22" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_d3f93886fc054b448b7d07a97ad95414" source="Stereotype">
+					<details xmi:id="det_48e61edb2f9a4cb0b5779428913f1c05" key="column" value="true" />
+					<details xmi:id="det_f67b1a80b10c4531b41a25d807f093ee" key="modelType" value="DBColumn" />
+					<details xmi:id="det_512d7f90025f4149b08321abecba2f06" key="primaryKey" value="true" />
+					<details xmi:id="det_e9b7004602324277a6ddda1ad843f5d8" key="stereotype" value="PK" />
+					<details xmi:id="det_21d5045c74234706bbd90ff1beb41952" key="unique" value="true" />
+					<details xmi:id="det_3479fa5e31a94d25af5563e9436e9e71" key="uniqueConstraint" value="true" />
+					<details xmi:id="det_0062871cd8b7461d9ae053fd27396f70" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
-			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_cef8a7c03b454bdabf3890e882b93aa6_attr" name="name" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_50__id">
+			<ownedAttribute xmi:type="uml:Property" xmi:id="xmi_344557a4b3774033a7bb91aa54dd488b_attr" name="name" visibility="public" aggregation="none" isDerived="false" isDerivedUnion="false" isID="false" isLeaf="false" isReadOnly="false" isStatic="false" type="varchar_50__id">
 				<xmi:Extension extender="Visual Paradigm">
 					<attribute />
 					<modelType value="DBColumn" />
@@ -702,23 +702,23 @@
 					<isVisible xmi:value="true" />
 					<qualityScore value="-1" />
 				</xmi:Extension>
-				<eAnnotations xmi:id="annot_070c80110a1f494fad3778b9c12d4827" source="Stereotype">
-					<details xmi:id="det_2533546707d3458f8991d31d1c647f29" key="column" value="true" />
-					<details xmi:id="det_cf532544b3594f1ca597e351c3ff6d5a" key="modelType" value="DBColumn" />
-					<details xmi:id="det_b6036723e07f49e6b2aa1832a0c8fa7c" key="unique" value="true" />
-					<details xmi:id="det_18729710c04748139b8a9e4b110f8cce" key="uniqueConstraint" value="true" />
-					<details xmi:id="det_42afa4a919a74d7aa7a1c2e0bb1bbba8" key="stereotype" value="U" />
-					<details xmi:id="det_0d84dfdc92164f84a8ff9892c4324812" key="nullable" value="false" />
+				<eAnnotations xmi:id="annot_6d6b7f693df9423cb2fbc4cd285e0b7d" source="Stereotype">
+					<details xmi:id="det_29d9e48e41ff47319c9c3de640e96261" key="column" value="true" />
+					<details xmi:id="det_1f86c5d81d384d6c9c8513e0eb26bc42" key="modelType" value="DBColumn" />
+					<details xmi:id="det_969fedd3300746728c40e415b4d8e5b9" key="unique" value="true" />
+					<details xmi:id="det_9248fe9cbdbc498ebbcabe2c8ea22da7" key="uniqueConstraint" value="true" />
+					<details xmi:id="det_c84ec1fb0d6a437cab30c862375957f5" key="stereotype" value="U" />
+					<details xmi:id="det_d89b4d326dd04346a8d1765cba6f3c05" key="nullable" value="false" />
 				</eAnnotations>
 			</ownedAttribute>
 		</ownedMember>
-		<ownedMember xmi:type="uml:dbForeignKey" xmi:id="xmi_fc66335cb95c4f49befab3933b871423" name="" from="xmi_e498dd5aee7b45628c2706742b2f90bf" to="xmi_6020fdba346d4a5fbc45112dc31df615" fromMultiplicity="1" toMultiplicity="1" identifying="false" syncType="1" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<from xmi:idref="xmi_e498dd5aee7b45628c2706742b2f90bf" />
-			<to xmi:idref="xmi_6020fdba346d4a5fbc45112dc31df615" />
+		<ownedMember xmi:type="uml:dbForeignKey" xmi:id="xmi_cf483a8893a64f46a540da10dcc0f4ae" name="" from="xmi_d533f19b366f4a1fbf047f058d3a4f70" to="xmi_290fd1d7fdf94b9f86d73f6b1a987074" fromMultiplicity="1" toMultiplicity="1" identifying="false" syncType="1" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<from xmi:idref="xmi_d533f19b366f4a1fbf047f058d3a4f70" />
+			<to xmi:idref="xmi_290fd1d7fdf94b9f86d73f6b1a987074" />
 			<xmi:Extension extender="Visual Paradigm">
 				<modelType value="DBForeignKey" />
-				<from value="xmi_e498dd5aee7b45628c2706742b2f90bf" />
-				<to value="xmi_6020fdba346d4a5fbc45112dc31df615" />
+				<from value="xmi_d533f19b366f4a1fbf047f058d3a4f70" />
+				<to value="xmi_290fd1d7fdf94b9f86d73f6b1a987074" />
 				<fromMultiplicity value="1" />
 				<toMultiplicity value="1" />
 				<identifying value="false" />
@@ -726,13 +726,13 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:dbForeignKey" xmi:id="xmi_487f48c5705749e2bb595270e7178e56" name="" from="xmi_e498dd5aee7b45628c2706742b2f90bf" to="xmi_872b77fece9e4aafad477c359d006410" fromMultiplicity="1" toMultiplicity="0..*" identifying="false" syncType="1" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<from xmi:idref="xmi_e498dd5aee7b45628c2706742b2f90bf" />
-			<to xmi:idref="xmi_872b77fece9e4aafad477c359d006410" />
+		<ownedMember xmi:type="uml:dbForeignKey" xmi:id="xmi_eb0eb928ed404ae3befa583b6fafbdcf" name="" from="xmi_d533f19b366f4a1fbf047f058d3a4f70" to="xmi_36aa02d737744e6aa46734f3f891f00a" fromMultiplicity="1" toMultiplicity="0..*" identifying="false" syncType="1" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<from xmi:idref="xmi_d533f19b366f4a1fbf047f058d3a4f70" />
+			<to xmi:idref="xmi_36aa02d737744e6aa46734f3f891f00a" />
 			<xmi:Extension extender="Visual Paradigm">
 				<modelType value="DBForeignKey" />
-				<from value="xmi_e498dd5aee7b45628c2706742b2f90bf" />
-				<to value="xmi_872b77fece9e4aafad477c359d006410" />
+				<from value="xmi_d533f19b366f4a1fbf047f058d3a4f70" />
+				<to value="xmi_36aa02d737744e6aa46734f3f891f00a" />
 				<fromMultiplicity value="1" />
 				<toMultiplicity value="0..*" />
 				<identifying value="false" />
@@ -740,13 +740,13 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:dbForeignKey" xmi:id="xmi_c2f8596c0f404d9ea186d36a2ddc652c" name="" from="xmi_872b77fece9e4aafad477c359d006410" to="xmi_33133de3978c41afb0c6686a155cbf00" fromMultiplicity="0..*" toMultiplicity="0..*" identifying="false" syncType="1" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<from xmi:idref="xmi_872b77fece9e4aafad477c359d006410" />
-			<to xmi:idref="xmi_33133de3978c41afb0c6686a155cbf00" />
+		<ownedMember xmi:type="uml:dbForeignKey" xmi:id="xmi_adaf273a32264df08cbee1325f4a5256" name="" from="xmi_36aa02d737744e6aa46734f3f891f00a" to="xmi_c636e42f18f8426aaca96661437c64b9" fromMultiplicity="0..*" toMultiplicity="0..*" identifying="false" syncType="1" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<from xmi:idref="xmi_36aa02d737744e6aa46734f3f891f00a" />
+			<to xmi:idref="xmi_c636e42f18f8426aaca96661437c64b9" />
 			<xmi:Extension extender="Visual Paradigm">
 				<modelType value="DBForeignKey" />
-				<from value="xmi_872b77fece9e4aafad477c359d006410" />
-				<to value="xmi_33133de3978c41afb0c6686a155cbf00" />
+				<from value="xmi_36aa02d737744e6aa46734f3f891f00a" />
+				<to value="xmi_c636e42f18f8426aaca96661437c64b9" />
 				<fromMultiplicity value="0..*" />
 				<toMultiplicity value="0..*" />
 				<identifying value="false" />
@@ -756,7 +756,7 @@
 		</ownedMember>
 		<xmi:Extension extender="Visual Paradigm">
 			<vpumlChildModels>
-				<vpumlModel id="xmi_e498dd5aee7b45628c2706742b2f90bf" modelType="DBTable">
+				<vpumlModel id="xmi_d533f19b366f4a1fbf047f058d3a4f70" modelType="DBTable">
 					<properties>
 						<property name="name" type="string" value="users" />
 						<property name="modelType" type="string" value="DBTable" />
@@ -768,18 +768,18 @@
 						<property name="documentation" type="htmlString" value="Stores core authentication and user profile data." />
 					</properties>
 					<vpumlChildModelRefs>
-						<modelRef value="xmi_d1ef966fc4e1439aa3573fafa1ce640d" />
-						<modelRef value="xmi_b2aa2c3543a94eafb0ed124eed373db3" />
-						<modelRef value="xmi_4926e007ac4f459fbd0c4f1f83a86bd4" />
-						<modelRef value="xmi_3709623dc2de489b90652c58217b9651" />
+						<modelRef value="xmi_486b4dc262d34421862d6f21b6f16399" />
+						<modelRef value="xmi_98efa9e1ab3041a1b128c2e427130789" />
+						<modelRef value="xmi_5b431baded1b40e0b668795c67eef28f" />
+						<modelRef value="xmi_46f62e6c609f4984aa2d6f3fa8ed50e3" />
 					</vpumlChildModelRefs>
 					<vpumlChildModels>
-						<vpumlModel id="xmi_d1ef966fc4e1439aa3573fafa1ce640d" modelType="DBColumn">
+						<vpumlModel id="xmi_486b4dc262d34421862d6f21b6f16399" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="id" />
 								<property name="modelType" type="string" value="DBColumn" />
 								<property name="type" type="int" value="9" />
-								<property name="typeName" type="string" value="int8" />
+								<property name="typeName" type="string" value="bigint" />
 								<property name="length" type="int" value="19" />
 								<property name="scale" type="int" value="0" />
 								<property name="nullable" type="boolean" value="false" />
@@ -793,7 +793,7 @@
 								<property name="idGenerator" type="stringSelection" value="native" />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_b2aa2c3543a94eafb0ed124eed373db3" modelType="DBColumn">
+						<vpumlModel id="xmi_98efa9e1ab3041a1b128c2e427130789" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="email" />
 								<property name="modelType" type="string" value="DBColumn" />
@@ -812,7 +812,7 @@
 								<property name="documentation" type="htmlString" value="Unique user login email address." />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_4926e007ac4f459fbd0c4f1f83a86bd4" modelType="DBColumn">
+						<vpumlModel id="xmi_5b431baded1b40e0b668795c67eef28f" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="is_active" />
 								<property name="modelType" type="string" value="DBColumn" />
@@ -830,7 +830,7 @@
 								<property name="syncToAttribute" type="int" value="0" />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_3709623dc2de489b90652c58217b9651" modelType="DBColumn">
+						<vpumlModel id="xmi_46f62e6c609f4984aa2d6f3fa8ed50e3" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="created_at" />
 								<property name="modelType" type="string" value="DBColumn" />
@@ -850,7 +850,7 @@
 						</vpumlModel>
 					</vpumlChildModels>
 				</vpumlModel>
-				<vpumlModel id="xmi_6020fdba346d4a5fbc45112dc31df615" modelType="DBTable">
+				<vpumlModel id="xmi_290fd1d7fdf94b9f86d73f6b1a987074" modelType="DBTable">
 					<properties>
 						<property name="name" type="string" value="user_profiles" />
 						<property name="modelType" type="string" value="DBTable" />
@@ -861,18 +861,18 @@
 						<property name="qualityScore" type="int" value="-1" />
 					</properties>
 					<vpumlChildModelRefs>
-						<modelRef value="xmi_506d30a517824409b2860af8e9325408" />
-						<modelRef value="xmi_002c102b1be247c2bcf3e9dd2ca026a4" />
-						<modelRef value="xmi_49ed57c9c6bb40b08d00be00234e83fe" />
-						<modelRef value="xmi_f6c385a4a4554311aae3e9308deaf479" />
+						<modelRef value="xmi_943fda943398496eaaf96162f38e1da8" />
+						<modelRef value="xmi_a893a122ffd64feb86d05c07bc734f59" />
+						<modelRef value="xmi_a441b8ce9903492d98cdfd831efae0e3" />
+						<modelRef value="xmi_24f56386e97c4aa39e3b03b70b35d6a5" />
 					</vpumlChildModelRefs>
 					<vpumlChildModels>
-						<vpumlModel id="xmi_506d30a517824409b2860af8e9325408" modelType="DBColumn">
+						<vpumlModel id="xmi_943fda943398496eaaf96162f38e1da8" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="id" />
 								<property name="modelType" type="string" value="DBColumn" />
 								<property name="type" type="int" value="9" />
-								<property name="typeName" type="string" value="int8" />
+								<property name="typeName" type="string" value="bigint" />
 								<property name="length" type="int" value="19" />
 								<property name="scale" type="int" value="0" />
 								<property name="nullable" type="boolean" value="false" />
@@ -886,26 +886,26 @@
 								<property name="idGenerator" type="stringSelection" value="native" />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_002c102b1be247c2bcf3e9dd2ca026a4" modelType="DBColumn">
+						<vpumlModel id="xmi_a893a122ffd64feb86d05c07bc734f59" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="user_id" />
 								<property name="modelType" type="string" value="DBColumn" />
 								<property name="type" type="int" value="9" />
-								<property name="typeName" type="string" value="int8" />
+								<property name="typeName" type="string" value="bigint" />
 								<property name="length" type="int" value="19" />
 								<property name="scale" type="int" value="0" />
 								<property name="nullable" type="boolean" value="false" />
 								<property name="unique" type="boolean" value="true" />
 								<property name="primaryKey" type="boolean" value="false" />
 								<property name="foreignKey" type="boolean" value="true" />
-								<property name="foreignKeyConstraints" type="modelRefs" value="xmi_c2f8596c0f404d9ea186d36a2ddc652c" />
+								<property name="foreignKeyConstraints" type="modelRefs" value="xmi_adaf273a32264df08cbee1325f4a5256" />
 								<property name="index" type="boolean" value="false" />
 								<property name="syncType" type="int" value="1" />
 								<property name="generated" type="int" value="0" />
 								<property name="syncToAttribute" type="int" value="0" />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_49ed57c9c6bb40b08d00be00234e83fe" modelType="DBColumn">
+						<vpumlModel id="xmi_a441b8ce9903492d98cdfd831efae0e3" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="birth_date" />
 								<property name="modelType" type="string" value="DBColumn" />
@@ -923,12 +923,12 @@
 								<property name="syncToAttribute" type="int" value="0" />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_f6c385a4a4554311aae3e9308deaf479" modelType="DBColumn">
+						<vpumlModel id="xmi_24f56386e97c4aa39e3b03b70b35d6a5" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="avatar_url" />
 								<property name="modelType" type="string" value="DBColumn" />
 								<property name="type" type="int" value="27" />
-								<property name="typeName" type="string" value="text" />
+								<property name="typeName" type="string" value="clob" />
 								<property name="length" type="int" value="0" />
 								<property name="scale" type="int" value="0" />
 								<property name="nullable" type="boolean" value="true" />
@@ -943,7 +943,7 @@
 						</vpumlModel>
 					</vpumlChildModels>
 				</vpumlModel>
-				<vpumlModel id="xmi_872b77fece9e4aafad477c359d006410" modelType="DBTable">
+				<vpumlModel id="xmi_36aa02d737744e6aa46734f3f891f00a" modelType="DBTable">
 					<properties>
 						<property name="name" type="string" value="orders" />
 						<property name="modelType" type="string" value="DBTable" />
@@ -954,19 +954,19 @@
 						<property name="qualityScore" type="int" value="-1" />
 					</properties>
 					<vpumlChildModelRefs>
-						<modelRef value="xmi_c694023a02ba4aac96f7a45f9ee6dcf6" />
-						<modelRef value="xmi_808684a831414280a461972fcaa18295" />
-						<modelRef value="xmi_60dffc64a9ae4a8692c84f1ea2c6b447" />
-						<modelRef value="xmi_6bd7e6dd854d4fedada0c509eaeeabdf" />
-						<modelRef value="xmi_45fb2667c1934c64a203083a7429c59b" />
+						<modelRef value="xmi_008b705a246746429db80ae2388d89a1" />
+						<modelRef value="xmi_43608f7d47914f74b7431aa7a4fee583" />
+						<modelRef value="xmi_e5c7aca4110e4ba2ba9f3fcdf593f070" />
+						<modelRef value="xmi_be0f24e7f883416698bf213c558fc9b8" />
+						<modelRef value="xmi_ee3fb477a03f446fa6b9c0ae0a3cc0bc" />
 					</vpumlChildModelRefs>
 					<vpumlChildModels>
-						<vpumlModel id="xmi_c694023a02ba4aac96f7a45f9ee6dcf6" modelType="DBColumn">
+						<vpumlModel id="xmi_008b705a246746429db80ae2388d89a1" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="id" />
 								<property name="modelType" type="string" value="DBColumn" />
 								<property name="type" type="int" value="9" />
-								<property name="typeName" type="string" value="int8" />
+								<property name="typeName" type="string" value="bigint" />
 								<property name="length" type="int" value="19" />
 								<property name="scale" type="int" value="0" />
 								<property name="nullable" type="boolean" value="false" />
@@ -980,26 +980,26 @@
 								<property name="idGenerator" type="stringSelection" value="native" />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_808684a831414280a461972fcaa18295" modelType="DBColumn">
+						<vpumlModel id="xmi_43608f7d47914f74b7431aa7a4fee583" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="user_id" />
 								<property name="modelType" type="string" value="DBColumn" />
 								<property name="type" type="int" value="9" />
-								<property name="typeName" type="string" value="int8" />
+								<property name="typeName" type="string" value="bigint" />
 								<property name="length" type="int" value="19" />
 								<property name="scale" type="int" value="0" />
 								<property name="nullable" type="boolean" value="false" />
 								<property name="unique" type="boolean" value="false" />
 								<property name="primaryKey" type="boolean" value="false" />
 								<property name="foreignKey" type="boolean" value="true" />
-								<property name="foreignKeyConstraints" type="modelRefs" value="xmi_c2f8596c0f404d9ea186d36a2ddc652c" />
+								<property name="foreignKeyConstraints" type="modelRefs" value="xmi_adaf273a32264df08cbee1325f4a5256" />
 								<property name="index" type="boolean" value="false" />
 								<property name="syncType" type="int" value="1" />
 								<property name="generated" type="int" value="0" />
 								<property name="syncToAttribute" type="int" value="0" />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_60dffc64a9ae4a8692c84f1ea2c6b447" modelType="DBColumn">
+						<vpumlModel id="xmi_e5c7aca4110e4ba2ba9f3fcdf593f070" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="total_amount" />
 								<property name="modelType" type="string" value="DBColumn" />
@@ -1017,12 +1017,12 @@
 								<property name="syncToAttribute" type="int" value="0" />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_6bd7e6dd854d4fedada0c509eaeeabdf" modelType="DBColumn">
+						<vpumlModel id="xmi_be0f24e7f883416698bf213c558fc9b8" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="discount_pct" />
 								<property name="modelType" type="string" value="DBColumn" />
 								<property name="type" type="int" value="12" />
-								<property name="typeName" type="string" value="float4" />
+								<property name="typeName" type="string" value="float" />
 								<property name="length" type="int" value="0" />
 								<property name="scale" type="int" value="0" />
 								<property name="nullable" type="boolean" value="true" />
@@ -1035,7 +1035,7 @@
 								<property name="syncToAttribute" type="int" value="0" />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_45fb2667c1934c64a203083a7429c59b" modelType="DBColumn">
+						<vpumlModel id="xmi_ee3fb477a03f446fa6b9c0ae0a3cc0bc" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="status" />
 								<property name="modelType" type="string" value="DBColumn" />
@@ -1055,7 +1055,7 @@
 						</vpumlModel>
 					</vpumlChildModels>
 				</vpumlModel>
-				<vpumlModel id="xmi_33133de3978c41afb0c6686a155cbf00" modelType="DBTable">
+				<vpumlModel id="xmi_c636e42f18f8426aaca96661437c64b9" modelType="DBTable">
 					<properties>
 						<property name="name" type="string" value="tags" />
 						<property name="modelType" type="string" value="DBTable" />
@@ -1066,16 +1066,16 @@
 						<property name="qualityScore" type="int" value="-1" />
 					</properties>
 					<vpumlChildModelRefs>
-						<modelRef value="xmi_05334f756693417a84fbaaed43bbb868" />
-						<modelRef value="xmi_cef8a7c03b454bdabf3890e882b93aa6" />
+						<modelRef value="xmi_e73218eda4a449a8a9dc905b3579798a" />
+						<modelRef value="xmi_344557a4b3774033a7bb91aa54dd488b" />
 					</vpumlChildModelRefs>
 					<vpumlChildModels>
-						<vpumlModel id="xmi_05334f756693417a84fbaaed43bbb868" modelType="DBColumn">
+						<vpumlModel id="xmi_e73218eda4a449a8a9dc905b3579798a" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="id" />
 								<property name="modelType" type="string" value="DBColumn" />
 								<property name="type" type="int" value="9" />
-								<property name="typeName" type="string" value="int8" />
+								<property name="typeName" type="string" value="bigint" />
 								<property name="length" type="int" value="19" />
 								<property name="scale" type="int" value="0" />
 								<property name="nullable" type="boolean" value="false" />
@@ -1089,7 +1089,7 @@
 								<property name="idGenerator" type="stringSelection" value="native" />
 							</properties>
 						</vpumlModel>
-						<vpumlModel id="xmi_cef8a7c03b454bdabf3890e882b93aa6" modelType="DBColumn">
+						<vpumlModel id="xmi_344557a4b3774033a7bb91aa54dd488b" modelType="DBColumn">
 							<properties>
 								<property name="name" type="string" value="name" />
 								<property name="modelType" type="string" value="DBColumn" />
@@ -1109,12 +1109,12 @@
 						</vpumlModel>
 					</vpumlChildModels>
 				</vpumlModel>
-				<vpumlModel id="xmi_fc66335cb95c4f49befab3933b871423" modelType="DBForeignKey">
+				<vpumlModel id="xmi_cf483a8893a64f46a540da10dcc0f4ae" modelType="DBForeignKey">
 					<properties>
 						<property name="name" type="string" value="" />
 						<property name="modelType" type="string" value="DBForeignKey" />
-						<property name="from" type="fromTo" modelRef="xmi_e498dd5aee7b45628c2706742b2f90bf" />
-						<property name="to" type="fromTo" modelRef="xmi_6020fdba346d4a5fbc45112dc31df615" />
+						<property name="from" type="fromTo" modelRef="xmi_d533f19b366f4a1fbf047f058d3a4f70" />
+						<property name="to" type="fromTo" modelRef="xmi_290fd1d7fdf94b9f86d73f6b1a987074" />
 						<property name="identifying" type="boolean" value="false" />
 						<property name="subtype" type="boolean" value="false" />
 						<property name="syncType" type="int" value="1" />
@@ -1125,12 +1125,12 @@
 						<property name="foreignKeyRelationshipPattern" type="string" value="{association_name}" />
 					</properties>
 				</vpumlModel>
-				<vpumlModel id="xmi_487f48c5705749e2bb595270e7178e56" modelType="DBForeignKey">
+				<vpumlModel id="xmi_eb0eb928ed404ae3befa583b6fafbdcf" modelType="DBForeignKey">
 					<properties>
 						<property name="name" type="string" value="" />
 						<property name="modelType" type="string" value="DBForeignKey" />
-						<property name="from" type="fromTo" modelRef="xmi_e498dd5aee7b45628c2706742b2f90bf" />
-						<property name="to" type="fromTo" modelRef="xmi_872b77fece9e4aafad477c359d006410" />
+						<property name="from" type="fromTo" modelRef="xmi_d533f19b366f4a1fbf047f058d3a4f70" />
+						<property name="to" type="fromTo" modelRef="xmi_36aa02d737744e6aa46734f3f891f00a" />
 						<property name="identifying" type="boolean" value="false" />
 						<property name="subtype" type="boolean" value="false" />
 						<property name="syncType" type="int" value="1" />
@@ -1141,12 +1141,12 @@
 						<property name="foreignKeyRelationshipPattern" type="string" value="{association_name}" />
 					</properties>
 				</vpumlModel>
-				<vpumlModel id="xmi_c2f8596c0f404d9ea186d36a2ddc652c" modelType="DBForeignKey">
+				<vpumlModel id="xmi_adaf273a32264df08cbee1325f4a5256" modelType="DBForeignKey">
 					<properties>
 						<property name="name" type="string" value="" />
 						<property name="modelType" type="string" value="DBForeignKey" />
-						<property name="from" type="fromTo" modelRef="xmi_872b77fece9e4aafad477c359d006410" />
-						<property name="to" type="fromTo" modelRef="xmi_33133de3978c41afb0c6686a155cbf00" />
+						<property name="from" type="fromTo" modelRef="xmi_36aa02d737744e6aa46734f3f891f00a" />
+						<property name="to" type="fromTo" modelRef="xmi_c636e42f18f8426aaca96661437c64b9" />
 						<property name="identifying" type="boolean" value="false" />
 						<property name="subtype" type="boolean" value="false" />
 						<property name="syncType" type="int" value="1" />
@@ -1159,7 +1159,7 @@
 				</vpumlModel>
 			</vpumlChildModels>
 		</xmi:Extension>
-		<ownedMember xmi:type="uml:Actor" xmi:id="xmi_c930269e8d6c4df0baf47e402b7a113c" name="CustomerActor" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:Actor" xmi:id="xmi_0a0d9354b7fe462a8bea7cf174ccca64" name="CustomerActor" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="Actor" />
@@ -1167,9 +1167,9 @@
 				<qualityScore value="-1" />
 				<documentation value="Registered end-user purchasing goods." />
 			</xmi:Extension>
-			<ownedComment xmi:type="uml:Comment" xmi:id="xmi_c930269e8d6c4df0baf47e402b7a113c_comment" body="Registered end-user purchasing goods." />
+			<ownedComment xmi:type="uml:Comment" xmi:id="xmi_0a0d9354b7fe462a8bea7cf174ccca64_comment" body="Registered end-user purchasing goods." />
 		</ownedMember>
-		<ownedMember xmi:type="uml:Actor" xmi:id="xmi_04cf75c9d8364d83b1004c04ecbbd407" name="AdminActor" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:Actor" xmi:id="xmi_e4c45d22caeb4ca19a97c2e7949707a9" name="AdminActor" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="Actor" />
@@ -1177,13 +1177,13 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Component" xmi:id="xmi_bbcf64224d544bc087231b7a5c4c414d" name="E-Commerce Platform" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:Component" xmi:id="xmi_0beebf32019840f39a8e626a89373cd8" name="E-Commerce Platform" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<modelType value="System" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_735133337f6f47ccbd41b2e938ac7572" name="Login" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_c55949fe978a4754ba52243e9128ee1f" name="Login" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="UseCase" />
@@ -1191,14 +1191,14 @@
 				<qualityScore value="-1" />
 				<documentation value="Authenticate customer with email and password." />
 			</xmi:Extension>
-			<ownedComment xmi:type="uml:Comment" xmi:id="xmi_735133337f6f47ccbd41b2e938ac7572_comment" body="Authenticate customer with email and password." />
-			<include xmi:type="uml:Include" xmi:id="xmi_77d86dbd10b1459c897d9e264b878033" addition="xmi_5ccc327f3c384ded93cd54d9b2cdb6ed" name="«Include»">
+			<ownedComment xmi:type="uml:Comment" xmi:id="xmi_c55949fe978a4754ba52243e9128ee1f_comment" body="Authenticate customer with email and password." />
+			<include xmi:type="uml:Include" xmi:id="xmi_f0e7488ced44436d83c20aee6064cc36" addition="xmi_ad5c335f36364ae38819690cdf2e3c60" name="«Include»">
 				<xmi:Extension extender="Visual Paradigm">
 					<qualityScore value="-1" />
 				</xmi:Extension>
 			</include>
 		</ownedMember>
-		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_5ccc327f3c384ded93cd54d9b2cdb6ed" name="TwoFactorAuth" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_ad5c335f36364ae38819690cdf2e3c60" name="TwoFactorAuth" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="UseCase" />
@@ -1206,22 +1206,22 @@
 				<qualityScore value="-1" />
 				<documentation value="Verify second factor via SMS or authenticator app." />
 			</xmi:Extension>
-			<ownedComment xmi:type="uml:Comment" xmi:id="xmi_5ccc327f3c384ded93cd54d9b2cdb6ed_comment" body="Verify second factor via SMS or authenticator app." />
+			<ownedComment xmi:type="uml:Comment" xmi:id="xmi_ad5c335f36364ae38819690cdf2e3c60_comment" body="Verify second factor via SMS or authenticator app." />
 		</ownedMember>
-		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_da32353b875a4c35b213d2645eda0db8" name="PlaceOrder" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_1b89c7e82d1041ed8a65e7375eae6cf4" name="PlaceOrder" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="UseCase" />
 				<businessModel xmi:value="false" />
 				<qualityScore value="-1" />
 			</xmi:Extension>
-			<extend xmi:type="uml:Extend" xmi:id="xmi_7b69c90617994de1aaf90faf0a55a232" extendedCase="xmi_2e9159b2ffd04dc88561b165ffe14c51" name="«Extend»">
+			<extend xmi:type="uml:Extend" xmi:id="xmi_2a44167c56104da7ad3aade483fdf253" extendedCase="xmi_d068bc9a58784e40b0f909f21b76b22c" name="«Extend»">
 				<xmi:Extension extender="Visual Paradigm">
 					<qualityScore value="-1" />
 				</xmi:Extension>
 			</extend>
 		</ownedMember>
-		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_2e9159b2ffd04dc88561b165ffe14c51" name="ApplyDiscountCoupon" visibility="public" isAbstract="false" isLeaf="false">
+		<ownedMember xmi:type="uml:UseCase" xmi:id="xmi_d068bc9a58784e40b0f909f21b76b22c" name="ApplyDiscountCoupon" visibility="public" isAbstract="false" isLeaf="false">
 			<xmi:Extension extender="Visual Paradigm">
 				<isRoot xmi:value="false" />
 				<modelType value="UseCase" />
@@ -1229,35 +1229,16 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_5e43f15bfcac4d429a04fe4c26c59360" name="CustomerActor_PlaceOrder_Association" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_5e43f15bfcac4d429a04fe4c26c59360_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_5e43f15bfcac4d429a04fe4c26c59360_end_src" name="customeractor" visibility="public" type="xmi_c930269e8d6c4df0baf47e402b7a113c" association="xmi_5e43f15bfcac4d429a04fe4c26c59360" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_cf5c36161c124e018426a0581c18329f" name="CustomerActor_PlaceOrder_Association" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_cf5c36161c124e018426a0581c18329f_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_cf5c36161c124e018426a0581c18329f_end_src" name="customeractor" visibility="public" type="xmi_0a0d9354b7fe462a8bea7cf174ccca64" association="xmi_cf5c36161c124e018426a0581c18329f" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
 				</xmi:Extension>
 			</ownedEnd>
-			<memberEnd xmi:idref="xmi_5e43f15bfcac4d429a04fe4c26c59360_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_5e43f15bfcac4d429a04fe4c26c59360_end_tgt" name="placeorder" visibility="public" type="xmi_da32353b875a4c35b213d2645eda0db8" association="xmi_5e43f15bfcac4d429a04fe4c26c59360" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
-				<xmi:Extension extender="Visual Paradigm">
-					<associationEnd />
-					<qualityScore value="-1" />
-				</xmi:Extension>
-			</ownedEnd>
-			<xmi:Extension extender="Visual Paradigm">
-				<qualityScore value="-1" />
-			</xmi:Extension>
-		</ownedMember>
-		<ownedMember xmi:type="uml:Association" xmi:id="xmi_81b82e06701b4c0fb1739e217bd036bf" name="CustomerActor_Login_Association" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
-			<memberEnd xmi:idref="xmi_81b82e06701b4c0fb1739e217bd036bf_end_src" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_81b82e06701b4c0fb1739e217bd036bf_end_src" name="customeractor" visibility="public" type="xmi_c930269e8d6c4df0baf47e402b7a113c" association="xmi_81b82e06701b4c0fb1739e217bd036bf" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
-				<xmi:Extension extender="Visual Paradigm">
-					<associationEnd />
-					<qualityScore value="-1" />
-				</xmi:Extension>
-			</ownedEnd>
-			<memberEnd xmi:idref="xmi_81b82e06701b4c0fb1739e217bd036bf_end_tgt" />
-			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_81b82e06701b4c0fb1739e217bd036bf_end_tgt" name="login" visibility="public" type="xmi_735133337f6f47ccbd41b2e938ac7572" association="xmi_81b82e06701b4c0fb1739e217bd036bf" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+			<memberEnd xmi:idref="xmi_cf5c36161c124e018426a0581c18329f_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_cf5c36161c124e018426a0581c18329f_end_tgt" name="placeorder" visibility="public" type="xmi_1b89c7e82d1041ed8a65e7375eae6cf4" association="xmi_cf5c36161c124e018426a0581c18329f" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
 				<xmi:Extension extender="Visual Paradigm">
 					<associationEnd />
 					<qualityScore value="-1" />
@@ -1267,65 +1248,84 @@
 				<qualityScore value="-1" />
 			</xmi:Extension>
 		</ownedMember>
-		<ownedMember xmi:type="uml:StateMachine" xmi:id="sm_87f8e3ec715e4f1f9da7b03c014abedc" name="EnterpriseSystem_StateMachine">
-			<region xmi:type="uml:Region" xmi:id="region_eeceb35ebc9e4fc3bd229c80f5b2b58e" name="DefaultRegion">
-				<subvertex xmi:type="uml:Pseudostate" xmi:id="xmi_ef2f50a6e41b4b75bd0a84b4922f08e1" name="InitialState" kind="initial">
+		<ownedMember xmi:type="uml:Association" xmi:id="xmi_f62de4bc2ed94d92bcdf62d45c490971" name="CustomerActor_Login_Association" visibility="public" isAbstract="false" isDerived="false" isLeaf="false">
+			<memberEnd xmi:idref="xmi_f62de4bc2ed94d92bcdf62d45c490971_end_src" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_f62de4bc2ed94d92bcdf62d45c490971_end_src" name="customeractor" visibility="public" type="xmi_0a0d9354b7fe462a8bea7cf174ccca64" association="xmi_f62de4bc2ed94d92bcdf62d45c490971" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+				<xmi:Extension extender="Visual Paradigm">
+					<associationEnd />
+					<qualityScore value="-1" />
+				</xmi:Extension>
+			</ownedEnd>
+			<memberEnd xmi:idref="xmi_f62de4bc2ed94d92bcdf62d45c490971_end_tgt" />
+			<ownedEnd xmi:type="uml:Property" xmi:id="xmi_f62de4bc2ed94d92bcdf62d45c490971_end_tgt" name="login" visibility="public" type="xmi_c55949fe978a4754ba52243e9128ee1f" association="xmi_f62de4bc2ed94d92bcdf62d45c490971" aggregation="none" isDerived="false" isDerivedUnion="false" isLeaf="false" isNavigable="true" isReadOnly="false" isStatic="false">
+				<xmi:Extension extender="Visual Paradigm">
+					<associationEnd />
+					<qualityScore value="-1" />
+				</xmi:Extension>
+			</ownedEnd>
+			<xmi:Extension extender="Visual Paradigm">
+				<qualityScore value="-1" />
+			</xmi:Extension>
+		</ownedMember>
+		<ownedMember xmi:type="uml:StateMachine" xmi:id="sm_99a7432a57bd44e0ab827cb69a4ca9ed" name="EnterpriseSystem_StateMachine">
+			<region xmi:type="uml:Region" xmi:id="region_ab6c27600ad441a4af9bfad44cbc46d5" name="DefaultRegion">
+				<subvertex xmi:type="uml:Pseudostate" xmi:id="xmi_4d39162160034169b43829d2317b7db2" name="InitialState" kind="initial">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="Pseudostate" />
 					</xmi:Extension>
 				</subvertex>
-				<subvertex xmi:type="uml:State" xmi:id="xmi_99bdca25944a4f6f84a5309ce3270cae" name="Draft">
-					<entry xmi:type="uml:Activity" xmi:id="xmi_99bdca25944a4f6f84a5309ce3270cae_entry" name="init_draft()" />
-					<exit xmi:type="uml:Activity" xmi:id="xmi_99bdca25944a4f6f84a5309ce3270cae_exit" name="validate_items()" />
+				<subvertex xmi:type="uml:State" xmi:id="xmi_a2f9191c9e204d159eb1afb49bc2294a" name="Draft">
+					<entry xmi:type="uml:Activity" xmi:id="xmi_a2f9191c9e204d159eb1afb49bc2294a_entry" name="init_draft()" />
+					<exit xmi:type="uml:Activity" xmi:id="xmi_a2f9191c9e204d159eb1afb49bc2294a_exit" name="validate_items()" />
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="State" />
 						<documentation value="Order is being edited." />
 					</xmi:Extension>
-					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_99bdca25944a4f6f84a5309ce3270cae_comment" body="Order is being edited." />
+					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_a2f9191c9e204d159eb1afb49bc2294a_comment" body="Order is being edited." />
 				</subvertex>
-				<subvertex xmi:type="uml:State" xmi:id="xmi_840dd1732bcf499782c7fd4e699c23a4" name="Paid">
-					<entry xmi:type="uml:Activity" xmi:id="xmi_840dd1732bcf499782c7fd4e699c23a4_entry" name="send_receipt()" />
-					<doActivity xmi:type="uml:Activity" xmi:id="xmi_840dd1732bcf499782c7fd4e699c23a4_do" name="reserve_inventory()" />
+				<subvertex xmi:type="uml:State" xmi:id="xmi_b8410ac23f464c578831a7dff0b14d80" name="Paid">
+					<entry xmi:type="uml:Activity" xmi:id="xmi_b8410ac23f464c578831a7dff0b14d80_entry" name="send_receipt()" />
+					<doActivity xmi:type="uml:Activity" xmi:id="xmi_b8410ac23f464c578831a7dff0b14d80_do" name="reserve_inventory()" />
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="State" />
 						<documentation value="Funds captured successfully." />
 					</xmi:Extension>
-					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_840dd1732bcf499782c7fd4e699c23a4_comment" body="Funds captured successfully." />
+					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_b8410ac23f464c578831a7dff0b14d80_comment" body="Funds captured successfully." />
 				</subvertex>
-				<subvertex xmi:type="uml:State" xmi:id="xmi_ea7db67c82ba47199a947e5dc4c9175c" name="Shipped">
-					<doActivity xmi:type="uml:Activity" xmi:id="xmi_ea7db67c82ba47199a947e5dc4c9175c_do" name="track_carrier()" />
+				<subvertex xmi:type="uml:State" xmi:id="xmi_461f54aac3df4a01ad1c04becd10c5b2" name="Shipped">
+					<doActivity xmi:type="uml:Activity" xmi:id="xmi_461f54aac3df4a01ad1c04becd10c5b2_do" name="track_carrier()" />
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="State" />
 						<documentation value="Package is in transit with carrier." />
 					</xmi:Extension>
-					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_ea7db67c82ba47199a947e5dc4c9175c_comment" body="Package is in transit with carrier." />
+					<ownedComment xmi:type="uml:Comment" xmi:id="xmi_461f54aac3df4a01ad1c04becd10c5b2_comment" body="Package is in transit with carrier." />
 				</subvertex>
-				<subvertex xmi:type="uml:FinalState" xmi:id="xmi_d829a0c0bacc47b28050616edd04b4de" name="Completed">
+				<subvertex xmi:type="uml:FinalState" xmi:id="xmi_7f358496ae29449292d41d1f91eb5bf8" name="Completed">
 					<xmi:Extension extender="Visual Paradigm">
 						<modelType value="FinalState" />
 					</xmi:Extension>
 				</subvertex>
-				<transition xmi:type="uml:Transition" xmi:id="xmi_9c014c491f2f4c8f901487ab36a4bd9d" source="xmi_ef2f50a6e41b4b75bd0a84b4922f08e1" target="xmi_99bdca25944a4f6f84a5309ce3270cae" name="create">
-					<trigger xmi:type="uml:Trigger" xmi:id="trigger_72ca3827bd0a4caea21ef7eb5a459241" name="create" />
+				<transition xmi:type="uml:Transition" xmi:id="xmi_2ab1f3ac53e14e898b2f26c611f7eaad" source="xmi_4d39162160034169b43829d2317b7db2" target="xmi_a2f9191c9e204d159eb1afb49bc2294a" name="create">
+					<trigger xmi:type="uml:Trigger" xmi:id="trigger_4758b0d93ee1420b9b2c1ee06ea17091" name="create" />
 				</transition>
-				<transition xmi:type="uml:Transition" xmi:id="xmi_9f2c808de0f442e1a1e795106d1c86ff" source="xmi_99bdca25944a4f6f84a5309ce3270cae" target="xmi_840dd1732bcf499782c7fd4e699c23a4" name="paySuccess [balance &gt;= total]">
-					<guard xmi:type="uml:Constraint" xmi:id="xmi_9f2c808de0f442e1a1e795106d1c86ff_guard" name="balance &gt;= total">
-						<specification xmi:type="uml:OpaqueExpression" xmi:id="xmi_9f2c808de0f442e1a1e795106d1c86ff_guard_spec" body="balance &gt;= total" />
+				<transition xmi:type="uml:Transition" xmi:id="xmi_a68b51b3af2d4e43ad827097d119ed58" source="xmi_a2f9191c9e204d159eb1afb49bc2294a" target="xmi_b8410ac23f464c578831a7dff0b14d80" name="paySuccess [balance &gt;= total]">
+					<guard xmi:type="uml:Constraint" xmi:id="xmi_a68b51b3af2d4e43ad827097d119ed58_guard" name="balance &gt;= total">
+						<specification xmi:type="uml:OpaqueExpression" xmi:id="xmi_a68b51b3af2d4e43ad827097d119ed58_guard_spec" body="balance &gt;= total" />
 					</guard>
-					<trigger xmi:type="uml:Trigger" xmi:id="trigger_44a77b769aa74abca9f482d211ab608a" name="paySuccess" />
+					<trigger xmi:type="uml:Trigger" xmi:id="trigger_076dfeae65a34c31b0df9d97e52650cb" name="paySuccess" />
 				</transition>
-				<transition xmi:type="uml:Transition" xmi:id="xmi_26265b3ca54d409796f18acc52fe8a1c" source="xmi_840dd1732bcf499782c7fd4e699c23a4" target="xmi_ea7db67c82ba47199a947e5dc4c9175c" name="dispatchOrder [inStock == true]">
-					<guard xmi:type="uml:Constraint" xmi:id="xmi_26265b3ca54d409796f18acc52fe8a1c_guard" name="inStock == true">
-						<specification xmi:type="uml:OpaqueExpression" xmi:id="xmi_26265b3ca54d409796f18acc52fe8a1c_guard_spec" body="inStock == true" />
+				<transition xmi:type="uml:Transition" xmi:id="xmi_33b10043853a474c96c7529ba48f621a" source="xmi_b8410ac23f464c578831a7dff0b14d80" target="xmi_461f54aac3df4a01ad1c04becd10c5b2" name="dispatchOrder [inStock == true]">
+					<guard xmi:type="uml:Constraint" xmi:id="xmi_33b10043853a474c96c7529ba48f621a_guard" name="inStock == true">
+						<specification xmi:type="uml:OpaqueExpression" xmi:id="xmi_33b10043853a474c96c7529ba48f621a_guard_spec" body="inStock == true" />
 					</guard>
-					<trigger xmi:type="uml:Trigger" xmi:id="trigger_0f45c9d60e51426db987bad22dd5d682" name="dispatchOrder" />
+					<trigger xmi:type="uml:Trigger" xmi:id="trigger_44c50264f17f421db1d69c99f889ba8b" name="dispatchOrder" />
 				</transition>
-				<transition xmi:type="uml:Transition" xmi:id="xmi_9bc0d19c8a7d4ac6b79a607dde60e409" source="xmi_ea7db67c82ba47199a947e5dc4c9175c" target="xmi_d829a0c0bacc47b28050616edd04b4de" name="deliveredConfirmation">
-					<trigger xmi:type="uml:Trigger" xmi:id="trigger_3a7f09fabac8413082d04da78fc8246c" name="deliveredConfirmation" />
+				<transition xmi:type="uml:Transition" xmi:id="xmi_8468469390064d3492c271819d0457b1" source="xmi_461f54aac3df4a01ad1c04becd10c5b2" target="xmi_7f358496ae29449292d41d1f91eb5bf8" name="deliveredConfirmation">
+					<trigger xmi:type="uml:Trigger" xmi:id="trigger_53e2085b990741819a984ff7d0027d41" name="deliveredConfirmation" />
 				</transition>
 			</region>
 		</ownedMember>
-		<ownedComment xmi:type="uml:Comment" xmi:id="xmi_40907f6aa7f5411b92a427ba12786af1" body="Order state transitions must be strictly audited and idempotent." annotatedElement="xmi_dbf0729c916c4ca2ade3e40c2b7693ad">
+		<ownedComment xmi:type="uml:Comment" xmi:id="xmi_26ff5a6f515f402399a500e199892999" body="Order state transitions must be strictly audited and idempotent." annotatedElement="xmi_d52eb400d9a64562ada203bf6cb66fca">
 			<xmi:Extension extender="Visual Paradigm">
 				<type value="NOTE" />
 				<qualityScore value="-1" />
@@ -1355,7 +1355,7 @@
 			</properties>
 		</xmi:Extension>
 		<uml:Diagram.element>
-			<uml:DiagramElement xmi:id="shape_xmi_233fcb15b1bb4048803dbe268c360356" geometry="30,20,1408,337" preferredShapeType="Package" subject="xmi_233fcb15b1bb4048803dbe268c360356">
+			<uml:DiagramElement xmi:id="shape_xmi_fe9afd13e3c9405b8c2ad152d7654a24" geometry="30,20,1408,337" preferredShapeType="Package" subject="xmi_fe9afd13e3c9405b8c2ad152d7654a24">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,20,1408,317" />
 					<captionInternalWidth value="-2147483648" />
@@ -1383,7 +1383,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_3841185d60ee48e4a9d5ef5369d477c5" geometry="60,60,500,168" preferredShapeType="Package" subject="xmi_3841185d60ee48e4a9d5ef5369d477c5">
+			<uml:DiagramElement xmi:id="shape_xmi_22152c1c6d80468ba09fd62c618933da" geometry="60,60,500,168" preferredShapeType="Package" subject="xmi_22152c1c6d80468ba09fd62c618933da">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,20,500,148" />
 					<captionInternalWidth value="-2147483648" />
@@ -1405,14 +1405,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_233fcb15b1bb4048803dbe268c360356" />
+					<parentDiagramElement idref="shape_xmi_fe9afd13e3c9405b8c2ad152d7654a24" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_69c60330fa3a4ac1b2b92b62f45a1335" geometry="2088,60,512,166" preferredShapeType="Package" subject="xmi_69c60330fa3a4ac1b2b92b62f45a1335">
+			<uml:DiagramElement xmi:id="shape_xmi_314080e6ae474b2482a28021e321a61b" geometry="2088,60,512,166" preferredShapeType="Package" subject="xmi_314080e6ae474b2482a28021e321a61b">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,20,512,146" />
 					<captionInternalWidth value="-2147483648" />
@@ -1440,7 +1440,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_9818bf25ffad4ce0890b8527c3d4d8cc" geometry="650,121,214,82" preferredShapeType="Class" subject="xmi_9818bf25ffad4ce0890b8527c3d4d8cc">
+			<uml:DiagramElement xmi:id="shape_xmi_c86930da465a406e926677451620aaa7" geometry="650,121,214,82" preferredShapeType="Class" subject="xmi_c86930da465a406e926677451620aaa7">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,214,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1461,14 +1461,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_233fcb15b1bb4048803dbe268c360356" />
+					<parentDiagramElement idref="shape_xmi_fe9afd13e3c9405b8c2ad152d7654a24" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_d27f6de9b879464fb24318824218961d" geometry="1049,121,359,102" preferredShapeType="Class" subject="xmi_d27f6de9b879464fb24318824218961d">
+			<uml:DiagramElement xmi:id="shape_xmi_3a4442d70565406db765f3643ffff689" geometry="1049,121,359,102" preferredShapeType="Class" subject="xmi_3a4442d70565406db765f3643ffff689">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,359,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1489,14 +1489,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_233fcb15b1bb4048803dbe268c360356" />
+					<parentDiagramElement idref="shape_xmi_fe9afd13e3c9405b8c2ad152d7654a24" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_d71e47ea7e49434fb0425aa0bc143db2" geometry="650,231,206,80" preferredShapeType="Class" subject="xmi_d71e47ea7e49434fb0425aa0bc143db2">
+			<uml:DiagramElement xmi:id="shape_xmi_b4f34f4382484828a822022e5e8b243d" geometry="650,231,206,80" preferredShapeType="Class" subject="xmi_b4f34f4382484828a822022e5e8b243d">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,206,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1517,14 +1517,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_233fcb15b1bb4048803dbe268c360356" />
+					<parentDiagramElement idref="shape_xmi_fe9afd13e3c9405b8c2ad152d7654a24" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_dbf0729c916c4ca2ade3e40c2b7693ad" geometry="90,121,214,82" preferredShapeType="Class" subject="xmi_dbf0729c916c4ca2ade3e40c2b7693ad">
+			<uml:DiagramElement xmi:id="shape_xmi_d52eb400d9a64562ada203bf6cb66fca" geometry="90,121,214,82" preferredShapeType="Class" subject="xmi_d52eb400d9a64562ada203bf6cb66fca">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,214,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1545,14 +1545,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_3841185d60ee48e4a9d5ef5369d477c5" />
+					<parentDiagramElement idref="shape_xmi_22152c1c6d80468ba09fd62c618933da" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_458bd78f23714dabaff0e8511df7d5de" geometry="330,121,200,80" preferredShapeType="Class" subject="xmi_458bd78f23714dabaff0e8511df7d5de">
+			<uml:DiagramElement xmi:id="shape_xmi_cd43cd1ec8f44f12bc958138a4d1e9ed" geometry="330,121,200,80" preferredShapeType="Class" subject="xmi_cd43cd1ec8f44f12bc958138a4d1e9ed">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,200,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1573,14 +1573,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_3841185d60ee48e4a9d5ef5369d477c5" />
+					<parentDiagramElement idref="shape_xmi_22152c1c6d80468ba09fd62c618933da" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_030d9c1a8cfe4da482a2ac61023a25d9" geometry="2118,121,282,80" preferredShapeType="Interface" subject="xmi_030d9c1a8cfe4da482a2ac61023a25d9">
+			<uml:DiagramElement xmi:id="shape_xmi_49cbce9504ca4377b936f0119e4e8e8f" geometry="2118,121,282,80" preferredShapeType="Interface" subject="xmi_49cbce9504ca4377b936f0119e4e8e8f">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,282,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1601,14 +1601,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_69c60330fa3a4ac1b2b92b62f45a1335" />
+					<parentDiagramElement idref="shape_xmi_314080e6ae474b2482a28021e321a61b" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_d7db7201e42c447fb56bcb1fe4fa5c06" geometry="2364,121,206,80" preferredShapeType="Class" subject="xmi_d7db7201e42c447fb56bcb1fe4fa5c06">
+			<uml:DiagramElement xmi:id="shape_xmi_6f0e8bde94234e3ea2d1be8086398ea8" geometry="2364,121,206,80" preferredShapeType="Class" subject="xmi_6f0e8bde94234e3ea2d1be8086398ea8">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,206,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1629,14 +1629,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_69c60330fa3a4ac1b2b92b62f45a1335" />
+					<parentDiagramElement idref="shape_xmi_314080e6ae474b2482a28021e321a61b" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_2b96fb14d94b46f2b5213cee5a43ba04" fromDiagramElement="shape_xmi_d27f6de9b879464fb24318824218961d" toDiagramElement="shape_xmi_9818bf25ffad4ce0890b8527c3d4d8cc" geometry="1049,172;864,162;" preferredShapeType="Generalization" subject="xmi_2b96fb14d94b46f2b5213cee5a43ba04">
+			<uml:DiagramElement xmi:id="conn_xmi_8692d01965aa472a9e807c636fdf3d14" fromDiagramElement="shape_xmi_3a4442d70565406db765f3643ffff689" toDiagramElement="shape_xmi_c86930da465a406e926677451620aaa7" geometry="1049,172;864,162;" preferredShapeType="Generalization" subject="xmi_8692d01965aa472a9e807c636fdf3d14">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="956,167,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1662,7 +1662,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_9ec7593df4ff4e389574ff46704c26bf" fromDiagramElement="shape_xmi_d71e47ea7e49434fb0425aa0bc143db2" toDiagramElement="shape_xmi_d27f6de9b879464fb24318824218961d" geometry="856,271;1049,172;" preferredShapeType="Generalization" subject="xmi_9ec7593df4ff4e389574ff46704c26bf">
+			<uml:DiagramElement xmi:id="conn_xmi_35af84a02801445099475bcdd80faa77" fromDiagramElement="shape_xmi_b4f34f4382484828a822022e5e8b243d" toDiagramElement="shape_xmi_3a4442d70565406db765f3643ffff689" geometry="856,271;1049,172;" preferredShapeType="Generalization" subject="xmi_35af84a02801445099475bcdd80faa77">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="952,221,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1688,7 +1688,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_8c9c91f8ed4f4edfa2210a7354f35d4d" fromDiagramElement="shape_xmi_d71e47ea7e49434fb0425aa0bc143db2" toDiagramElement="shape_xmi_dbf0729c916c4ca2ade3e40c2b7693ad" geometry="650,271;304,162;" preferredShapeType="Aggregation" subject="xmi_8c9c91f8ed4f4edfa2210a7354f35d4d">
+			<uml:DiagramElement xmi:id="conn_xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94" fromDiagramElement="shape_xmi_b4f34f4382484828a822022e5e8b243d" toDiagramElement="shape_xmi_d52eb400d9a64562ada203bf6cb66fca" geometry="650,271;304,162;" preferredShapeType="Aggregation" subject="xmi_95a8fb42564b4b3b9c8e9fac5fdaeb94">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="477,216,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1720,7 +1720,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_bbcaf9c05b8e40f988bea4ffb9668a2b" fromDiagramElement="shape_xmi_dbf0729c916c4ca2ade3e40c2b7693ad" toDiagramElement="shape_xmi_458bd78f23714dabaff0e8511df7d5de" geometry="304,162;330,161;" preferredShapeType="Composition" subject="xmi_bbcaf9c05b8e40f988bea4ffb9668a2b">
+			<uml:DiagramElement xmi:id="conn_xmi_aceec159eeec4ecd85a8b725bd535f89" fromDiagramElement="shape_xmi_d52eb400d9a64562ada203bf6cb66fca" toDiagramElement="shape_xmi_cd43cd1ec8f44f12bc958138a4d1e9ed" geometry="304,162;330,161;" preferredShapeType="Composition" subject="xmi_aceec159eeec4ecd85a8b725bd535f89">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="317,161,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1752,7 +1752,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_5eb2ab2e9d71499da3257eeae8b406ac" fromDiagramElement="shape_xmi_dbf0729c916c4ca2ade3e40c2b7693ad" toDiagramElement="shape_xmi_030d9c1a8cfe4da482a2ac61023a25d9" geometry="304,162;2118,161;" preferredShapeType="Realization" subject="xmi_5eb2ab2e9d71499da3257eeae8b406ac">
+			<uml:DiagramElement xmi:id="conn_xmi_329c1b938c0048feba4f6b1884b2be43" fromDiagramElement="shape_xmi_d52eb400d9a64562ada203bf6cb66fca" toDiagramElement="shape_xmi_49cbce9504ca4377b936f0119e4e8e8f" geometry="304,162;2118,161;" preferredShapeType="Realization" subject="xmi_329c1b938c0048feba4f6b1884b2be43">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="1211,161,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1778,7 +1778,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="2" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_df055b9fa65e4e5b92c307bf27267b85" fromDiagramElement="shape_xmi_d7db7201e42c447fb56bcb1fe4fa5c06" toDiagramElement="shape_xmi_030d9c1a8cfe4da482a2ac61023a25d9" geometry="2467,161;2259,161;" preferredShapeType="Realization" subject="xmi_df055b9fa65e4e5b92c307bf27267b85">
+			<uml:DiagramElement xmi:id="conn_xmi_964988b0e63b442b9fe8bc81c49aeb93" fromDiagramElement="shape_xmi_6f0e8bde94234e3ea2d1be8086398ea8" toDiagramElement="shape_xmi_49cbce9504ca4377b936f0119e4e8e8f" geometry="2467,161;2259,161;" preferredShapeType="Realization" subject="xmi_964988b0e63b442b9fe8bc81c49aeb93">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="2363,161,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1804,7 +1804,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="2" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_40907f6aa7f5411b92a427ba12786af1" geometry="354,121,200,60" preferredShapeType="NOTE" subject="xmi_40907f6aa7f5411b92a427ba12786af1">
+			<uml:DiagramElement xmi:id="shape_xmi_26ff5a6f515f402399a500e199892999" geometry="354,121,200,60" preferredShapeType="NOTE" subject="xmi_26ff5a6f515f402399a500e199892999">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,200,60" />
 					<captionInternalWidth value="-2147483648" />
@@ -1831,7 +1831,7 @@
 				<elementLine color="Cr:180,180,100,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_anchor_xmi_40907f6aa7f5411b92a427ba12786af1" fromDiagramElement="shape_xmi_40907f6aa7f5411b92a427ba12786af1" toDiagramElement="shape_xmi_dbf0729c916c4ca2ade3e40c2b7693ad" geometry="354,151;304,162;" preferredShapeType="Anchor" subject="anchor_xmi_40907f6aa7f5411b92a427ba12786af1">
+			<uml:DiagramElement xmi:id="conn_anchor_xmi_26ff5a6f515f402399a500e199892999" fromDiagramElement="shape_xmi_26ff5a6f515f402399a500e199892999" toDiagramElement="shape_xmi_d52eb400d9a64562ada203bf6cb66fca" geometry="354,151;304,162;" preferredShapeType="Anchor" subject="anchor_xmi_26ff5a6f515f402399a500e199892999">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="329,156,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -1893,7 +1893,7 @@
 			</properties>
 		</xmi:Extension>
 		<uml:Diagram.element>
-			<uml:DiagramElement xmi:id="shape_xmi_e498dd5aee7b45628c2706742b2f90bf" geometry="60,60,242,128" preferredShapeType="DBTable" subject="xmi_e498dd5aee7b45628c2706742b2f90bf">
+			<uml:DiagramElement xmi:id="shape_xmi_d533f19b366f4a1fbf047f058d3a4f70" geometry="60,60,242,128" preferredShapeType="DBTable" subject="xmi_d533f19b366f4a1fbf047f058d3a4f70">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,242,15" />
 					<captionInternalWidth value="-2147483648" />
@@ -1924,7 +1924,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_33133de3978c41afb0c6686a155cbf00" geometry="392,60,220,90" preferredShapeType="DBTable" subject="xmi_33133de3978c41afb0c6686a155cbf00">
+			<uml:DiagramElement xmi:id="shape_xmi_c636e42f18f8426aaca96661437c64b9" geometry="392,60,220,90" preferredShapeType="DBTable" subject="xmi_c636e42f18f8426aaca96661437c64b9">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,220,15" />
 					<captionInternalWidth value="-2147483648" />
@@ -1955,7 +1955,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_6020fdba346d4a5fbc45112dc31df615" geometry="60,298,233,128" preferredShapeType="DBTable" subject="xmi_6020fdba346d4a5fbc45112dc31df615">
+			<uml:DiagramElement xmi:id="shape_xmi_290fd1d7fdf94b9f86d73f6b1a987074" geometry="60,298,233,128" preferredShapeType="DBTable" subject="xmi_290fd1d7fdf94b9f86d73f6b1a987074">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,233,15" />
 					<captionInternalWidth value="-2147483648" />
@@ -1986,7 +1986,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_872b77fece9e4aafad477c359d006410" geometry="383,298,304,148" preferredShapeType="DBTable" subject="xmi_872b77fece9e4aafad477c359d006410">
+			<uml:DiagramElement xmi:id="shape_xmi_36aa02d737744e6aa46734f3f891f00a" geometry="383,298,304,148" preferredShapeType="DBTable" subject="xmi_36aa02d737744e6aa46734f3f891f00a">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,304,15" />
 					<captionInternalWidth value="-2147483648" />
@@ -2017,7 +2017,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_fc66335cb95c4f49befab3933b871423" fromDiagramElement="shape_xmi_e498dd5aee7b45628c2706742b2f90bf" toDiagramElement="shape_xmi_6020fdba346d4a5fbc45112dc31df615" geometry="181,188;176,298;" preferredShapeType="DBForeignKey" subject="xmi_fc66335cb95c4f49befab3933b871423">
+			<uml:DiagramElement xmi:id="conn_xmi_cf483a8893a64f46a540da10dcc0f4ae" fromDiagramElement="shape_xmi_d533f19b366f4a1fbf047f058d3a4f70" toDiagramElement="shape_xmi_290fd1d7fdf94b9f86d73f6b1a987074" geometry="181,188;176,298;" preferredShapeType="DBForeignKey" subject="xmi_cf483a8893a64f46a540da10dcc0f4ae">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="178,243,20,0" />
 					<captionInternalWidth value="-2147483648" />
@@ -2052,7 +2052,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_487f48c5705749e2bb595270e7178e56" fromDiagramElement="shape_xmi_e498dd5aee7b45628c2706742b2f90bf" toDiagramElement="shape_xmi_872b77fece9e4aafad477c359d006410" geometry="302,124;383,372;" preferredShapeType="DBForeignKey" subject="xmi_487f48c5705749e2bb595270e7178e56">
+			<uml:DiagramElement xmi:id="conn_xmi_eb0eb928ed404ae3befa583b6fafbdcf" fromDiagramElement="shape_xmi_d533f19b366f4a1fbf047f058d3a4f70" toDiagramElement="shape_xmi_36aa02d737744e6aa46734f3f891f00a" geometry="302,124;383,372;" preferredShapeType="DBForeignKey" subject="xmi_eb0eb928ed404ae3befa583b6fafbdcf">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="342,248,20,0" />
 					<captionInternalWidth value="-2147483648" />
@@ -2087,7 +2087,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_c2f8596c0f404d9ea186d36a2ddc652c" fromDiagramElement="shape_xmi_872b77fece9e4aafad477c359d006410" toDiagramElement="shape_xmi_33133de3978c41afb0c6686a155cbf00" geometry="535,298;502,150;" preferredShapeType="DBForeignKey" subject="xmi_c2f8596c0f404d9ea186d36a2ddc652c">
+			<uml:DiagramElement xmi:id="conn_xmi_adaf273a32264df08cbee1325f4a5256" fromDiagramElement="shape_xmi_36aa02d737744e6aa46734f3f891f00a" toDiagramElement="shape_xmi_c636e42f18f8426aaca96661437c64b9" geometry="535,298;502,150;" preferredShapeType="DBForeignKey" subject="xmi_adaf273a32264df08cbee1325f4a5256">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="518,224,20,0" />
 					<captionInternalWidth value="-2147483648" />
@@ -2147,7 +2147,7 @@
 			</properties>
 		</xmi:Extension>
 		<uml:Diagram.element>
-			<uml:DiagramElement xmi:id="shape_xmi_bbcf64224d544bc087231b7a5c4c414d" geometry="325,15,610,300" preferredShapeType="System" subject="xmi_bbcf64224d544bc087231b7a5c4c414d">
+			<uml:DiagramElement xmi:id="shape_xmi_0beebf32019840f39a8e626a89373cd8" geometry="325,15,610,300" preferredShapeType="System" subject="xmi_0beebf32019840f39a8e626a89373cd8">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,610,25" />
 					<captionInternalWidth value="-2147483648" />
@@ -2174,7 +2174,7 @@
 				<elementLine color="Cr:120,120,120,255" style="1" transparency="0" weight="1.5" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_c930269e8d6c4df0baf47e402b7a113c" geometry="60,60,80,80" preferredShapeType="Actor" subject="xmi_c930269e8d6c4df0baf47e402b7a113c">
+			<uml:DiagramElement xmi:id="shape_xmi_0a0d9354b7fe462a8bea7cf174ccca64" geometry="60,60,80,80" preferredShapeType="Actor" subject="xmi_0a0d9354b7fe462a8bea7cf174ccca64">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,80,80,18" />
 					<captionInternalWidth value="-2147483648" />
@@ -2202,7 +2202,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_735133337f6f47ccbd41b2e938ac7572" geometry="360,60,170,70" preferredShapeType="UseCase" subject="xmi_735133337f6f47ccbd41b2e938ac7572">
+			<uml:DiagramElement xmi:id="shape_xmi_c55949fe978a4754ba52243e9128ee1f" geometry="360,60,170,70" preferredShapeType="UseCase" subject="xmi_c55949fe978a4754ba52243e9128ee1f">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,70" />
 					<captionInternalWidth value="-2147483648" />
@@ -2223,14 +2223,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_bbcf64224d544bc087231b7a5c4c414d" />
+					<parentDiagramElement idref="shape_xmi_0beebf32019840f39a8e626a89373cd8" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_da32353b875a4c35b213d2645eda0db8" geometry="360,200,170,70" preferredShapeType="UseCase" subject="xmi_da32353b875a4c35b213d2645eda0db8">
+			<uml:DiagramElement xmi:id="shape_xmi_1b89c7e82d1041ed8a65e7375eae6cf4" geometry="360,200,170,70" preferredShapeType="UseCase" subject="xmi_1b89c7e82d1041ed8a65e7375eae6cf4">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,70" />
 					<captionInternalWidth value="-2147483648" />
@@ -2251,14 +2251,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_bbcf64224d544bc087231b7a5c4c414d" />
+					<parentDiagramElement idref="shape_xmi_0beebf32019840f39a8e626a89373cd8" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_5ccc327f3c384ded93cd54d9b2cdb6ed" geometry="680,60,170,70" preferredShapeType="UseCase" subject="xmi_5ccc327f3c384ded93cd54d9b2cdb6ed">
+			<uml:DiagramElement xmi:id="shape_xmi_ad5c335f36364ae38819690cdf2e3c60" geometry="680,60,170,70" preferredShapeType="UseCase" subject="xmi_ad5c335f36364ae38819690cdf2e3c60">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,170,70" />
 					<captionInternalWidth value="-2147483648" />
@@ -2279,14 +2279,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_bbcf64224d544bc087231b7a5c4c414d" />
+					<parentDiagramElement idref="shape_xmi_0beebf32019840f39a8e626a89373cd8" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_2e9159b2ffd04dc88561b165ffe14c51" geometry="680,200,220,70" preferredShapeType="UseCase" subject="xmi_2e9159b2ffd04dc88561b165ffe14c51">
+			<uml:DiagramElement xmi:id="shape_xmi_d068bc9a58784e40b0f909f21b76b22c" geometry="680,200,220,70" preferredShapeType="UseCase" subject="xmi_d068bc9a58784e40b0f909f21b76b22c">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,220,70" />
 					<captionInternalWidth value="-2147483648" />
@@ -2307,14 +2307,14 @@
 						<ashowOperationSignature value="true" />
 						<ashowInitialAttributeValue value="true" />
 					</properties>
-					<parentDiagramElement idref="shape_xmi_bbcf64224d544bc087231b7a5c4c414d" />
+					<parentDiagramElement idref="shape_xmi_0beebf32019840f39a8e626a89373cd8" />
 				</xmi:Extension>
 				<elementFill color1="Cr:122,207,245,255" color2="" style="1" transparency="0" type="1" />
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_04cf75c9d8364d83b1004c04ecbbd407" geometry="730,340,80,80" preferredShapeType="Actor" subject="xmi_04cf75c9d8364d83b1004c04ecbbd407">
+			<uml:DiagramElement xmi:id="shape_xmi_e4c45d22caeb4ca19a97c2e7949707a9" geometry="730,340,80,80" preferredShapeType="Actor" subject="xmi_e4c45d22caeb4ca19a97c2e7949707a9">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,80,80,18" />
 					<captionInternalWidth value="-2147483648" />
@@ -2342,7 +2342,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_5e43f15bfcac4d429a04fe4c26c59360" fromDiagramElement="shape_xmi_c930269e8d6c4df0baf47e402b7a113c" toDiagramElement="shape_xmi_da32353b875a4c35b213d2645eda0db8" geometry="140,100;360,235;" preferredShapeType="Association" subject="xmi_5e43f15bfcac4d429a04fe4c26c59360">
+			<uml:DiagramElement xmi:id="conn_xmi_cf5c36161c124e018426a0581c18329f" fromDiagramElement="shape_xmi_0a0d9354b7fe462a8bea7cf174ccca64" toDiagramElement="shape_xmi_1b89c7e82d1041ed8a65e7375eae6cf4" geometry="140,100;360,235;" preferredShapeType="Association" subject="xmi_cf5c36161c124e018426a0581c18329f">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="250,167,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -2368,7 +2368,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_81b82e06701b4c0fb1739e217bd036bf" fromDiagramElement="shape_xmi_c930269e8d6c4df0baf47e402b7a113c" toDiagramElement="shape_xmi_735133337f6f47ccbd41b2e938ac7572" geometry="140,100;360,95;" preferredShapeType="Association" subject="xmi_81b82e06701b4c0fb1739e217bd036bf">
+			<uml:DiagramElement xmi:id="conn_xmi_f62de4bc2ed94d92bcdf62d45c490971" fromDiagramElement="shape_xmi_0a0d9354b7fe462a8bea7cf174ccca64" toDiagramElement="shape_xmi_c55949fe978a4754ba52243e9128ee1f" geometry="140,100;360,95;" preferredShapeType="Association" subject="xmi_f62de4bc2ed94d92bcdf62d45c490971">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="250,97,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -2394,7 +2394,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_77d86dbd10b1459c897d9e264b878033" fromDiagramElement="shape_xmi_735133337f6f47ccbd41b2e938ac7572" toDiagramElement="shape_xmi_5ccc327f3c384ded93cd54d9b2cdb6ed" geometry="530,95;680,95;" preferredShapeType="Include" subject="xmi_77d86dbd10b1459c897d9e264b878033">
+			<uml:DiagramElement xmi:id="conn_xmi_f0e7488ced44436d83c20aee6064cc36" fromDiagramElement="shape_xmi_c55949fe978a4754ba52243e9128ee1f" toDiagramElement="shape_xmi_ad5c335f36364ae38819690cdf2e3c60" geometry="530,95;680,95;" preferredShapeType="Include" subject="xmi_f0e7488ced44436d83c20aee6064cc36">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="605,95,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -2420,7 +2420,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="2" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_7b69c90617994de1aaf90faf0a55a232" fromDiagramElement="shape_xmi_da32353b875a4c35b213d2645eda0db8" toDiagramElement="shape_xmi_2e9159b2ffd04dc88561b165ffe14c51" geometry="530,235;680,235;" preferredShapeType="Extend" subject="xmi_7b69c90617994de1aaf90faf0a55a232">
+			<uml:DiagramElement xmi:id="conn_xmi_2a44167c56104da7ad3aade483fdf253" fromDiagramElement="shape_xmi_1b89c7e82d1041ed8a65e7375eae6cf4" toDiagramElement="shape_xmi_d068bc9a58784e40b0f909f21b76b22c" geometry="530,235;680,235;" preferredShapeType="Extend" subject="xmi_2a44167c56104da7ad3aade483fdf253">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="605,235,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -2471,7 +2471,7 @@
 			</properties>
 		</xmi:Extension>
 		<uml:Diagram.element>
-			<uml:DiagramElement xmi:id="shape_xmi_ef2f50a6e41b4b75bd0a84b4922f08e1" geometry="60,166,28,28" preferredShapeType="InitialPseudoState" subject="xmi_ef2f50a6e41b4b75bd0a84b4922f08e1">
+			<uml:DiagramElement xmi:id="shape_xmi_4d39162160034169b43829d2317b7db2" geometry="60,166,28,28" preferredShapeType="InitialPseudoState" subject="xmi_4d39162160034169b43829d2317b7db2">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,0,0" />
 					<captionInternalWidth value="-2147483648" />
@@ -2498,7 +2498,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_99bdca25944a4f6f84a5309ce3270cae" geometry="248,139,231,82" preferredShapeType="State2" subject="xmi_99bdca25944a4f6f84a5309ce3270cae">
+			<uml:DiagramElement xmi:id="shape_xmi_a2f9191c9e204d159eb1afb49bc2294a" geometry="248,139,231,82" preferredShapeType="State2" subject="xmi_a2f9191c9e204d159eb1afb49bc2294a">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,231,15" />
 					<captionInternalWidth value="-2147483648" />
@@ -2527,7 +2527,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_840dd1732bcf499782c7fd4e699c23a4" geometry="639,139,240,82" preferredShapeType="State2" subject="xmi_840dd1732bcf499782c7fd4e699c23a4">
+			<uml:DiagramElement xmi:id="shape_xmi_b8410ac23f464c578831a7dff0b14d80" geometry="639,139,240,82" preferredShapeType="State2" subject="xmi_b8410ac23f464c578831a7dff0b14d80">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,240,15" />
 					<captionInternalWidth value="-2147483648" />
@@ -2556,7 +2556,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_ea7db67c82ba47199a947e5dc4c9175c" geometry="1039,149,206,62" preferredShapeType="State2" subject="xmi_ea7db67c82ba47199a947e5dc4c9175c">
+			<uml:DiagramElement xmi:id="shape_xmi_461f54aac3df4a01ad1c04becd10c5b2" geometry="1039,149,206,62" preferredShapeType="State2" subject="xmi_461f54aac3df4a01ad1c04becd10c5b2">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,206,15" />
 					<captionInternalWidth value="-2147483648" />
@@ -2585,7 +2585,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="shape_xmi_d829a0c0bacc47b28050616edd04b4de" geometry="1405,166,28,28" preferredShapeType="FinalState2" subject="xmi_d829a0c0bacc47b28050616edd04b4de">
+			<uml:DiagramElement xmi:id="shape_xmi_7f358496ae29449292d41d1f91eb5bf8" geometry="1405,166,28,28" preferredShapeType="FinalState2" subject="xmi_7f358496ae29449292d41d1f91eb5bf8">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="0,0,0,0" />
 					<captionInternalWidth value="-2147483648" />
@@ -2612,7 +2612,7 @@
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 				<CompartmentFont value="none" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_9c014c491f2f4c8f901487ab36a4bd9d" fromDiagramElement="shape_xmi_ef2f50a6e41b4b75bd0a84b4922f08e1" toDiagramElement="shape_xmi_99bdca25944a4f6f84a5309ce3270cae" geometry="88,180;248,180;" preferredShapeType="Transition2" subject="xmi_9c014c491f2f4c8f901487ab36a4bd9d">
+			<uml:DiagramElement xmi:id="conn_xmi_2ab1f3ac53e14e898b2f26c611f7eaad" fromDiagramElement="shape_xmi_4d39162160034169b43829d2317b7db2" toDiagramElement="shape_xmi_a2f9191c9e204d159eb1afb49bc2294a" geometry="88,180;248,180;" preferredShapeType="Transition2" subject="xmi_2ab1f3ac53e14e898b2f26c611f7eaad">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="168,180,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -2638,7 +2638,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_9f2c808de0f442e1a1e795106d1c86ff" fromDiagramElement="shape_xmi_99bdca25944a4f6f84a5309ce3270cae" toDiagramElement="shape_xmi_840dd1732bcf499782c7fd4e699c23a4" geometry="479,180;639,180;" preferredShapeType="Transition2" subject="xmi_9f2c808de0f442e1a1e795106d1c86ff">
+			<uml:DiagramElement xmi:id="conn_xmi_a68b51b3af2d4e43ad827097d119ed58" fromDiagramElement="shape_xmi_a2f9191c9e204d159eb1afb49bc2294a" toDiagramElement="shape_xmi_b8410ac23f464c578831a7dff0b14d80" geometry="479,180;639,180;" preferredShapeType="Transition2" subject="xmi_a68b51b3af2d4e43ad827097d119ed58">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="559,180,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -2664,7 +2664,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_26265b3ca54d409796f18acc52fe8a1c" fromDiagramElement="shape_xmi_840dd1732bcf499782c7fd4e699c23a4" toDiagramElement="shape_xmi_ea7db67c82ba47199a947e5dc4c9175c" geometry="879,180;1039,180;" preferredShapeType="Transition2" subject="xmi_26265b3ca54d409796f18acc52fe8a1c">
+			<uml:DiagramElement xmi:id="conn_xmi_33b10043853a474c96c7529ba48f621a" fromDiagramElement="shape_xmi_b8410ac23f464c578831a7dff0b14d80" toDiagramElement="shape_xmi_461f54aac3df4a01ad1c04becd10c5b2" geometry="879,180;1039,180;" preferredShapeType="Transition2" subject="xmi_33b10043853a474c96c7529ba48f621a">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="959,180,60,16" />
 					<captionInternalWidth value="-2147483648" />
@@ -2690,7 +2690,7 @@
 				<elementFont bold="false" color="Cr:0,0,0,255" italic="false" name="Dialog" size="11" style="0" />
 				<elementLine color="Cr:0,0,0,255" style="1" transparency="0" weight="1.0" />
 			</uml:DiagramElement>
-			<uml:DiagramElement xmi:id="conn_xmi_9bc0d19c8a7d4ac6b79a607dde60e409" fromDiagramElement="shape_xmi_ea7db67c82ba47199a947e5dc4c9175c" toDiagramElement="shape_xmi_d829a0c0bacc47b28050616edd04b4de" geometry="1245,180;1405,180;" preferredShapeType="Transition2" subject="xmi_9bc0d19c8a7d4ac6b79a607dde60e409">
+			<uml:DiagramElement xmi:id="conn_xmi_8468469390064d3492c271819d0457b1" fromDiagramElement="shape_xmi_461f54aac3df4a01ad1c04becd10c5b2" toDiagramElement="shape_xmi_7f358496ae29449292d41d1f91eb5bf8" geometry="1245,180;1405,180;" preferredShapeType="Transition2" subject="xmi_8468469390064d3492c271819d0457b1">
 				<xmi:Extension extender="Visual Paradigm">
 					<captionBounds value="1325,180,60,16" />
 					<captionInternalWidth value="-2147483648" />

@@ -799,7 +799,7 @@ def add_er_column(
     Args:
         entity_name: Name or ID of the target ER Entity.
         name: Column name (e.g. 'user_id', 'email', 'price').
-        type: Column data type (e.g. 'INT', 'VARCHAR', 'TIMESTAMP', 'DECIMAL', 'NUMERIC', 'FLOAT', 'BOOL').
+        type: Column data type. Standard VP ERD types: 'bigint', 'binary', 'bit', 'blob', 'char', 'clob', 'date', 'decimal', 'double', 'float', 'integer', 'numeric', 'real', 'smallint', 'time', 'timestamp', 'tinyint', 'varbinary', 'varchar'. Also supports 'int8', 'int4', 'int2', 'bool', 'uuid'.
         length: Optional column length / precision (e.g. 255).
         is_nullable: Whether column allows NULL (automatically False if is_pk is True).
         is_pk: True if column is part of the Primary Key.
