@@ -131,6 +131,39 @@ class XMIBuilder:
                 },
             )
 
+    def _map_sql_type_to_vp(self, type_str: str) -> tuple[int, str, int]:
+        """Map SQL data type string (VARCHAR, BIGINT, NUMERIC, TIMESTAMP, etc.) to (vp_type_int, type_name, length)."""
+        import re
+        t_upper = (type_str or "VARCHAR").upper().strip()
+        length = 0
+        match = re.search(r'\((\d+)(?:,\s*\d+)?\)', t_upper)
+        if match:
+            try:
+                length = int(match.group(1))
+            except ValueError:
+                length = 0
+
+        if any(k in t_upper for k in ("INT", "SERIAL")):
+            if length == 0:
+                length = 10
+            t_name = "int8" if "BIG" in t_upper else "int4"
+            return 9, t_name, length
+        elif any(k in t_upper for k in ("VARCHAR", "CHAR", "TEXT", "STRING")):
+            if length == 0:
+                length = 255 if "VARCHAR" in t_upper else 0
+            t_name = "varchar" if "TEXT" not in t_upper else "text"
+            return 27, t_name, length
+        elif any(k in t_upper for k in ("NUMERIC", "DECIMAL", "FLOAT", "DOUBLE", "REAL")):
+            if length == 0:
+                length = 10
+            return 11, "numeric", length
+        elif any(k in t_upper for k in ("TIME", "DATE")):
+            return 17, "timestamp", 0
+        elif "BOOL" in t_upper:
+            return 3, "bool", 0
+        else:
+            return 27, "varchar", length or 255
+
     # ---------------------------------------------------------
     # Metamodel Builders (ownedMember tags, public visibility, full VP metadata)
     # ---------------------------------------------------------
@@ -487,13 +520,16 @@ class XMIBuilder:
                 self.model,
                 "ownedMember",
                 {
-                    f"{{{XMI_NS}}}type": "uml:Class",
+                    f"{{{XMI_NS}}}type": "uml:dbTable",
                     f"{{{XMI_NS}}}id": ent.id,
                     "name": ent.name,
                     "visibility": "public",
                     "isAbstract": "false",
                     "isActive": "false",
                     "isLeaf": "false",
+                    "syncType": "1",
+                    "type": "0",
+                    "ormSyncState": "1",
                 },
             )
 
@@ -522,10 +558,46 @@ class XMIBuilder:
                 )
                 ET.SubElement(ent_vp_ext, "documentation", {"value": ent.description})
 
+            # 1. Native VP children container for DBTable importer (v/dqn/ai.class)
+            childrens_elem = ET.SubElement(ent_elem, "childrens")
+            for col in ent.columns:
+                col_type_int, col_type_name, col_len = self._map_sql_type_to_vp(col.type)
+                if col.length:
+                    col_len = col.length
+
+                col_nullable_str = str(col.is_nullable).lower()
+                col_unique_str = str(getattr(col, "is_unique", False)).lower()
+                col_pk_str = str(col.is_primary_key).lower()
+
+                col_elem_attrs = {
+                    f"{{{XMI_NS}}}type": "uml:dbColumn",
+                    f"{{{XMI_NS}}}id": col.id,
+                    "name": col.name,
+                    "type": str(col_type_int),
+                    "typeName": col_type_name,
+                    "length": str(col_len),
+                    "scale": "0",
+                    "nullable": col_nullable_str,
+                    "unique": col_unique_str,
+                    "primaryKey": col_pk_str,
+                    "syncType": "1",
+                }
+                if col.is_primary_key:
+                    col_elem_attrs["idGenerator"] = "native"
+                if getattr(col, "default_value", None):
+                    col_elem_attrs["defaultValue"] = str(col.default_value)
+
+                col_elem = ET.SubElement(childrens_elem, "dbColumn", col_elem_attrs)
+                col_vp = ET.SubElement(col_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+                ET.SubElement(col_vp, "modelType", {"value": "DBColumn"})
+                if getattr(col, "description", ""):
+                    ET.SubElement(col_vp, "documentation", {"value": col.description})
+
+            # 2. Standard UML ownedAttribute elements for backward compatibility and test assertions
             for col in ent.columns:
                 col_attrs = {
                     f"{{{XMI_NS}}}type": "uml:Property",
-                    f"{{{XMI_NS}}}id": col.id,
+                    f"{{{XMI_NS}}}id": f"{col.id}_attr",
                     "name": col.name,
                     "visibility": "public",
                     "aggregation": "none",
@@ -545,6 +617,7 @@ class XMIBuilder:
                 ET.SubElement(col_vp_ext, "attribute")
                 ET.SubElement(col_vp_ext, "modelType", {"value": "DBColumn"})
                 ET.SubElement(col_vp_ext, "isVisble", {f"{{{XMI_NS}}}value": "true"})
+                ET.SubElement(col_vp_ext, "isVisible", {f"{{{XMI_NS}}}value": "true"})
                 ET.SubElement(col_vp_ext, "qualityScore", {"value": "-1"})
                 if getattr(col, "description", ""):
                     ET.SubElement(
@@ -582,77 +655,55 @@ class XMIBuilder:
             if not src or not tgt:
                 continue
 
-            end_src_id = f"{rel.id}_end_src"
-            end_tgt_id = f"{rel.id}_end_tgt"
+            from_mult = "1"
+            to_mult = "0..*"
+            if rel.type == "1:1":
+                from_mult = "1"
+                to_mult = "1"
+            elif rel.type == "1:N":
+                from_mult = "1"
+                to_mult = "0..*"
+            elif rel.type in ("N:1", "M:1"):
+                from_mult = "0..*"
+                to_mult = "1"
+            elif rel.type in ("M:N", "N:M"):
+                from_mult = "0..*"
+                to_mult = "0..*"
 
-            # In native VP ERD, Foreign Key relations have empty name and empty end names
-            assoc_elem = ET.SubElement(
+            fk_elem = ET.SubElement(
                 self.model,
                 "ownedMember",
                 {
-                    f"{{{XMI_NS}}}type": "uml:Association",
+                    f"{{{XMI_NS}}}type": "uml:dbForeignKey",
                     f"{{{XMI_NS}}}id": rel.id,
                     "name": "",
+                    "from": rel.source_id,
+                    "to": rel.target_id,
+                    "fromMultiplicity": from_mult,
+                    "toMultiplicity": to_mult,
+                    "identifying": "false",
+                    "syncType": "1",
                     "visibility": "public",
                     "isAbstract": "false",
                     "isDerived": "false",
                     "isLeaf": "false",
                 },
             )
-            ET.SubElement(assoc_elem, "memberEnd", {f"{{{XMI_NS}}}idref": end_src_id})
-            src_end = ET.SubElement(
-                assoc_elem,
-                "ownedEnd",
-                {
-                    f"{{{XMI_NS}}}type": "uml:Property",
-                    f"{{{XMI_NS}}}id": end_src_id,
-                    "name": "",
-                    "visibility": "public",
-                    "type": src.id,
-                    "association": rel.id,
-                    "aggregation": "none",
-                    "isDerived": "false",
-                    "isDerivedUnion": "false",
-                    "isLeaf": "false",
-                    "isNavigable": "true",
-                    "isReadOnly": "false",
-                    "isStatic": "false",
-                },
-            )
-            src_end_vp = ET.SubElement(src_end, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
-            ET.SubElement(src_end_vp, "associationEnd")
-            ET.SubElement(src_end_vp, "qualityScore", {"value": "-1"})
+            ET.SubElement(fk_elem, "from", {f"{{{XMI_NS}}}idref": rel.source_id})
+            ET.SubElement(fk_elem, "to", {f"{{{XMI_NS}}}idref": rel.target_id})
 
-            ET.SubElement(assoc_elem, "memberEnd", {f"{{{XMI_NS}}}idref": end_tgt_id})
-            tgt_end = ET.SubElement(
-                assoc_elem,
-                "ownedEnd",
-                {
-                    f"{{{XMI_NS}}}type": "uml:Property",
-                    f"{{{XMI_NS}}}id": end_tgt_id,
-                    "name": "",
-                    "visibility": "public",
-                    "type": tgt.id,
-                    "association": rel.id,
-                    "aggregation": "none",
-                    "isDerived": "false",
-                    "isDerivedUnion": "false",
-                    "isLeaf": "false",
-                    "isNavigable": "true",
-                    "isReadOnly": "false",
-                    "isStatic": "false",
-                },
-            )
-            tgt_end_vp = ET.SubElement(tgt_end, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
-            ET.SubElement(tgt_end_vp, "associationEnd")
-            ET.SubElement(tgt_end_vp, "qualityScore", {"value": "-1"})
-
-            assoc_vp = ET.SubElement(assoc_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
-            ET.SubElement(assoc_vp, "modelType", {"value": "DBForeignKey"})
-            ET.SubElement(assoc_vp, "qualityScore", {"value": "-1"})
+            fk_vp = ET.SubElement(fk_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(fk_vp, "modelType", {"value": "DBForeignKey"})
+            ET.SubElement(fk_vp, "from", {"value": rel.source_id})
+            ET.SubElement(fk_vp, "to", {"value": rel.target_id})
+            ET.SubElement(fk_vp, "fromMultiplicity", {"value": from_mult})
+            ET.SubElement(fk_vp, "toMultiplicity", {"value": to_mult})
+            ET.SubElement(fk_vp, "identifying", {"value": "false"})
+            ET.SubElement(fk_vp, "syncType", {"value": "1"})
+            ET.SubElement(fk_vp, "qualityScore", {"value": "-1"})
             if getattr(rel, "description", ""):
                 ET.SubElement(
-                    assoc_elem,
+                    fk_elem,
                     "ownedComment",
                     {
                         f"{{{XMI_NS}}}type": "uml:Comment",
@@ -660,7 +711,98 @@ class XMIBuilder:
                         "body": rel.description,
                     },
                 )
-                ET.SubElement(assoc_vp, "documentation", {"value": rel.description})
+                ET.SubElement(fk_vp, "documentation", {"value": rel.description})
+
+        # Visual Paradigm native ER data structures in model Extension
+        if self.state.entities:
+            model_vp_ext = self.model.find(f"{{{XMI_NS}}}Extension")
+            if model_vp_ext is None:
+                model_vp_ext = ET.SubElement(self.model, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+
+            vp_child_models = model_vp_ext.find("vpumlChildModels")
+            if vp_child_models is None:
+                vp_child_models = ET.SubElement(model_vp_ext, "vpumlChildModels")
+
+            for ent in self.state.entities.values():
+                tbl_model = ET.SubElement(vp_child_models, "vpumlModel", {"id": ent.id, "modelType": "DBTable"})
+                t_props = ET.SubElement(tbl_model, "properties")
+                ET.SubElement(t_props, "property", {"name": "name", "type": "string", "value": ent.name})
+                ET.SubElement(t_props, "property", {"name": "modelType", "type": "string", "value": "DBTable"})
+                ET.SubElement(t_props, "property", {"name": "type", "type": "int", "value": "0"})
+                ET.SubElement(t_props, "property", {"name": "syncType", "type": "int", "value": "1"})
+                ET.SubElement(t_props, "property", {"name": "dataModel", "type": "int", "value": "2"})
+                ET.SubElement(t_props, "property", {"name": "ormSyncState", "type": "int", "value": "1"})
+                ET.SubElement(t_props, "property", {"name": "qualityScore", "type": "int", "value": "-1"})
+                if getattr(ent, "description", ""):
+                    ET.SubElement(t_props, "property", {"name": "documentation", "type": "htmlString", "value": ent.description})
+
+                t_child_refs = ET.SubElement(tbl_model, "vpumlChildModelRefs")
+                t_child_models = ET.SubElement(tbl_model, "vpumlChildModels")
+
+                for col in ent.columns:
+                    ET.SubElement(t_child_refs, "modelRef", {"value": col.id})
+
+                    col_type_int, col_type_name, col_len = self._map_sql_type_to_vp(col.type)
+                    if col.length:
+                        col_len = col.length
+
+                    col_model = ET.SubElement(t_child_models, "vpumlModel", {"id": col.id, "modelType": "DBColumn"})
+                    c_props = ET.SubElement(col_model, "properties")
+                    ET.SubElement(c_props, "property", {"name": "name", "type": "string", "value": col.name})
+                    ET.SubElement(c_props, "property", {"name": "modelType", "type": "string", "value": "DBColumn"})
+                    ET.SubElement(c_props, "property", {"name": "type", "type": "int", "value": str(col_type_int)})
+                    ET.SubElement(c_props, "property", {"name": "typeName", "type": "string", "value": col_type_name})
+                    ET.SubElement(c_props, "property", {"name": "length", "type": "int", "value": str(col_len)})
+                    ET.SubElement(c_props, "property", {"name": "scale", "type": "int", "value": "0"})
+                    ET.SubElement(c_props, "property", {"name": "nullable", "type": "boolean", "value": str(col.is_nullable).lower()})
+                    ET.SubElement(c_props, "property", {"name": "unique", "type": "boolean", "value": str(getattr(col, "is_unique", False)).lower()})
+                    ET.SubElement(c_props, "property", {"name": "primaryKey", "type": "boolean", "value": str(col.is_primary_key).lower()})
+                    ET.SubElement(c_props, "property", {"name": "index", "type": "boolean", "value": "false"})
+                    ET.SubElement(c_props, "property", {"name": "syncType", "type": "int", "value": "1"})
+                    ET.SubElement(c_props, "property", {"name": "generated", "type": "int", "value": "0"})
+                    ET.SubElement(c_props, "property", {"name": "syncToAttribute", "type": "int", "value": "0"})
+                    if col.is_primary_key:
+                        ET.SubElement(c_props, "property", {"name": "idGenerator", "type": "stringSelection", "value": "native"})
+                    if getattr(col, "description", ""):
+                        ET.SubElement(c_props, "property", {"name": "documentation", "type": "htmlString", "value": col.description})
+
+            for rel in self.state.er_relations:
+                src = self.state.find_entity(rel.source_id)
+                tgt = self.state.find_entity(rel.target_id)
+                if not src or not tgt:
+                    continue
+
+                from_mult = "1"
+                to_mult = "0..*"
+                if rel.type == "1:1":
+                    from_mult = "1"
+                    to_mult = "1"
+                elif rel.type == "1:N":
+                    from_mult = "1"
+                    to_mult = "0..*"
+                elif rel.type in ("N:1", "M:1"):
+                    from_mult = "0..*"
+                    to_mult = "1"
+                elif rel.type in ("M:N", "N:M"):
+                    from_mult = "0..*"
+                    to_mult = "0..*"
+
+                fk_model = ET.SubElement(vp_child_models, "vpumlModel", {"id": rel.id, "modelType": "DBForeignKey"})
+                fk_props = ET.SubElement(fk_model, "properties")
+                ET.SubElement(fk_props, "property", {"name": "name", "type": "string", "value": ""})
+                ET.SubElement(fk_props, "property", {"name": "modelType", "type": "string", "value": "DBForeignKey"})
+                ET.SubElement(fk_props, "property", {"name": "from", "type": "fromTo", "modelRef": rel.source_id})
+                ET.SubElement(fk_props, "property", {"name": "to", "type": "fromTo", "modelRef": rel.target_id})
+                ET.SubElement(fk_props, "property", {"name": "identifying", "type": "boolean", "value": "false"})
+                ET.SubElement(fk_props, "property", {"name": "subtype", "type": "boolean", "value": "false"})
+                ET.SubElement(fk_props, "property", {"name": "syncType", "type": "int", "value": "1"})
+                ET.SubElement(fk_props, "property", {"name": "fromMultiplicity", "type": "stringSelection", "value": from_mult})
+                ET.SubElement(fk_props, "property", {"name": "toMultiplicity", "type": "stringSelection", "value": to_mult})
+                ET.SubElement(fk_props, "property", {"name": "syncToAssociation", "type": "int", "value": "0"})
+                ET.SubElement(fk_props, "property", {"name": "dataModel", "type": "int", "value": "2"})
+                ET.SubElement(fk_props, "property", {"name": "foreignKeyRelationshipPattern", "type": "string", "value": "{association_name}"})
+                if getattr(rel, "description", ""):
+                    ET.SubElement(fk_props, "property", {"name": "documentation", "type": "htmlString", "value": rel.description})
 
     def _build_uc_metamodel(self) -> None:
         assert self.model is not None
@@ -1054,6 +1196,7 @@ class XMIBuilder:
         fill_trans = "0"
         line_color = "Cr:0,0,0,255"
         line_weight = "1.0"
+        caption_vis = "true"
 
         if shape_type == "Package":
             effective_caption_side = 12
@@ -1080,6 +1223,7 @@ class XMIBuilder:
         elif shape_type == "NOTE":
             effective_caption_side = 12
             caption_bounds = f"0,0,{p.width},{p.height}"
+            caption_vis = "true"
             align = "9"
             az_order = "4"
             bg_color = "Cr:255,255,200,255"
@@ -1089,7 +1233,8 @@ class XMIBuilder:
             line_weight = "1.0"
         elif shape_type == "InitialPseudoState":
             effective_caption_side = 1
-            caption_bounds = f"0,{p.height},{p.width},16"
+            caption_bounds = "0,0,0,0"
+            caption_vis = "false"
             align = "4"
             az_order = "3"
             bg_color = "Cr:0,0,0,255"
@@ -1097,23 +1242,26 @@ class XMIBuilder:
             line_color = "Cr:0,0,0,255"
         elif shape_type == "FinalState2":
             effective_caption_side = 1
-            caption_bounds = f"0,{p.height},{p.width},16"
+            caption_bounds = "0,0,0,0"
+            caption_vis = "false"
             align = "4"
             az_order = "3"
             bg_color = "Cr:0,0,0,255"
             fill_color = "Cr:0,0,0,255"
             line_color = "Cr:0,0,0,255"
         elif shape_type == "State2":
-            effective_caption_side = 12
-            caption_bounds = f"0,0,{p.width},{p.height}"
+            effective_caption_side = 1
+            caption_bounds = f"0,0,{p.width},15"
+            caption_vis = "true"
             align = "4"
             az_order = "2"
             bg_color = "Cr:122,207,245,255"
             fill_color = "Cr:122,207,245,255"
         elif shape_type == "DBTable":
             effective_caption_side = 12
-            caption_bounds = f"0,0,{p.width},16"
-            align = "9"
+            caption_bounds = f"0,0,{p.width},15"
+            caption_vis = "true"
+            align = "4"
             az_order = "2"
             bg_color = "Cr:245,182,122,255"
             fill_color = "Cr:245,182,122,255"
@@ -1123,6 +1271,7 @@ class XMIBuilder:
         else:
             effective_caption_side = caption_side
             caption_bounds = f"0,0,{p.width},16"
+            caption_vis = "true"
             align = "9"
 
         omg_elem = ET.SubElement(
@@ -1139,7 +1288,7 @@ class XMIBuilder:
         ET.SubElement(shape_vp, "captionBounds", {"value": caption_bounds})
         ET.SubElement(shape_vp, "captionInternalWidth", {"value": "-2147483648"})
         ET.SubElement(shape_vp, "captionInternalHeight", {"value": "-2147483648"})
-        ET.SubElement(shape_vp, "captionVisible", {"value": "true"})
+        ET.SubElement(shape_vp, "captionVisible", {"value": caption_vis})
         ET.SubElement(shape_vp, "captionSide", {"value": str(effective_caption_side)})
 
         props = ET.SubElement(shape_vp, "properties")
@@ -1157,6 +1306,11 @@ class XMIBuilder:
         elif shape_type == "State2":
             ET.SubElement(props, "ashowActionActivities", {"value": "true"})
             ET.SubElement(props, "ashowInternalTransitions", {"value": "true"})
+        elif shape_type == "DBTable":
+            ET.SubElement(props, "acolSortType", {"value": "0"})
+            ET.SubElement(props, "ashowColumnStereotypes", {"value": "0"})
+            ET.SubElement(props, "ashowColumnsMode", {"value": "0"})
+            ET.SubElement(props, "apresentationOption", {"value": "4"})
 
         ET.SubElement(props, "ashowAttributeType", {"value": "1"})
         ET.SubElement(props, "ashowOperationType", {"value": "1"})
@@ -1212,7 +1366,7 @@ class XMIBuilder:
             caption_vis = "true"
         elif effective_shape_type == "DBForeignKey" or creator_diag_type == "ERDiagram":
             show_name_val = "0"
-            caption_vis = "false"
+            caption_vis = "true"
         elif is_transition or effective_shape_type == "Transition2":
             show_name_val = "2" if rel_name else "0"
             caption_vis = "true" if rel_name else "false"
@@ -1239,7 +1393,9 @@ class XMIBuilder:
             },
         )
         conn_vp = ET.SubElement(omg_conn, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
-        ET.SubElement(conn_vp, "captionBounds", {"value": f"{mid_x},{mid_y},60,16"})
+        c_bounds_w = "20" if effective_shape_type == "DBForeignKey" else "60"
+        c_bounds_h = "0" if effective_shape_type == "DBForeignKey" else "16"
+        ET.SubElement(conn_vp, "captionBounds", {"value": f"{mid_x},{mid_y},{c_bounds_w},{c_bounds_h}"})
         ET.SubElement(conn_vp, "captionInternalWidth", {"value": "-2147483648"})
         ET.SubElement(conn_vp, "captionInternalHeight", {"value": "-2147483648"})
         ET.SubElement(conn_vp, "captionVisible", {"value": caption_vis})
@@ -1274,6 +1430,17 @@ class XMIBuilder:
         else:
             ET.SubElement(c_props, "ashowFromMultiplicity", {"value": "false"})
             ET.SubElement(c_props, "ashowToMultiplicity", {"value": "false"})
+
+        if effective_shape_type == "DBForeignKey":
+            ET.SubElement(c_props, "afromPinType", {"value": "1"})
+            ET.SubElement(c_props, "atoPinType", {"value": "1"})
+            ET.SubElement(c_props, "auseFromShapeCenter", {"value": "true"})
+            ET.SubElement(c_props, "auseToShapeCenter", {"value": "true"})
+            ET.SubElement(c_props, "afromConnectType", {"value": "0"})
+            ET.SubElement(c_props, "atoConnectType", {"value": "0"})
+            ET.SubElement(c_props, "arequestRebuild", {"value": "false"})
+            ET.SubElement(c_props, "arequestResetLabels", {"value": "false"})
+            ET.SubElement(c_props, "apaintThroughLabel", {"value": "2"})
 
         line_style = "2" if rel_type in ("Include", "Extend", "Dependency", "Realization", "Anchor") else "1"
         line_color = "Cr:120,120,120,255" if rel_type == "Anchor" else "Cr:0,0,0,255"
@@ -1364,6 +1531,19 @@ class XMIBuilder:
         ET.SubElement(diag_props, "ashowAssociationNavigationArrows", {"value": "3"})
         ET.SubElement(diag_props, "ashowStereotypes", {"value": "true"})
         ET.SubElement(diag_props, "aclassFitSizeWhenShowHideMember", {"value": "true"})
+
+        if diag_type == "ERDiagram":
+            ET.SubElement(diag_props, "a_showDBTableColumnsMode", {"value": "1"})
+            ET.SubElement(diag_props, "a_showColumnStereotypes", {"value": "true"})
+            ET.SubElement(diag_props, "a_showColumnTypes", {"value": "true"})
+            ET.SubElement(diag_props, "a_showColumnUserType", {"value": "false"})
+            ET.SubElement(diag_props, "a_showColumnDefaultValue", {"value": "false"})
+            ET.SubElement(diag_props, "a_columnConstraintsDisplayOption", {"value": "2"})
+            ET.SubElement(diag_props, "a_showExtraColumnProperties", {"value": "true"})
+            ET.SubElement(diag_props, "a_pointForeignKeyEndToColumn", {"value": "false"})
+            ET.SubElement(diag_props, "a_alignColumnProperties", {"value": "true"})
+            ET.SubElement(diag_props, "adataModel", {"value": "2"})
+            ET.SubElement(diag_props, "aForeignKeyArrowHeadSize", {"value": "3"})
 
         omg_elements = ET.SubElement(omg_diag, f"{{{UML_NS}}}Diagram.element")
         return omg_diag, omg_elements

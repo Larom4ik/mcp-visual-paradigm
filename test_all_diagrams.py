@@ -217,6 +217,7 @@ def run_tests():
 
     # Validate ER Entities & eAnnotations
     users_table = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "users")
+    assert users_table.attrib.get(f"{{{XMI_NS}}}type") == "uml:dbTable", "ER table element must have xmi:type='uml:dbTable'"
     table_annot = users_table.find("eAnnotations")
     assert table_annot is not None
     assert table_annot.attrib.get("source") == "Stereotype"
@@ -228,7 +229,30 @@ def run_tests():
     assert users_ext.find("documentation").attrib.get("value") == "Stores core authentication and user profile data."
     users_comment = users_table.find("ownedComment")
     assert users_comment is not None and users_comment.attrib.get("body") == "Stores core authentication and user profile data."
-    print("ER Entity DBTable modelType, eAnnotation, and documentation verified.")
+
+    # Validate native Visual Paradigm <childrens> and <dbColumn> elements
+    childrens = users_table.find("childrens")
+    assert childrens is not None, "ER table must have <childrens> container for VP DBColumn importer"
+    db_cols = childrens.findall("dbColumn")
+    assert len(db_cols) == 3, f"Expected 3 dbColumn elements in users table, got {len(db_cols)}"
+    id_db_col = next(c for c in db_cols if c.attrib.get("name") == "id")
+    assert id_db_col.attrib.get("primaryKey") == "true"
+    assert id_db_col.attrib.get("type") == "9"
+    assert id_db_col.attrib.get("typeName") == "int8"
+    assert id_db_col.attrib.get("idGenerator") == "native"
+    print("ER Entity native uml:dbTable, <childrens><dbColumn>, and documentation verified.")
+
+    # Validate ER Foreign Keys (uml:dbForeignKey)
+    er_fks = [el for el in model.findall("ownedMember") if el.attrib.get(f"{{{XMI_NS}}}type") == "uml:dbForeignKey"]
+    assert len(er_fks) == 3, f"Expected 3 uml:dbForeignKey elements, got {len(er_fks)}"
+    for fk in er_fks:
+        assert fk.attrib.get("from"), "dbForeignKey must specify 'from' table"
+        assert fk.attrib.get("to"), "dbForeignKey must specify 'to' table"
+        assert fk.attrib.get("fromMultiplicity") is not None
+        assert fk.attrib.get("toMultiplicity") is not None
+        assert fk.find("from") is not None and f"{{{XMI_NS}}}idref" in fk.find("from").attrib
+        assert fk.find("to") is not None and f"{{{XMI_NS}}}idref" in fk.find("to").attrib
+    print("ER Foreign Key metamodel (uml:dbForeignKey with from/to and multiplicities) verified.")
 
     # Validate PK / FK annotations and column documentation
     id_col = next(el for el in users_table.findall("ownedAttribute") if el.attrib.get("name") == "id")
@@ -311,12 +335,18 @@ def run_tests():
 
     # Check ER Diagram Visual Shapes (DBTable with Peach color, DBForeignKey with no multiplicity text)
     erd_diag = next(d for d in omg_diagrams if d.attrib.get("diagramType") == "ERDiagram")
+    erd_props = erd_diag.find(f"{{{XMI_NS}}}Extension").find("properties")
+    assert erd_props.find("a_showDBTableColumnsMode").attrib.get("value") == "1", "ERDiagram must have a_showDBTableColumnsMode='1'"
+    assert erd_props.find("a_showColumnTypes").attrib.get("value") == "true", "ERDiagram must have a_showColumnTypes='true'"
+    assert erd_props.find("a_columnConstraintsDisplayOption").attrib.get("value") == "2", "ERDiagram must have a_columnConstraintsDisplayOption='2'"
+
     erd_elems = erd_diag.find(f"{{{UML_NS}}}Diagram.element").findall(f"{{{UML_NS}}}DiagramElement")
     table_shapes = [el for el in erd_elems if el.attrib.get("preferredShapeType") == "DBTable"]
     assert len(table_shapes) == 4, f"Expected 4 DBTable shapes, got {len(table_shapes)}"
     for ts in table_shapes:
         ts_props = ts.find(f"{{{XMI_NS}}}Extension").find("properties")
         assert ts_props.find("abackground").attrib.get("value") == "Cr:245,182,122,255", "DBTable must be peach/orange"
+        assert ts_props.find("ashowColumnsMode").attrib.get("value") == "0", "DBTable must have ashowColumnsMode='0'"
     erd_conns = [el for el in erd_elems if el.attrib.get("preferredShapeType") == "DBForeignKey"]
     assert len(erd_conns) == 3, f"Expected 3 DBForeignKey connectors, got {len(erd_conns)}"
     for ec in erd_conns:
@@ -324,7 +354,21 @@ def run_tests():
         assert ec_props.find("ashowConnectorName").attrib.get("value") == "0", "DBForeignKey must suppress name caption"
         assert ec_props.find("ashowFromMultiplicity").attrib.get("value") == "false", "DBForeignKey must suppress text multiplicity"
         assert ec_props.find("ashowToMultiplicity").attrib.get("value") == "false", "DBForeignKey must suppress text multiplicity"
+        assert ec_props.find("afromPinType").attrib.get("value") == "1", "DBForeignKey must set afromPinType='1'"
+        assert ec_props.find("atoPinType").attrib.get("value") == "1", "DBForeignKey must set atoPinType='1'"
     print("Visual ER Diagram native DBTable (peach color) and DBForeignKey (clean Crow's Foot) verified.")
+
+    # Check vpumlChildModels under model Extension for ER data modeling
+    model_elem = root.find(f"{{{UML_NS}}}Model")
+    model_vp = model_elem.find(f"{{{XMI_NS}}}Extension")
+    assert model_vp is not None, "Model must have Visual Paradigm Extension"
+    vp_children = model_vp.find("vpumlChildModels")
+    assert vp_children is not None, "Model Extension must contain vpumlChildModels"
+    vp_tables = [m for m in vp_children.findall("vpumlModel") if m.attrib.get("modelType") == "DBTable"]
+    assert len(vp_tables) == 4, f"Expected 4 vpumlModel DBTable elements, got {len(vp_tables)}"
+    vp_fks = [m for m in vp_children.findall("vpumlModel") if m.attrib.get("modelType") == "DBForeignKey"]
+    assert len(vp_fks) == 3, f"Expected 3 vpumlModel DBForeignKey elements, got {len(vp_fks)}"
+    print("Native Visual Paradigm ER metamodel (DBTable, DBColumn, DBForeignKey in vpumlChildModels) verified.")
 
     # Check Use Case Diagram System Boundary shape
     uc_diag = next(d for d in omg_diagrams if d.attrib.get("diagramType") == "UseCaseDiagram")
@@ -339,22 +383,29 @@ def run_tests():
     sm_state2 = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "State2"]
     assert len(sm_state2) == 3, f"Expected 3 State2 shapes, got {len(sm_state2)}"
     for s2 in sm_state2:
-        s2_props = s2.find(f"{{{XMI_NS}}}Extension").find("properties")
+        s2_ext = s2.find(f"{{{XMI_NS}}}Extension")
+        s2_props = s2_ext.find("properties")
         assert s2_props.find("ashowActionActivities").attrib.get("value") == "true", "State2 must display action activities"
+        assert s2_ext.find("captionSide").attrib.get("value") == "1", "State2 captionSide must be 1 (header compartment anchor)"
+        assert s2_ext.find("captionBounds").attrib.get("value").endswith(",15"), "State2 captionBounds height must be 15 (header tab)"
 
     sm_final = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "FinalState2"]
     assert len(sm_final) == 1, f"Expected 1 FinalState2 shape, got {len(sm_final)}"
-    final_props = sm_final[0].find(f"{{{XMI_NS}}}Extension").find("properties")
+    final_ext = sm_final[0].find(f"{{{XMI_NS}}}Extension")
+    assert final_ext.find("captionVisible").attrib.get("value") == "false", "FinalState2 caption must be hidden"
+    final_props = final_ext.find("properties")
     assert final_props.find("abackground").attrib.get("value") == "Cr:0,0,0,255", "FinalState2 must be solid black"
 
     sm_init = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "InitialPseudoState"]
     assert len(sm_init) == 1, f"Expected 1 InitialPseudoState shape, got {len(sm_init)}"
-    init_props = sm_init[0].find(f"{{{XMI_NS}}}Extension").find("properties")
+    init_ext = sm_init[0].find(f"{{{XMI_NS}}}Extension")
+    assert init_ext.find("captionVisible").attrib.get("value") == "false", "InitialPseudoState caption must be hidden"
+    init_props = init_ext.find("properties")
     assert init_props.find("abackground").attrib.get("value") == "Cr:0,0,0,255", "InitialPseudoState must be solid black"
 
     sm_trans = [el for el in sm_elems if el.attrib.get("preferredShapeType") == "Transition2"]
     assert len(sm_trans) == 4, f"Expected 4 Transition2 connectors, got {len(sm_trans)}"
-    print("Visual State Machine shapes (State2 with activities, solid black Initial/Final, Transition2) verified.")
+    print("Visual State Machine shapes (State2 with activities in header, solid black Initial/Final, Transition2) verified.")
 
     # Check that auto-generated role names are suppressed on connectors
     all_connectors = [
