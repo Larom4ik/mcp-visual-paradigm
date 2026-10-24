@@ -94,22 +94,26 @@ def run_tests():
     print("\n=== 5. ER Diagram Setup ===")
     print(add_er_entity("users", description="Stores core authentication and user profile data."))
     print(add_er_column("users", "id", "BIGINT", is_pk=True))
-    print(add_er_column("users", "email", "VARCHAR(255)", description="Unique user login email address."))
+    print(add_er_column("users", "email", "VARCHAR(255)", is_unique=True, is_nullable=False, description="Unique user login email address."))
+    print(add_er_column("users", "is_active", "BOOL", is_nullable=False))
     print(add_er_column("users", "created_at", "TIMESTAMP"))
 
     print(add_er_entity("user_profiles"))
     print(add_er_column("user_profiles", "id", "BIGINT", is_pk=True))
-    print(add_er_column("user_profiles", "user_id", "BIGINT", is_fk=True))
+    print(add_er_column("user_profiles", "user_id", "BIGINT", is_fk=True, is_unique=True, is_nullable=False))
+    print(add_er_column("user_profiles", "birth_date", "DATE"))
     print(add_er_column("user_profiles", "avatar_url", "TEXT"))
 
     print(add_er_entity("orders"))
     print(add_er_column("orders", "id", "BIGINT", is_pk=True))
-    print(add_er_column("orders", "user_id", "BIGINT", is_fk=True))
+    print(add_er_column("orders", "user_id", "BIGINT", is_fk=True, is_nullable=False))
+    print(add_er_column("orders", "total_amount", "NUMERIC(10, 2)", is_nullable=False))
+    print(add_er_column("orders", "discount_pct", "FLOAT"))
     print(add_er_column("orders", "status", "VARCHAR(50)"))
 
     print(add_er_entity("tags"))
     print(add_er_column("tags", "id", "BIGINT", is_pk=True))
-    print(add_er_column("tags", "name", "VARCHAR(50)"))
+    print(add_er_column("tags", "name", "VARCHAR(50)", is_unique=True, is_nullable=False))
 
     # ER Relations
     print(add_er_relation("users", "user_profiles", "1:1"))
@@ -234,13 +238,51 @@ def run_tests():
     childrens = users_table.find("childrens")
     assert childrens is not None, "ER table must have <childrens> container for VP DBColumn importer"
     db_cols = childrens.findall("dbColumn")
-    assert len(db_cols) == 3, f"Expected 3 dbColumn elements in users table, got {len(db_cols)}"
+    assert len(db_cols) == 4, f"Expected 4 dbColumn elements in users table, got {len(db_cols)}"
     id_db_col = next(c for c in db_cols if c.attrib.get("name") == "id")
     assert id_db_col.attrib.get("primaryKey") == "true"
     assert id_db_col.attrib.get("type") == "9"
     assert id_db_col.attrib.get("typeName") == "int8"
     assert id_db_col.attrib.get("idGenerator") == "native"
-    print("ER Entity native uml:dbTable, <childrens><dbColumn>, and documentation verified.")
+
+    email_db_col = next(c for c in db_cols if c.attrib.get("name") == "email")
+    assert email_db_col.attrib.get("unique") == "true", "email must have unique='true'"
+    assert email_db_col.attrib.get("nullable") == "false", "email must have nullable='false'"
+    assert email_db_col.attrib.get("type") == "27"
+    assert email_db_col.attrib.get("typeName") == "varchar"
+
+    active_db_col = next(c for c in db_cols if c.attrib.get("name") == "is_active")
+    assert active_db_col.attrib.get("type") == "3", "BOOL must map to type='3'"
+    assert active_db_col.attrib.get("typeName") == "bool"
+    assert active_db_col.attrib.get("nullable") == "false"
+
+    created_db_col = next(c for c in db_cols if c.attrib.get("name") == "created_at")
+    assert created_db_col.attrib.get("type") == "17"
+    assert created_db_col.attrib.get("typeName") == "timestamp"
+
+    # Validate orders table: NUMERIC, FLOAT, FK constraints
+    orders_table = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "orders")
+    orders_cols = orders_table.find("childrens").findall("dbColumn")
+    user_id_col = next(c for c in orders_cols if c.attrib.get("name") == "user_id")
+    assert user_id_col.attrib.get("foreignKey") == "true", "orders.user_id must be marked foreignKey='true'"
+    assert user_id_col.attrib.get("foreignKeyConstraints"), "orders.user_id must have foreignKeyConstraints"
+
+    total_col = next(c for c in orders_cols if c.attrib.get("name") == "total_amount")
+    assert total_col.attrib.get("type") == "11", "NUMERIC must map to type='11'"
+    assert total_col.attrib.get("typeName") == "numeric"
+    assert total_col.attrib.get("nullable") == "false"
+
+    discount_col = next(c for c in orders_cols if c.attrib.get("name") == "discount_pct")
+    assert discount_col.attrib.get("type") == "12", "FLOAT must map to type='12'"
+    assert discount_col.attrib.get("typeName") == "float4"
+
+    # Validate user_profiles table: DATE type
+    profiles_table = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "user_profiles")
+    profiles_cols = profiles_table.find("childrens").findall("dbColumn")
+    date_col = next(c for c in profiles_cols if c.attrib.get("name") == "birth_date")
+    assert date_col.attrib.get("type") == "15", "DATE must map to type='15'"
+    assert date_col.attrib.get("typeName") == "date"
+    print("ER Entity native types (int8, varchar, bool, timestamp, numeric, float4, date) and unique/fk verified.")
 
     # Validate ER Foreign Keys (uml:dbForeignKey)
     er_fks = [el for el in model.findall("ownedMember") if el.attrib.get(f"{{{XMI_NS}}}type") == "uml:dbForeignKey"]
@@ -263,7 +305,10 @@ def run_tests():
     email_col = next(el for el in users_table.findall("ownedAttribute") if el.attrib.get("name") == "email")
     email_ext = email_col.find(f"{{{XMI_NS}}}Extension")
     assert email_ext is not None and email_ext.find("documentation").attrib.get("value") == "Unique user login email address."
-    print("Column PK eAnnotation and documentation verified.")
+    email_annot = email_col.find("eAnnotations")
+    email_keys = [d.attrib.get("key") for d in email_annot.findall("details")]
+    assert "unique" in email_keys, "email ownedAttribute must have 'unique' eAnnotation"
+    print("Column PK and UNIQUE eAnnotation and documentation verified.")
 
     # Validate Use Case & Include / Extend (Capitalized Stereotypes)
     login_uc = next(el for el in model.findall("ownedMember") if el.attrib.get("name") == "Login")

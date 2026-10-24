@@ -104,6 +104,7 @@ class ColumnModel(BaseNode):
     type: str = Field(default="VARCHAR", description="Column SQL / primitive data type")
     is_pk: bool = Field(default=False, description="Flag indicating Primary Key constraint")
     is_fk: bool = Field(default=False, description="Flag indicating Foreign Key constraint")
+    is_unique: bool = Field(default=False, description="Flag indicating Unique constraint")
     length: Optional[int] = Field(default=None, description="Optional length or precision (e.g. 255)")
     is_nullable: bool = Field(default=True, description="Whether column allows NULL values")
 
@@ -115,6 +116,8 @@ class ColumnModel(BaseNode):
                 data["is_pk"] = data["is_primary_key"]
             if "is_foreign_key" in data and "is_fk" not in data:
                 data["is_fk"] = data["is_foreign_key"]
+            if "unique" in data and "is_unique" not in data:
+                data["is_unique"] = data["unique"]
         return data
 
     @property
@@ -129,6 +132,7 @@ class ColumnModel(BaseNode):
     def validate_pk_not_nullable(self) -> "ColumnModel":
         if self.is_pk:
             self.is_nullable = False
+            self.is_unique = True
         return self
 
 

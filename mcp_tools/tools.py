@@ -791,6 +791,7 @@ def add_er_column(
     is_nullable: bool = True,
     is_pk: bool = False,
     is_fk: bool = False,
+    is_unique: bool = False,
     description: str = "",
 ) -> str:
     """Add a column/field to an existing ER Entity.
@@ -798,11 +799,12 @@ def add_er_column(
     Args:
         entity_name: Name or ID of the target ER Entity.
         name: Column name (e.g. 'user_id', 'email', 'price').
-        type: Column data type (e.g. 'INT', 'VARCHAR', 'TIMESTAMP', 'DECIMAL').
+        type: Column data type (e.g. 'INT', 'VARCHAR', 'TIMESTAMP', 'DECIMAL', 'NUMERIC', 'FLOAT', 'BOOL').
         length: Optional column length / precision (e.g. 255).
         is_nullable: Whether column allows NULL (automatically False if is_pk is True).
         is_pk: True if column is part of the Primary Key.
         is_fk: True if column is a Foreign Key.
+        is_unique: True if column has a Unique constraint.
         description: Optional documentation description for Open Specification.
 
     Returns:
@@ -825,6 +827,7 @@ def add_er_column(
             is_nullable=bool(is_nullable),
             is_primary_key=bool(is_pk),
             is_foreign_key=bool(is_fk),
+            is_unique=bool(is_unique),
             description=description,
         )
         ent.columns.append(col)
@@ -834,6 +837,8 @@ def add_er_column(
             flags.append("PK")
         if col.is_foreign_key:
             flags.append("FK")
+        if col.is_unique and not col.is_primary_key:
+            flags.append("UNIQUE")
         if not col.is_nullable:
             flags.append("NOT NULL")
         flags_str = f" [{', '.join(flags)}]" if flags else ""

@@ -143,26 +143,70 @@ class XMIBuilder:
             except ValueError:
                 length = 0
 
-        if any(k in t_upper for k in ("INT", "SERIAL")):
-            if length == 0:
-                length = 10
-            t_name = "int8" if "BIG" in t_upper else "int4"
-            return 9, t_name, length
-        elif any(k in t_upper for k in ("VARCHAR", "CHAR", "TEXT", "STRING")):
-            if length == 0:
-                length = 255 if "VARCHAR" in t_upper else 0
-            t_name = "varchar" if "TEXT" not in t_upper else "text"
-            return 27, t_name, length
-        elif any(k in t_upper for k in ("NUMERIC", "DECIMAL", "FLOAT", "DOUBLE", "REAL")):
-            if length == 0:
-                length = 10
-            return 11, "numeric", length
-        elif any(k in t_upper for k in ("TIME", "DATE")):
-            return 17, "timestamp", 0
-        elif "BOOL" in t_upper:
-            return 3, "bool", 0
-        else:
+        # 1. Integer / Serial types
+        if "BIGINT" in t_upper or "INT8" in t_upper or "BIGSERIAL" in t_upper or "SERIAL8" in t_upper:
+            return 9, "int8", length or 19
+        elif "SMALLINT" in t_upper or "INT2" in t_upper or "TINYINT" in t_upper:
+            return 8, "int2", length or 5
+        elif any(k in t_upper for k in ("INT", "INTEGER", "INT4")):
+            return 9, "int4", length or 10
+        elif any(k in t_upper for k in ("SERIAL", "SERIAL4")):
+            return 9, "serial4", length or 10
+
+        # 2. Floating-point & Fixed-point types
+        elif any(k in t_upper for k in ("DOUBLE", "FLOAT8")):
+            return 13, "float8", 0
+        elif any(k in t_upper for k in ("FLOAT", "REAL", "FLOAT4")):
+            return 12, "float4", 0
+        elif "NUMERIC" in t_upper:
+            return 11, "numeric", length or 10
+        elif any(k in t_upper for k in ("DECIMAL", "DEC")):
+            return 11, "decimal", length or 10
+        elif "MONEY" in t_upper:
+            return 14, "money", 0
+
+        # 3. String & Character types
+        elif "VARCHAR" in t_upper or "VARYING" in t_upper:
             return 27, "varchar", length or 255
+        elif "CHAR" in t_upper or "BPCHAR" in t_upper:
+            return 27, "char", length or 1
+        elif any(k in t_upper for k in ("TEXT", "CLOB", "STRING")):
+            return 27, "text", 0
+
+        # 4. Date & Time types
+        elif "TIMESTAMPTZ" in t_upper:
+            return 17, "timestamptz", 0
+        elif "TIMESTAMP" in t_upper:
+            return 17, "timestamp", 0
+        elif "TIMETZ" in t_upper:
+            return 16, "timetz", 0
+        elif "TIME" in t_upper:
+            return 16, "time", 0
+        elif "DATE" in t_upper:
+            return 15, "date", 0
+        elif "INTERVAL" in t_upper:
+            return 18, "interval", 0
+
+        # 5. Boolean
+        elif any(k in t_upper for k in ("BOOL", "BOOLEAN")):
+            return 3, "bool", 0
+
+        # 6. Binary / Large Objects
+        elif any(k in t_upper for k in ("BYTEA", "BLOB", "BINARY", "VARBINARY")):
+            return 25, "bytea", length or 0
+
+        # 7. Identifiers & Structured types
+        elif "UUID" in t_upper:
+            return 28, "uuid", 0
+        elif "JSONB" in t_upper:
+            return 29, "jsonb", 0
+        elif "JSON" in t_upper:
+            return 29, "json", 0
+
+        # Default fallback
+        else:
+            clean_type = re.sub(r'\(.*?\)', '', t_upper).lower().strip() or "varchar"
+            return 27, clean_type, length or 255
 
     # ---------------------------------------------------------
     # Metamodel Builders (ownedMember tags, public visibility, full VP metadata)
@@ -560,6 +604,10 @@ class XMIBuilder:
 
             # 1. Native VP children container for DBTable importer (v/dqn/ai.class)
             childrens_elem = ET.SubElement(ent_elem, "childrens")
+            matching_fks = [
+                rel.id for rel in self.state.er_relations
+                if rel.target_id == ent.id or rel.source_id == ent.id
+            ]
             for col in ent.columns:
                 col_type_int, col_type_name, col_len = self._map_sql_type_to_vp(col.type)
                 if col.length:
@@ -568,6 +616,7 @@ class XMIBuilder:
                 col_nullable_str = str(col.is_nullable).lower()
                 col_unique_str = str(getattr(col, "is_unique", False)).lower()
                 col_pk_str = str(col.is_primary_key).lower()
+                col_fk_str = str(col.is_foreign_key).lower()
 
                 col_elem_attrs = {
                     f"{{{XMI_NS}}}type": "uml:dbColumn",
@@ -580,8 +629,11 @@ class XMIBuilder:
                     "nullable": col_nullable_str,
                     "unique": col_unique_str,
                     "primaryKey": col_pk_str,
+                    "foreignKey": col_fk_str,
                     "syncType": "1",
                 }
+                if col.is_foreign_key and matching_fks:
+                    col_elem_attrs["foreignKeyConstraints"] = matching_fks[0]
                 if col.is_primary_key:
                     col_elem_attrs["idGenerator"] = "native"
                 if getattr(col, "default_value", None):
@@ -590,6 +642,12 @@ class XMIBuilder:
                 col_elem = ET.SubElement(childrens_elem, "dbColumn", col_elem_attrs)
                 col_vp = ET.SubElement(col_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
                 ET.SubElement(col_vp, "modelType", {"value": "DBColumn"})
+                ET.SubElement(col_vp, "nullable", {"value": col_nullable_str})
+                ET.SubElement(col_vp, "unique", {"value": col_unique_str})
+                ET.SubElement(col_vp, "primaryKey", {"value": col_pk_str})
+                ET.SubElement(col_vp, "foreignKey", {"value": col_fk_str})
+                if col.is_foreign_key and matching_fks:
+                    ET.SubElement(col_vp, "foreignKeyConstraints", {"value": matching_fks[0]})
                 if getattr(col, "description", ""):
                     ET.SubElement(col_vp, "documentation", {"value": col.description})
 
@@ -644,6 +702,11 @@ class XMIBuilder:
                 if col.is_foreign_key:
                     ET.SubElement(col_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "foreignKey", "value": "true"})
                     ET.SubElement(col_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "stereotype", "value": "FK"})
+                if getattr(col, "is_unique", False):
+                    ET.SubElement(col_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "unique", "value": "true"})
+                    ET.SubElement(col_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "uniqueConstraint", "value": "true"})
+                    if not col.is_primary_key:
+                        ET.SubElement(col_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "stereotype", "value": "U"})
                 if not col.is_nullable:
                     ET.SubElement(col_annot, "details", {f"{{{XMI_NS}}}id": create_uuid_id("det"), "key": "nullable", "value": "false"})
                 if col.length:
@@ -757,6 +820,9 @@ class XMIBuilder:
                     ET.SubElement(c_props, "property", {"name": "nullable", "type": "boolean", "value": str(col.is_nullable).lower()})
                     ET.SubElement(c_props, "property", {"name": "unique", "type": "boolean", "value": str(getattr(col, "is_unique", False)).lower()})
                     ET.SubElement(c_props, "property", {"name": "primaryKey", "type": "boolean", "value": str(col.is_primary_key).lower()})
+                    ET.SubElement(c_props, "property", {"name": "foreignKey", "type": "boolean", "value": str(col.is_foreign_key).lower()})
+                    if col.is_foreign_key and matching_fks:
+                        ET.SubElement(c_props, "property", {"name": "foreignKeyConstraints", "type": "modelRefs", "value": matching_fks[0]})
                     ET.SubElement(c_props, "property", {"name": "index", "type": "boolean", "value": "false"})
                     ET.SubElement(c_props, "property", {"name": "syncType", "type": "int", "value": "1"})
                     ET.SubElement(c_props, "property", {"name": "generated", "type": "int", "value": "0"})
