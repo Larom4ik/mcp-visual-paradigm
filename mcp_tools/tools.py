@@ -1263,6 +1263,179 @@ def export_xmi(filepath: str) -> str:
         return f"ERROR: Failed to export XMI: {str(e)}"
 
 
+def batch_build_diagrams(spec: dict, filepath: Optional[str] = None) -> str:
+    """Batch build an entire architecture model (Class, ERD, Use Case, State Machine) from a single structured dictionary, and export to XMI.
+
+    This is the PREFERRED tool when transforming an entire specification or requirements document into diagrams.
+    It builds all elements, runs validation and the Visual Layout Engine, and exports the final .xmi file in one single call.
+
+    Args:
+        spec: Dictionary specification containing:
+            - "project_name": Optional[str] (e.g. "BankingSystem")
+            - "packages": list[dict] (e.g. [{"name": "Core", "parent": None}])
+            - "classes": list[dict] with attributes and methods
+            - "class_relations": list[dict] with source, target, type, etc.
+            - "entities": list[dict] with columns (type, is_pk, is_fk, is_unique, etc.)
+            - "er_relations": list[dict] with source, target, type ("1:1", "1:N", "M:N")
+            - "actors": list[dict] with name, description
+            - "use_cases": list[dict] with name, description
+            - "system_boundary": Optional[dict] with name, use_cases
+            - "uc_relations": list[dict] with source, target, type ("Association", "Include", "Extend")
+            - "states": list[dict] with name, type ("Initial", "State", "Final"), entry, do, exit
+            - "transitions": list[dict] with source, target, trigger, guard
+            - "notes": list[dict] with text, attached_to
+        filepath: Optional output file path (e.g. "./model.xmi"). Defaults to '{project_name}.xmi'.
+
+    Returns:
+        Structured execution summary with export path and element counts.
+    """
+    try:
+        if not isinstance(spec, dict):
+            return "ERROR: 'spec' must be a dictionary."
+
+        proj_name = spec.get("project_name", "ArchitectureProject")
+        init_project(proj_name)
+        log = [f"=== Batch Building Project: {proj_name} ==="]
+
+        # 1. Packages
+        for p in spec.get("packages", []):
+            if isinstance(p, dict) and "name" in p:
+                add_package(p["name"], p.get("parent"))
+                log.append(f"  + Package: {p['name']}")
+
+        # 2. Classes
+        for c in spec.get("classes", []):
+            if not isinstance(c, dict) or "name" not in c:
+                continue
+            elem_type = "Interface" if (c.get("is_interface") or c.get("element_type", "").lower() == "interface") else "Class"
+            add_class(
+                name=c["name"],
+                is_abstract=bool(c.get("is_abstract", False)),
+                element_type=elem_type,
+                package=c.get("package"),
+                description=c.get("description", ""),
+            )
+            for a in c.get("attributes", []):
+                if isinstance(a, dict) and "name" in a:
+                    add_class_attribute(
+                        class_name=c["name"],
+                        name=a["name"],
+                        type=a.get("type", "string"),
+                        visibility=a.get("visibility", "public"),
+                        multiplicity=a.get("multiplicity", ""),
+                        description=a.get("description", ""),
+                    )
+            for m in c.get("methods", []):
+                if isinstance(m, dict) and "name" in m:
+                    add_class_method(
+                        class_name=c["name"],
+                        name=m["name"],
+                        return_type=m.get("return_type", "void"),
+                        params=m.get("params") or m.get("parameters"),
+                        description=m.get("description", ""),
+                    )
+            log.append(f"  + Class: {c['name']}")
+
+        # 3. Class Relations
+        for r in spec.get("class_relations", []):
+            if not isinstance(r, dict) or "source" not in r or "target" not in r:
+                continue
+            src_n = r["source"]
+            tgt_n = r["target"]
+            if "hint" in r or "relationship_hint" in r:
+                smart_add_relation(src_n, tgt_n, r.get("hint") or r.get("relationship_hint"))
+            else:
+                add_class_relation(
+                    src_name=src_n,
+                    tgt_name=tgt_n,
+                    type=r.get("type", "Association"),
+                    src_mult=r.get("source_multiplicity", "") or r.get("src_mult", ""),
+                    tgt_mult=r.get("target_multiplicity", "") or r.get("tgt_mult", ""),
+                )
+
+        # 4. ER Entities
+        for e in spec.get("entities", []):
+            if not isinstance(e, dict) or "name" not in e:
+                continue
+            add_er_entity(name=e["name"], description=e.get("description", ""))
+            for col in e.get("columns", []):
+                if isinstance(col, dict) and "name" in col:
+                    add_er_column(
+                        entity_name=e["name"],
+                        name=col["name"],
+                        type=col.get("type", "VARCHAR"),
+                        length=col.get("length"),
+                        is_nullable=bool(col.get("is_nullable", True)),
+                        is_pk=bool(col.get("is_pk", False)),
+                        is_fk=bool(col.get("is_fk", False)),
+                        is_unique=bool(col.get("is_unique", False)),
+                        description=col.get("description", ""),
+                    )
+            log.append(f"  + Entity: {e['name']} ({len(e.get('columns', []))} columns)")
+
+        # 5. ER Relations
+        for er in spec.get("er_relations", []):
+            if isinstance(er, dict) and "source" in er and "target" in er:
+                add_er_relation(src_name=er["source"], tgt_name=er["target"], type=er.get("type", "1:N"))
+
+        # 6. Actors
+        for a in spec.get("actors", []):
+            if isinstance(a, dict) and "name" in a:
+                add_actor(a["name"], a.get("description", ""))
+
+        # 7. Use Cases
+        for uc in spec.get("use_cases", []):
+            if isinstance(uc, dict) and "name" in uc:
+                add_use_case(uc["name"], uc.get("description", ""))
+
+        # 8. System Boundary
+        sb = spec.get("system_boundary")
+        if isinstance(sb, dict) and "use_cases" in sb:
+            ucs = ",".join(sb["use_cases"]) if isinstance(sb["use_cases"], list) else str(sb["use_cases"])
+            set_system_boundary(name=sb.get("name", "System Boundary"), use_cases=ucs)
+
+        # 9. Use Case Relations
+        for ucr in spec.get("uc_relations", []):
+            if isinstance(ucr, dict) and "source" in ucr and "target" in ucr:
+                add_uc_relation(src_name=ucr["source"], tgt_name=ucr["target"], type=ucr.get("type", "Association"))
+
+        # 10. States
+        for s in spec.get("states", []):
+            if isinstance(s, dict) and "name" in s:
+                add_state(
+                    name=s["name"],
+                    type=s.get("type", "State"),
+                    entry=s.get("entry", ""),
+                    do=s.get("do", ""),
+                    exit=s.get("exit", ""),
+                    description=s.get("description", ""),
+                )
+
+        # 11. State Transitions
+        for t in spec.get("transitions", []):
+            if isinstance(t, dict) and "source" in t and "target" in t:
+                add_state_transition(
+                    src_name=t["source"],
+                    tgt_name=t["target"],
+                    trigger=t.get("trigger", ""),
+                    guard=t.get("guard", ""),
+                )
+
+        # 12. Notes
+        for n in spec.get("notes", []):
+            if isinstance(n, dict) and "text" in n:
+                add_note(text=n["text"], target=n.get("attached_to"))
+
+        # 13. Auto Export
+        out_path = filepath or spec.get("filepath") or f"{proj_name}.xmi"
+        export_result = export_xmi(out_path)
+
+        log.append(f"\n{export_result}")
+        return "\n".join(log)
+    except Exception as e:
+        return f"ERROR: Failed during batch_build_diagrams: {str(e)}"
+
+
 def get_project_summary() -> str:
     """Return a detailed text overview of the current project state across all 4 diagrams.
 
@@ -1376,6 +1549,7 @@ def register_all_tools(mcp: Any) -> None:
         set_element_documentation,
         add_note,
         export_xmi,
+        batch_build_diagrams,
         get_project_summary,
     ]
     for tool_fn in tools:
