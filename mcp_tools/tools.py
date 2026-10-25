@@ -1226,6 +1226,117 @@ def set_system_boundary(name: str = "System", use_cases: Optional[str] = None) -
 
 # --- Export and Summary Tools ---
 
+def _notify_vp_live_sync(filepath: str) -> Optional[str]:
+    """Attempt to notify the running Visual Paradigm Live Sync plugin to auto-import the XMI."""
+    import json
+    import os
+    import urllib.parse
+    import urllib.request
+
+    try:
+        abs_path = os.path.abspath(filepath)
+        url = f"http://127.0.0.1:19842/import?file={urllib.parse.quote(abs_path)}"
+        req = urllib.request.Request(url, method="POST")
+        with urllib.request.urlopen(req, timeout=0.6) as resp:
+            if resp.status == 200:
+                data = json.loads(resp.read().decode("utf-8"))
+                if data.get("success"):
+                    return f"Live Sync: Automatically sent to active Visual Paradigm session ({os.path.basename(abs_path)})."
+    except Exception:
+        pass
+    return None
+
+
+def sync_with_visual_paradigm(filepath: Optional[str] = None) -> str:
+    """Send an exported XMI model directly to a running Visual Paradigm instance via the Live Sync plugin.
+
+    Args:
+        filepath: Optional path to the .xmi file. If not specified, uses the last exported file or project name.
+
+    Returns:
+        Status message confirming import in Visual Paradigm or connection instructions if VP is closed.
+    """
+    import os
+
+    target_path = filepath
+    if not target_path:
+        target_path = f"{state.name}.xmi"
+
+    if not os.path.exists(target_path):
+        res = export_xmi(target_path)
+        if res.startswith("ERROR"):
+            return res
+
+    sync_notice = _notify_vp_live_sync(target_path)
+    if sync_notice:
+        return f"SUCCESS: {sync_notice}"
+    return (
+        f"Visual Paradigm Live Sync server not detected at http://127.0.0.1:19842.\n"
+        f"File '{os.path.abspath(target_path)}' is ready on disk.\n"
+        f"To import manually in Visual Paradigm: Project > Import > XMI...\n"
+        f"Or activate the plugin in Visual Paradigm (MCP menu) for automatic live sync."
+    )
+
+
+def export_diagram_image(
+    diagram_name: Optional[str] = None,
+    output_path: Optional[str] = None,
+) -> str:
+    """Export the currently active or specified diagram from Visual Paradigm as a high-resolution PNG image.
+
+    Enables multimodal AI agents (and users) to visually inspect the actual rendered diagram
+    layout, labels, connector routing, and completeness by opening the exported PNG with `view_file`.
+
+    Args:
+        diagram_name: Optional name of the diagram to export (e.g. 'Class Diagram', 'ER Diagram', 'Use Case Diagram').
+                      If omitted, exports the active / opened diagram in Visual Paradigm.
+        output_path: Optional file path where the PNG will be saved (e.g. './diagram.png').
+                     If omitted, automatically generates a PNG in the current working directory.
+
+    Returns:
+        Status message with the absolute path of the generated PNG image and instructions to inspect it via `view_file`.
+    """
+    import json
+    import os
+    import urllib.parse
+    import urllib.request
+
+    target_file = output_path
+    if not target_file:
+        clean_dname = (diagram_name or "active_diagram").strip().replace(" ", "_").lower()
+        target_file = os.path.abspath(f"{state.name}_{clean_dname}.png")
+    else:
+        target_file = os.path.abspath(target_file)
+
+    query_params = [f"file={urllib.parse.quote(target_file)}"]
+    if diagram_name and diagram_name.strip():
+        query_params.append(f"diagram={urllib.parse.quote(diagram_name.strip())}")
+
+    url = f"http://127.0.0.1:19842/export_image?{'&'.join(query_params)}"
+    try:
+        req = urllib.request.Request(url, method="POST")
+        with urllib.request.urlopen(req, timeout=4.0) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            if data.get("success"):
+                actual_img = data.get("image_path", target_file)
+                diag_title = data.get("diagram", diagram_name or "Active Diagram")
+                return (
+                    f"SUCCESS: Exported diagram '{diag_title}' to image: {actual_img}\n"
+                    f"Visual Inspection (Agent Vision): Call `view_file` on '{actual_img}' to visually "
+                    f"inspect the diagram layout, verify package bounding boxes, connector routing, and readability."
+                )
+            else:
+                return f"ERROR: Visual Paradigm image export failed: {data.get('error', 'Unknown error')}"
+    except urllib.error.URLError as e:
+        return (
+            f"ERROR: Cannot connect to Visual Paradigm Live Sync plugin at http://127.0.0.1:19842.\n"
+            f"Please ensure Visual Paradigm 18.1 is running and the MCP plugin is enabled.\n"
+            f"Details: {str(e)}"
+        )
+    except Exception as e:
+        return f"ERROR: Failed to export diagram image: {str(e)}"
+
+
 def export_xmi(filepath: str) -> str:
     """Export the architecture to a complete OMG XMI 2.1 file with Visual Paradigm diagram layout.
 
@@ -1254,10 +1365,13 @@ def export_xmi(filepath: str) -> str:
             f"States: {len(state.states)} (Transitions: {len(state.transitions)})"
         )
 
+        sync_notice = _notify_vp_live_sync(abs_path)
+        sync_suffix = f"\n{sync_notice}" if sync_notice else "\nReady for Visual Paradigm: Project > Import > XMI..."
+
         return (
             f"Successfully exported XMI 2.1 with Visual Layout Engine to: {abs_path}\n"
-            f"Diagram Statistics: {stats}\n"
-            f"Ready for Visual Paradigm: Project > Import > XMI..."
+            f"Diagram Statistics: {stats}"
+            f"{sync_suffix}"
         )
     except Exception as e:
         return f"ERROR: Failed to export XMI: {str(e)}"
@@ -1550,6 +1664,8 @@ def register_all_tools(mcp: Any) -> None:
         add_note,
         export_xmi,
         batch_build_diagrams,
+        sync_with_visual_paradigm,
+        export_diagram_image,
         get_project_summary,
     ]
     for tool_fn in tools:

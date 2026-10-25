@@ -37,6 +37,7 @@
   - [Настройка в Antigravity IDE / VS Code / Windsurf](#настройка-в-antigravity-ide--vs-code--windsurf)
 - [Полный справочник инструментов MCP](#полный-справочник-инструментов-mcp)
 - [Импорт модели в Visual Paradigm](#импорт-модели-в-visual-paradigm)
+- [Нативный Java-плагин (Live Sync)](#нативный-java-плагин-live-sync)
 - [Архитектура и движки сервера](#архитектура-и-движки-сервера)
 - [Тестирование и валидация](#тестирование-и-валидация)
 
@@ -212,13 +213,15 @@ python test_all_diagrams.py
 
 ## Полный справочник инструментов MCP
 
-Сервер предоставляет LLM-агенту **24 специализированных инструмента**, разделенных по архитектурным областям:
+Сервер предоставляет LLM-агенту **25 специализированных инструментов**, разделенных по архитектурным областям:
 
 ### 1. Управление проектом и пакетная сборка
 | Инструмент | Параметры | Описание |
 | :--- | :--- | :--- |
 | `batch_build_diagrams` | `spec: dict, filepath: Optional[str] = None` | Основной инструмент для ТЗ: создает сразу все 4 вида диаграмм (пакеты, классы, таблицы ERD, сценарии Use Case, конечные автоматы, заметки) за 1 вызов и автоматически генерирует готовый `.xmi`. |
 | `init_project` | `name: str = "ProjectModel"` | Инициализирует новый проект с заданным именем и сбрасывает предыдущее состояние. |
+| `sync_with_visual_paradigm` | `filepath: Optional[str] = None` | Отправляет сгенерированную модель напрямую в запущенный Visual Paradigm через фоновый Live Sync плагин. |
+| `export_diagram_image` | `diagram_name: Optional[str] = None, output_path: Optional[str] = None` | Экспортирует активную или указанную диаграмму из Visual Paradigm в высоком разрешении (PNG) для визуальной валидации агентом (Agent Vision через `view_file`). |
 | `get_project_summary` | — | Возвращает подробное структурированное дерево всех элементов по всем диаграммам (для саморефлексии модели). |
 | `set_element_documentation` | `element_name: str, documentation: str` | Добавляет или обновляет подробное описание (Open Specification / HTML-документацию) для любого элемента. |
 | `export_xmi` | `filepath: str` | Запускает Visual Layout Engine и сохраняет чистый файл формата OMG XMI 2.1. |
@@ -350,6 +353,32 @@ python test_all_diagrams.py
 
 ---
 
+## Нативный Java-плагин (Live Sync)
+
+Для максимальной автоматизации в каталог `plugin/` включен нативный Java-плагин для Visual Paradigm 18.1+, созданный на базе Visual Paradigm OpenAPI.
+
+### Возможности плагина:
+1. **Кнопка в главном меню Visual Paradigm**:
+   - Вкладка ленты меню **MCP** $\rightarrow$ группа **Actions** $\rightarrow$ **Import MCP Diagram (XMI)...**
+   - Позволяет выбрать и открыть любой сгенерированный XMI-файл в 1 клик.
+2. **Встроенный фоновый сервер Live Sync (`127.0.0.1:19842`)**:
+   - Автоматически слушает команды от Python MCP-сервера.
+   - Когда модель или пользователь вызывает `export_xmi`, `batch_build_diagrams` или `sync_with_visual_paradigm`, диаграммы **мгновенно отрисовываются прямо на экране в активном окне Visual Paradigm** без ручного импорта.
+3. **Обратный экспорт диаграмм в PNG (Agent Vision)**:
+   - Эндпоинт `/export_image` на базе `ModelConvertionManager.exportDiagramAsImage` генерирует растровое изображение PNG открытой диаграммы.
+   - Мультимодальный AI-агент получает путь к файлу и с помощью инструмента `view_file` осматривает результат своими глазами, оценивая сетку, взаимное расположение блоков, читаемость и плотность связей.
+
+### Быстрая установка (в 1 клик):
+Дважды запустите файл **`install_plugin.bat`** в корне репозитория (или выполните команду в консоли):
+```powershell
+powershell -ExecutionPolicy Bypass -File plugin/build.ps1
+```
+Скрипт компилирует Java-исходники под целевую платформу Java 11 (стандартная среда Visual Paradigm 18.1), собирает `lib/mcp-plugin.jar`, копирует иконки интерфейса и устанавливает плагин в пользовательский каталог `%APPDATA%\VisualParadigm\plugins\com.mcp.visualparadigm\`.
+
+После выполнения команды запустите или перезапустите Visual Paradigm — плагин активируется автоматически.
+
+---
+
 ## Архитектура и движки сервера
 
 ```
@@ -359,13 +388,20 @@ mcp-visual-paradigm/
 │   ├── rules.py            # Архитектурный валидатор (циклы наследования, правила FK, интерфейсов)
 │   └── state.py            # Потокобезопасное хранилище Singleton (ProjectState)
 ├── mcp_tools/
-│   └── tools.py            # 24 MCP-инструмента с типизацией и валидацией
+│   └── tools.py            # 26 MCP-инструментов с типизацией и валидацией
 ├── exporters/
-│   └── xmi_builder.py      # Ядро Visual Layout Engine и генерации OMG XMI 2.1
+│   ├── layout_engine.py    # Двумерная сетка (2D Grid Layout) и иерархическое размещение
+│   └── xmi_builder.py      # Ядро генерации OMG XMI 2.1 и интеграции Visual Paradigm
+├── plugin/                 # Нативный Java-плагин для Visual Paradigm (Live Sync и Agent Vision)
+│   ├── src/                # Исходный код Java (MCPPlugin, MCPSyncServer, Controllers)
+│   ├── plugin.xml          # Манифест плагина Visual Paradigm
+│   ├── build.ps1           # Скрипт компиляции и развертывания
+│   └── README.md           # Документация REST API плагина
 ├── main.py                 # Точка входа stdio-сервера
 ├── requirements.txt        # Зависимости проекта
 ├── test_all_diagrams.py    # E2E тестирование экспорта всех 4 диаграмм
-└── test_erd_types.py       # Юнит-тестирование палитры типов данных ERD
+├── test_erd_types.py       # Юнит-тестирование палитры типов данных ERD
+└── test_plugin_server.py   # Тест протокола Live Sync
 ```
 
 1. **State Store (`core/state.py`)**: Потокобезопасный singleton-реестр, хранящий карты классификаторов, сущностей БД, акторов, состояний и связей.

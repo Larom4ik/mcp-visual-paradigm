@@ -10,3 +10,7 @@ venv/
 .vscode/
 *.vpp
 1/
+plugin/bin/
+plugin/dist/
+test_showcase.py
+test_plugin_server.py

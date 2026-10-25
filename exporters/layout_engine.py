@@ -143,54 +143,73 @@ class BoundingBoxCalculator:
 # ---------------------------------------------------------
 
 class HierarchicalClassLayout:
-    """Places classes in distinct vertical layers based on inheritance and containment hierarchy."""
+    """Places classes in distinct vertical layers based on inheritance and containment hierarchy,
+    with 2D multi-row grid wrapping for packages."""
 
-    def __init__(self, start_x: int = 60, start_y: int = 60, gap_x: int = 60, gap_y: int = 100):
+    def __init__(
+        self,
+        start_x: int = 60,
+        start_y: int = 60,
+        gap_x: int = 60,
+        gap_y: int = 100,
+        max_packages_per_row: int = 2,
+        max_row_width: int = 2400,
+    ):
         self.start_x = start_x
         self.start_y = start_y
         self.gap_x = gap_x
         self.gap_y = gap_y
+        self.max_packages_per_row = max_packages_per_row
+        self.max_row_width = max_row_width
 
-    def layout(self, state: ProjectState) -> dict[str, NodePlacement]:
-        placements: dict[str, NodePlacement] = {}
-        if not state.classes and not state.packages:
-            return placements
+    def _layout_package_subtree(
+        self, pkg_id: str, state: ProjectState
+    ) -> tuple[dict[str, NodePlacement], int, int]:
+        """Recursively computes local placements (relative to 0,0) and bounding dimensions (w, h) for a package."""
+        pkg = state.packages[pkg_id]
+        local_placements: dict[str, NodePlacement] = {}
 
-        # A. First layout classes inside packages
-        # To handle nested packages, process from leaf packages up to root packages
-        package_depth: dict[str, int] = {}
+        # 1. Layout direct classes inside this package
+        pkg_classes = [state.classes[cid] for cid in pkg.class_ids if cid in state.classes]
+        classes_max_x = 0
+        classes_max_y = 0
 
-        def get_depth(pid: str) -> int:
-            if pid not in package_depth:
-                pkg = state.packages.get(pid)
-                if not pkg or not pkg.parent_package_id:
-                    package_depth[pid] = 0
-                else:
-                    package_depth[pid] = 1 + get_depth(pkg.parent_package_id)
-            return package_depth[pid]
+        if pkg_classes:
+            cols = max(2, int(math.ceil(math.sqrt(len(pkg_classes))))) if len(pkg_classes) > 1 else 1
+            num_rows = int(math.ceil(len(pkg_classes) / cols))
+            dims = [BoundingBoxCalculator.calculate_class_dimension(c) for c in pkg_classes]
 
-        sorted_packages = sorted(state.packages.values(), key=lambda p: get_depth(p.id), reverse=True)
+            col_widths = [0] * cols
+            row_heights = [0] * num_rows
+            for i, (w, h) in enumerate(dims):
+                c = i % cols
+                r = i // cols
+                col_widths[c] = max(col_widths[c], w)
+                row_heights[r] = max(row_heights[r], h)
 
-        current_pkg_x = self.start_x
-        current_pkg_y = self.start_y
+            start_cls_x = BoundingBoxCalculator.PADDING_X
+            start_cls_y = BoundingBoxCalculator.HEADER_OFFSET + BoundingBoxCalculator.PADDING_Y
 
-        # Layout leaf packages first
-        for pkg in sorted_packages:
-            # Layout classes inside this package
-            pkg_classes = [state.classes[cid] for cid in pkg.class_ids if cid in state.classes]
-            cols = max(2, int(math.ceil(math.sqrt(len(pkg_classes))))) if pkg_classes else 2
+            col_offsets = [0] * cols
+            acc_x = start_cls_x
+            for c in range(cols):
+                col_offsets[c] = acc_x
+                acc_x += col_widths[c] + 40
 
-            local_x = current_pkg_x + BoundingBoxCalculator.PADDING_X
-            local_y = current_pkg_y + BoundingBoxCalculator.HEADER_OFFSET + BoundingBoxCalculator.PADDING_Y
+            row_offsets = [0] * num_rows
+            acc_y = start_cls_y
+            for r in range(num_rows):
+                row_offsets[r] = acc_y
+                acc_y += row_heights[r] + 30
 
             for i, cls_node in enumerate(pkg_classes):
                 col = i % cols
                 row = i // cols
-                w, h = BoundingBoxCalculator.calculate_class_dimension(cls_node)
-                pos_x = local_x + col * (w + 40)
-                pos_y = local_y + row * (h + 30)
+                w, h = dims[i]
+                pos_x = col_offsets[col]
+                pos_y = row_offsets[row]
 
-                placements[cls_node.id] = NodePlacement(
+                local_placements[cls_node.id] = NodePlacement(
                     node_id=cls_node.id,
                     shape_id=f"shape_{cls_node.id}",
                     x=pos_x,
@@ -199,25 +218,106 @@ class HierarchicalClassLayout:
                     height=h,
                     parent_shape_id=f"shape_{pkg.id}",
                 )
+                classes_max_x = max(classes_max_x, pos_x + w)
+                classes_max_y = max(classes_max_y, pos_y + h)
+        else:
+            classes_max_y = BoundingBoxCalculator.HEADER_OFFSET
 
-            # Compute bounding box of this package
-            px, py, pw, ph = BoundingBoxCalculator.calculate_package_bounding_box(pkg, state, placements)
-            parent_sid = f"shape_{pkg.parent_package_id}" if pkg.parent_package_id else None
-            placements[pkg.id] = NodePlacement(
-                node_id=pkg.id,
-                shape_id=f"shape_{pkg.id}",
-                x=px,
-                y=py,
-                width=pw,
-                height=ph,
-                parent_shape_id=parent_sid,
-            )
-            current_pkg_x += pw + self.gap_x
+        # 2. Layout nested child packages recursively
+        child_pkgs = [state.packages[pid] for pid in pkg.child_package_ids if pid in state.packages]
+        if child_pkgs:
+            sub_start_y = (classes_max_y + 40) if pkg_classes else (BoundingBoxCalculator.HEADER_OFFSET + BoundingBoxCalculator.PADDING_Y)
+            sub_col_x = BoundingBoxCalculator.PADDING_X
+            sub_row_y = sub_start_y
+            sub_row_max_h = 0
+            sub_cols = 2 if len(child_pkgs) >= 2 else 1
+            sub_col_idx = 0
+
+            for cpkg in child_pkgs:
+                c_placements, cw, ch = self._layout_package_subtree(cpkg.id, state)
+                if sub_col_idx >= sub_cols and sub_col_idx > 0:
+                    sub_col_x = BoundingBoxCalculator.PADDING_X
+                    sub_row_y += sub_row_max_h + 40
+                    sub_row_max_h = 0
+                    sub_col_idx = 0
+
+                # Shift child package placements by (sub_col_x, sub_row_y)
+                for nid, p in c_placements.items():
+                    p.x += sub_col_x
+                    p.y += sub_row_y
+                    local_placements[nid] = p
+
+                sub_row_max_h = max(sub_row_max_h, ch)
+                sub_col_x += cw + 40
+                sub_col_idx += 1
+
+        # 3. Calculate bounding box of this package
+        if local_placements:
+            min_x = min(p.x for p in local_placements.values())
+            min_y = min(p.y for p in local_placements.values())
+            max_x = max(p.x + p.width for p in local_placements.values())
+            max_y = max(p.y + p.height for p in local_placements.values())
+            pw = max(240, (max_x - min_x) + 2 * BoundingBoxCalculator.PADDING_X)
+            ph = max(140, (max_y - min_y) + BoundingBoxCalculator.HEADER_OFFSET + 2 * BoundingBoxCalculator.PADDING_Y)
+        else:
+            pw, ph = 240, 140
+
+        parent_sid = f"shape_{pkg.parent_package_id}" if pkg.parent_package_id else None
+        local_placements[pkg.id] = NodePlacement(
+            node_id=pkg.id,
+            shape_id=f"shape_{pkg.id}",
+            x=0,
+            y=0,
+            width=pw,
+            height=ph,
+            parent_shape_id=parent_sid,
+        )
+        return local_placements, pw, ph
+
+    def layout(self, state: ProjectState) -> dict[str, NodePlacement]:
+        placements: dict[str, NodePlacement] = {}
+        if not state.classes and not state.packages:
+            return placements
+
+        # A. Layout packages in 2D multi-row grid
+        root_packages = [
+            p for p in state.packages.values()
+            if not p.parent_package_id or p.parent_package_id not in state.packages
+        ]
+
+        canvas_x = self.start_x
+        canvas_y = self.start_y
+        row_max_h = 0
+        items_in_row = 0
+
+        for rpkg in root_packages:
+            r_placements, rw, rh = self._layout_package_subtree(rpkg.id, state)
+
+            # Check if we should wrap to the next row
+            if items_in_row > 0 and (items_in_row >= self.max_packages_per_row or (canvas_x + rw > self.max_row_width)):
+                canvas_x = self.start_x
+                canvas_y += row_max_h + self.gap_y
+                row_max_h = 0
+                items_in_row = 0
+
+            # Translate all subtree nodes from local (0, 0) to (canvas_x, canvas_y)
+            for nid, placement in r_placements.items():
+                placement.x += canvas_x
+                placement.y += canvas_y
+                placements[nid] = placement
+
+            row_max_h = max(row_max_h, rh)
+            canvas_x += rw + self.gap_x
+            items_in_row += 1
 
         # B. Layout top-level classes (not in any package) using Hierarchical DAG (Layered)
-        top_classes = [c for c in state.classes.values() if not c.package_id]
+        top_classes = [
+            c for c in state.classes.values()
+            if not c.package_id or c.package_id not in state.packages
+        ]
         if top_classes:
-            top_placements = self._layout_dag_classes(top_classes, state, base_y=current_pkg_y if not state.packages else (max(p.y + p.height for p in placements.values()) + self.gap_y))
+            base_y = (canvas_y + row_max_h + self.gap_y) if root_packages else self.start_y
+            top_placements = self._layout_dag_classes(top_classes, state, base_y=base_y)
             placements.update(top_placements)
 
         return placements
