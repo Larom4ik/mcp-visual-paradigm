@@ -21,7 +21,14 @@ public class StopServerActionController implements VPActionController {
 
         if (server.isRunning()) {
             server.stop();
+            if (action != null) {
+                action.setEnabled(false);
+            }
             try {
+                VPAction startAction = ApplicationManager.instance().getActionManager().getAction("com.mcp.visualparadigm.actions.StartServerAction");
+                if (startAction != null) {
+                    startAction.setEnabled(true);
+                }
                 ApplicationManager.instance().getActionManager().queryStatus();
             } catch (Throwable ignored) {
             }

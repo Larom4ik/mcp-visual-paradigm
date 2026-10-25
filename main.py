@@ -32,9 +32,11 @@ CRITICAL OPERATIONAL RULES:
    - When the user asks to add another diagram to the current project (e.g. "Теперь добавь диаграмму классов"), set `append=True` (the default).
    - This preserves all existing diagrams in the project, creating new tabs in Visual Paradigm side-by-side.
 
-6. AGENT VISION & VISUAL VALIDATION:
-   - After building diagrams, call `export_diagram_image(diagram_name)` to export a high-resolution PNG image.
+6. AGENT VISION & VISUAL REFINEMENT LOOP:
+   - After building or updating diagrams, ALWAYS call `export_diagram_image(diagram_name)` to export a high-resolution PNG image directly from Visual Paradigm.
    - Inspect the rendered diagram visually using `view_file` to verify layout aesthetics, connector routing, and completeness.
+   - Evaluate the diagram like a human lead architect: ensure no shapes collide, labels are fully visible without truncation, and association lines flow cleanly without forming an entangled web.
+   - If visual crowding is observed, adjust element ordering or tier groupings in `spec` and re-render for an impeccable result.
 """
 
 # Support both Anthropic MCP SDK v1 (FastMCP) and v2 (MCPServer)

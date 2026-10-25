@@ -25,6 +25,9 @@ public class MCPPlugin implements VPPlugin {
         // Auto-start Live Sync HTTP Server on background thread
         try {
             MCPSyncServer.getInstance().start(MCPSyncServer.DEFAULT_PORT);
+            if (ApplicationManager.instance() != null && ApplicationManager.instance().getActionManager() != null) {
+                ApplicationManager.instance().getActionManager().queryStatus();
+            }
         } catch (Exception e) {
             System.err.println("[MCP Plugin] Failed to start Live Sync server: " + e.getMessage());
             e.printStackTrace();

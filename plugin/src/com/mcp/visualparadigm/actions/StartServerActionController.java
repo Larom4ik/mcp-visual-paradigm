@@ -31,7 +31,14 @@ public class StartServerActionController implements VPActionController {
         } else {
             try {
                 server.start(MCPSyncServer.DEFAULT_PORT);
+                if (action != null) {
+                    action.setEnabled(false);
+                }
                 try {
+                    VPAction stopAction = ApplicationManager.instance().getActionManager().getAction("com.mcp.visualparadigm.actions.StopServerAction");
+                    if (stopAction != null) {
+                        stopAction.setEnabled(true);
+                    }
                     ApplicationManager.instance().getActionManager().queryStatus();
                 } catch (Throwable ignored) {
                 }

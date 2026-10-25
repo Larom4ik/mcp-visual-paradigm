@@ -1495,9 +1495,13 @@ class XMIBuilder:
             c_bounds_w = "0"
             c_bounds_h = "0"
             caption_vis = "false"
+        elif effective_shape_type == "DBForeignKey" or creator_diag_type == "ERDiagram":
+            c_bounds_w = "20"
+            c_bounds_h = "0"
         else:
-            c_bounds_w = "20" if effective_shape_type == "DBForeignKey" else "60"
-            c_bounds_h = "0" if effective_shape_type == "DBForeignKey" else "16"
+            lbl_len = len(rel_name or "")
+            c_bounds_w = str(max(80, lbl_len * 9 + 24))
+            c_bounds_h = "18"
         ET.SubElement(conn_vp, "captionBounds", {"value": f"{mid_x},{mid_y},{c_bounds_w},{c_bounds_h}"})
         ET.SubElement(conn_vp, "captionInternalWidth", {"value": "-2147483648"})
         ET.SubElement(conn_vp, "captionInternalHeight", {"value": "-2147483648"})
@@ -1515,9 +1519,10 @@ class XMIBuilder:
         ET.SubElement(c_props, "acreatorDiagramType", {"value": creator_diag_type})
         ET.SubElement(c_props, "aselectable", {"value": "true"})
         ET.SubElement(c_props, "aconnectorStyle", {"value": "3"})
-        ET.SubElement(c_props, "aconnectorLineJumps", {"value": "4"})
-        ET.SubElement(c_props, "aconnectorLabelOrientation", {"value": "4"})
+        ET.SubElement(c_props, "aconnectorLineJumps", {"value": "1"})
+        ET.SubElement(c_props, "aconnectorLabelOrientation", {"value": "0"})
         ET.SubElement(c_props, "ashowConnectorName", {"value": show_name_val})
+        ET.SubElement(c_props, "apaintThroughLabel", {"value": "2"})
 
         # CRITICAL: Always suppress auto-generated role names (+customer, +order) to eliminate clutter
         ET.SubElement(c_props, "ashowFromRoleName", {"value": "false"})

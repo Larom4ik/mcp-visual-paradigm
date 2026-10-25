@@ -431,12 +431,42 @@ class UseCaseTierLayout:
 
         # 2. Distinguish Core Use Cases from Sub-UseCases (Include/Extend targets)
         sub_uc_ids: set[str] = set()
+        sub_to_core_map: dict[str, list[str]] = {}
         for rel in state.uc_relations:
             if rel.type in ("Include", "Extend"):
                 sub_uc_ids.add(rel.target_id)
+                sub_to_core_map.setdefault(rel.target_id, []).append(rel.source_id)
 
-        core_cases = [uc for uc in state.use_cases.values() if uc.id not in sub_uc_ids]
-        sub_cases = [uc for uc in state.use_cases.values() if uc.id in sub_uc_ids]
+        # Map each core use case to the primary actors that connect to it
+        uc_to_actor_ranks: dict[str, list[int]] = {}
+        primary_actor_ids = {act.id: idx for idx, act in enumerate(primary_actors)}
+        for rel in state.uc_relations:
+            if rel.source_id in primary_actor_ids and rel.target_id in state.use_cases:
+                uc_to_actor_ranks.setdefault(rel.target_id, []).append(primary_actor_ids[rel.source_id])
+            elif rel.target_id in primary_actor_ids and rel.source_id in state.use_cases:
+                uc_to_actor_ranks.setdefault(rel.source_id, []).append(primary_actor_ids[rel.target_id])
+
+        # Core cases: sort primarily by connected actor vertical rank to ensure parallel horizontal connections
+        uc_keys_list = list(state.use_cases.keys())
+
+        def _core_sort_key(uc: UseCaseNode) -> tuple[float, int]:
+            ranks = uc_to_actor_ranks.get(uc.id, [])
+            avg_rank = (sum(ranks) / len(ranks)) if ranks else 999.0
+            return (avg_rank, uc_keys_list.index(uc.id) if uc.id in uc_keys_list else 0)
+
+        raw_core_cases = [uc for uc in state.use_cases.values() if uc.id not in sub_uc_ids]
+        core_cases = sorted(raw_core_cases, key=_core_sort_key)
+        core_id_to_order = {uc.id: idx for idx, uc in enumerate(core_cases)}
+
+        # Sub cases: sort by parent core case vertical order so include/extend arrows flow horizontally
+        def _sub_sort_key(uc: UseCaseNode) -> tuple[float, int]:
+            parents = sub_to_core_map.get(uc.id, [])
+            parent_ranks = [core_id_to_order[p] for p in parents if p in core_id_to_order]
+            avg_parent_rank = (sum(parent_ranks) / len(parent_ranks)) if parent_ranks else 999.0
+            return (avg_parent_rank, uc_keys_list.index(uc.id) if uc.id in uc_keys_list else 0)
+
+        raw_sub_cases = [uc for uc in state.use_cases.values() if uc.id in sub_uc_ids]
+        sub_cases = sorted(raw_sub_cases, key=_sub_sort_key)
 
         # Place Column 2: Core Business Use Cases
         y_col2 = self.start_y
