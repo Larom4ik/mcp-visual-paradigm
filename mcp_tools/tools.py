@@ -30,9 +30,14 @@ from core.models import (
     UseCaseNode,
     VisibilityType,
 )
-from core.state import state
-from exporters.xmi_builder import XMIBuilder
-from core.doc_reader import RequirementsDocReader
+try:
+    from core.state import state
+    from exporters.xmi_builder import XMIBuilder
+    from core.doc_reader import RequirementsDocReader
+except ImportError:
+    from ..core.state import state
+    from ..exporters.xmi_builder import XMIBuilder
+    from ..core.doc_reader import RequirementsDocReader
 
 
 

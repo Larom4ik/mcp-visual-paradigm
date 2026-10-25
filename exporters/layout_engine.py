@@ -10,17 +10,30 @@ Features:
 
 import math
 from typing import Optional
-from core.models import (
-    ActorNode,
-    BaseNode,
-    ClassNode,
-    EntityNode,
-    PackageNode,
-    RelationModel,
-    StateNode,
-    UseCaseNode,
-)
-from core.state import ProjectState
+try:
+    from core.models import (
+        ActorNode,
+        BaseNode,
+        ClassNode,
+        EntityNode,
+        PackageNode,
+        RelationModel,
+        StateNode,
+        UseCaseNode,
+    )
+    from core.state import ProjectState
+except ImportError:
+    from ..core.models import (
+        ActorNode,
+        BaseNode,
+        ClassNode,
+        EntityNode,
+        PackageNode,
+        RelationModel,
+        StateNode,
+        UseCaseNode,
+    )
+    from ..core.state import ProjectState
 
 
 class NodePlacement:
@@ -541,7 +554,7 @@ class UseCaseTierLayout:
 # ---------------------------------------------------------
 
 class ERDClusterLayout:
-    """Arranges Database Entities by dependency order in a balanced 2D grid: root tables on top/left, child tables below."""
+    """Arranges Database Entities by dependency order into a globally balanced 2D grid: root tables on top, child tables below."""
 
     def __init__(
         self,
@@ -549,7 +562,7 @@ class ERDClusterLayout:
         start_y: int = 60,
         gap_x: int = 90,
         gap_y: int = 110,
-        max_cols: int = 4,
+        max_cols: Optional[int] = None,
     ):
         self.start_x = start_x
         self.start_y = start_y
@@ -562,7 +575,7 @@ class ERDClusterLayout:
         if not state.entities:
             return placements
 
-        # Topological sorting: entities without FKs first (Layer 0), entities with FKs next
+        # 1. Topological partitioning by dependency depth
         layer0: list[EntityNode] = []
         layer1: list[EntityNode] = []
         layer_junction: list[EntityNode] = []
@@ -576,17 +589,55 @@ class ERDClusterLayout:
             else:
                 layer0.append(ent)          # Independent parent table
 
-        layers = [layer0, layer1, layer_junction]
+        ordered_entities = layer0 + layer1 + layer_junction
+        total_n = len(ordered_entities)
+
+        # 2. Determine optimal column count based on total entity count
+        if total_n <= 3:
+            cols = total_n
+        elif total_n == 4:
+            cols = 2
+        elif total_n in (5, 6):
+            cols = 3
+        elif total_n in (7, 8):
+            cols = 4
+        elif total_n == 9:
+            cols = 3
+        elif total_n in (10, 11, 12):
+            cols = 4
+        elif total_n in (13, 14, 15):
+            cols = 5 if total_n == 15 else 4
+        elif total_n == 16:
+            cols = 4
+        else:
+            cols = max(3, min(6, int(math.ceil(math.sqrt(total_n * 1.25)))))
+
+        if self.max_cols and cols > self.max_cols:
+            cols = self.max_cols
+
+        # 3. Calculate balanced row capacities so rows differ by at most 1 item
+        num_rows = max(1, int(math.ceil(total_n / cols)))
+        base_per_row = total_n // num_rows
+        remainder = total_n % num_rows
+        row_sizes = [base_per_row + (1 if r < remainder else 0) for r in range(num_rows)]
+
+        row_entities: list[list[EntityNode]] = []
+        idx = 0
+        for sz in row_sizes:
+            row_entities.append(ordered_entities[idx : idx + sz])
+            idx += sz
+
+        # 4. Place each row on the canvas, aligning dependent tables under parents
         curr_y = self.start_y
         entity_centers: dict[str, float] = {}
 
-        for lyr_idx, lyr in enumerate(layers):
-            if not lyr:
+        for r_idx, row in enumerate(row_entities):
+            if not row:
                 continue
 
-            # If layer has dependent entities, sort them so they are close to their parent entities' X positions
-            if lyr_idx > 0 and entity_centers:
-                def _layer_sort_key(ent: EntityNode) -> float:
+            # In rows 1+, sort entities so they sit close to their referenced parent tables
+            if r_idx > 0 and entity_centers:
+                def _affinity_key(ent: EntityNode) -> float:
                     parent_xs: list[float] = []
                     for rel in state.er_relations:
                         if rel.source_id == ent.id and rel.target_id in entity_centers:
@@ -603,39 +654,26 @@ class ERDClusterLayout:
                                         parent_xs.append(p_x)
                     return (sum(parent_xs) / len(parent_xs)) if parent_xs else 9999.0
 
-                lyr = sorted(lyr, key=_layer_sort_key)
+                row = sorted(row, key=_affinity_key)
 
-            # Determine balanced columns per row (max 3 or 4) to prevent horizontal stretching
-            n = len(lyr)
-            if n <= 3:
-                cols_per_row = n
-            elif n == 4:
-                cols_per_row = 2
-            elif n <= 6:
-                cols_per_row = 3
-            else:
-                cols_per_row = min(self.max_cols, 4)
+            curr_x = self.start_x
+            row_max_h = 80
+            for ent in row:
+                w, h = BoundingBoxCalculator.calculate_entity_dimension(ent)
+                row_max_h = max(row_max_h, h)
+                placement = NodePlacement(
+                    node_id=ent.id,
+                    shape_id=f"shape_{ent.id}",
+                    x=curr_x,
+                    y=curr_y,
+                    width=w,
+                    height=h,
+                )
+                placements[ent.id] = placement
+                entity_centers[ent.id] = curr_x + w / 2.0
+                curr_x += w + self.gap_x
 
-            # Arrange this layer in rows
-            row_chunks = [lyr[i:i + cols_per_row] for i in range(0, n, cols_per_row)]
-            for chunk in row_chunks:
-                curr_x = self.start_x
-                row_max_h = 80
-                for ent in chunk:
-                    w, h = BoundingBoxCalculator.calculate_entity_dimension(ent)
-                    row_max_h = max(row_max_h, h)
-                    placement = NodePlacement(
-                        node_id=ent.id,
-                        shape_id=f"shape_{ent.id}",
-                        x=curr_x,
-                        y=curr_y,
-                        width=w,
-                        height=h,
-                    )
-                    placements[ent.id] = placement
-                    entity_centers[ent.id] = curr_x + w / 2.0
-                    curr_x += w + self.gap_x
-                curr_y += row_max_h + self.gap_y
+            curr_y += row_max_h + self.gap_y
 
         return placements
 

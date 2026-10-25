@@ -32,8 +32,8 @@ CRITICAL OPERATIONAL RULES:
    - When the user asks to add another diagram to the current project (e.g. "Теперь добавь диаграмму классов"), set `append=True` (the default).
    - This preserves all existing diagrams in the project, creating new tabs in Visual Paradigm side-by-side.
 
-6. ERD MODELING RULES & DOMAIN SCOPING (STRICT):
-   - Entity Scoping (5 to 7 core tables): Model 5 to 7 core business entities / domain aggregates. Do NOT overcomplicate with 10-15 auxiliary tables (avoid gratuitous session, log, role-dictionary, or audit tables unless explicitly required).
+6. ERD MODELING RULES:
+   - Entity Modeling: Model entities based directly on user requirements and architectural discussion. Do not artificially limit or inflate entity count; model all domain entities needed by the system without adding gratuitous dummy tables.
    - Exactly ONE Primary Key per Table: Every entity must have strictly ONE Primary Key column (`is_pk=True`). NEVER create multiple primary keys (e.g. `id1`, `id2`).
    - No Redundant UNIQUE on Primary Key: NEVER mark a Primary Key column with `is_unique=True`. Primary keys are unique by definition; marking them unique causes ugly duplicate `[PK, U1]` markers in Visual Paradigm.
    - Foreign Keys (FK) Recognition & Linking:

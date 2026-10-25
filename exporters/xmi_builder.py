@@ -18,27 +18,50 @@ import re
 import uuid
 import xml.etree.ElementTree as ET
 from typing import Optional
-from core.models import (
-    BaseNode,
-    ClassNode,
-    EntityNode,
-    MethodModel,
-    NoteNode,
-    PackageNode,
-    RelationModel,
-    SystemBoundaryNode,
-    UseCaseNode,
-)
-from core.state import ProjectState
-from exporters.layout_engine import (
-    BoundingBoxCalculator,
-    ERDClusterLayout,
-    HierarchicalClassLayout,
-    NodePlacement,
-    StateMachineFlowLayout,
-    UseCaseTierLayout,
-    WaypointRoutingEngine,
-)
+try:
+    from core.models import (
+        BaseNode,
+        ClassNode,
+        EntityNode,
+        MethodModel,
+        NoteNode,
+        PackageNode,
+        RelationModel,
+        SystemBoundaryNode,
+        UseCaseNode,
+    )
+    from core.state import ProjectState
+    from exporters.layout_engine import (
+        BoundingBoxCalculator,
+        ERDClusterLayout,
+        HierarchicalClassLayout,
+        NodePlacement,
+        StateMachineFlowLayout,
+        UseCaseTierLayout,
+        WaypointRoutingEngine,
+    )
+except ImportError:
+    from ..core.models import (
+        BaseNode,
+        ClassNode,
+        EntityNode,
+        MethodModel,
+        NoteNode,
+        PackageNode,
+        RelationModel,
+        SystemBoundaryNode,
+        UseCaseNode,
+    )
+    from ..core.state import ProjectState
+    from .layout_engine import (
+        BoundingBoxCalculator,
+        ERDClusterLayout,
+        HierarchicalClassLayout,
+        NodePlacement,
+        StateMachineFlowLayout,
+        UseCaseTierLayout,
+        WaypointRoutingEngine,
+    )
 
 XMI_NS = "http://schema.omg.org/spec/XMI/2.1"
 UML_NS = "http://schema.omg.org/spec/UML/2.0"

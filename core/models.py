@@ -224,7 +224,10 @@ class RelationModel(BaseNode):
 
         # 2. Context-aware validation via ProjectState if available
         try:
-            from core.state import state
+            try:
+                from core.state import state
+            except ImportError:
+                from .state import state
 
             # Rule: Include / Extend only allowed between UseCaseNode
             if self.type in ("Include", "Extend"):
