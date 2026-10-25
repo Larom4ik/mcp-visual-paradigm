@@ -21,6 +21,10 @@ public class StopServerActionController implements VPActionController {
 
         if (server.isRunning()) {
             server.stop();
+            try {
+                ApplicationManager.instance().getActionManager().queryStatus();
+            } catch (Throwable ignored) {
+            }
             if (viewManager != null) {
                 viewManager.showMessage("MCP: Live Sync DISCONNECTED. Server stopped.");
                 viewManager.showMessageDialog(
@@ -45,7 +49,7 @@ public class StopServerActionController implements VPActionController {
     @Override
     public void update(VPAction action) {
         if (action != null) {
-            action.setEnabled(true);
+            action.setEnabled(MCPSyncServer.getInstance().isRunning());
             action.setLabel("Disconnect");
             action.setTooltip("Stop MCP Live Sync background server");
         }

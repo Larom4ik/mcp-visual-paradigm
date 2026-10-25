@@ -391,25 +391,40 @@ class HierarchicalClassLayout:
 # ---------------------------------------------------------
 
 class UseCaseTierLayout:
-    """Arranges Use Case diagrams in 3 clear functional columns from left to right."""
+    """Arranges Use Case diagrams in 3 clear functional columns from left to right with dynamic spacing."""
 
-    def __init__(self, col1_x: int = 60, col2_x: int = 360, col3_x: int = 680, start_y: int = 60, gap_y: int = 130):
+    def __init__(self, col1_x: int = 80, col2_x: int = 340, col3_x: int = 760, start_y: int = 60, gap_y: int = 50):
         self.col1_x = col1_x
         self.col2_x = col2_x
         self.col3_x = col3_x
         self.start_y = start_y
         self.gap_y = gap_y
 
+    @staticmethod
+    def calculate_uc_dimension(name: str) -> tuple[int, int]:
+        """Calculate optimal width and height for a Use Case oval so multi-line text fits neatly."""
+        clean_len = len(name)
+        # Cap width between 230 and 290 px so ovals don't become massive flattened bars
+        w = max(230, min(290, 8 * clean_len + 30))
+        # Visual Paradigm wraps text: multi-line needs proportional height
+        if clean_len > 55:
+            h = 90
+        elif clean_len > 32:
+            h = 80
+        else:
+            h = 65
+        return w, h
+
     def layout(self, state: ProjectState) -> dict[str, NodePlacement]:
         placements: dict[str, NodePlacement] = {}
 
-        # 1. Primary Actors (associated with UseCases) -> Column 1
-        # Secondary Actors or sub-cases -> Column 3
+        # 1. Actors: Distinguish secondary/external actors from primary business actors
         primary_actors: list[ActorNode] = []
         secondary_actors: list[ActorNode] = []
 
         for act in state.actors.values():
-            if "admin" in act.name.lower() or "service" in act.name.lower() or "system" in act.name.lower():
+            n = act.name.lower()
+            if any(k in n for k in ("service", "сервис", "external", "внешн")):
                 secondary_actors.append(act)
             else:
                 primary_actors.append(act)
@@ -423,57 +438,70 @@ class UseCaseTierLayout:
         core_cases = [uc for uc in state.use_cases.values() if uc.id not in sub_uc_ids]
         sub_cases = [uc for uc in state.use_cases.values() if uc.id in sub_uc_ids]
 
-        # Place Column 1: Primary Actors
-        y_col1 = self.start_y
-        for act in primary_actors:
-            placements[act.id] = NodePlacement(
-                node_id=act.id,
-                shape_id=f"shape_{act.id}",
-                x=self.col1_x,
-                y=y_col1,
-                width=80,
-                height=80,
-            )
-            y_col1 += 80 + self.gap_y
-
         # Place Column 2: Core Business Use Cases
         y_col2 = self.start_y
+        max_col2_w = 0
         for uc in core_cases:
-            w = max(170, 10 * len(uc.name) + 30)
+            w, h = self.calculate_uc_dimension(uc.name)
+            max_col2_w = max(max_col2_w, w)
             placements[uc.id] = NodePlacement(
                 node_id=uc.id,
                 shape_id=f"shape_{uc.id}",
                 x=self.col2_x,
                 y=y_col2,
                 width=w,
-                height=70,
+                height=h,
             )
-            y_col2 += 70 + 70
+            y_col2 += h + self.gap_y
 
-        # Place Column 3: Included/Extended Use Cases and Secondary Actors
+        total_col2_h = max(200, y_col2 - self.start_y)
+
+        # Place Column 3: Included/Extended Sub-UseCases (placed with dynamic gap after Col 2)
+        effective_col3_x = max(self.col3_x, self.col2_x + max_col2_w + 140)
         y_col3 = self.start_y
         for uc in sub_cases:
-            w = max(170, 10 * len(uc.name) + 30)
+            w, h = self.calculate_uc_dimension(uc.name)
             placements[uc.id] = NodePlacement(
                 node_id=uc.id,
                 shape_id=f"shape_{uc.id}",
-                x=self.col3_x,
+                x=effective_col3_x,
                 y=y_col3,
                 width=w,
-                height=70,
+                height=h,
             )
-            y_col3 += 70 + 70
+            y_col3 += h + self.gap_y
 
         for act in secondary_actors:
             placements[act.id] = NodePlacement(
                 node_id=act.id,
                 shape_id=f"shape_{act.id}",
-                x=self.col3_x + 50,
+                x=effective_col3_x + 50,
                 y=y_col3,
                 width=80,
                 height=80,
             )
             y_col3 += 80 + self.gap_y
+
+        # Place Column 1: Primary Actors
+        # Distribute primary actors vertically to balance across the height of Core Use Cases
+        num_actors = len(primary_actors)
+        if num_actors == 1:
+            actor_y_positions = [self.start_y + max(0, (total_col2_h - 80) // 2)]
+        elif num_actors > 1:
+            step = max(110, (total_col2_h - 80) // (num_actors - 1))
+            actor_y_positions = [self.start_y + i * step for i in range(num_actors)]
+        else:
+            actor_y_positions = []
+
+        for i, act in enumerate(primary_actors):
+            placements[act.id] = NodePlacement(
+                node_id=act.id,
+                shape_id=f"shape_{act.id}",
+                x=self.col1_x,
+                y=actor_y_positions[i],
+                width=80,
+                height=80,
+            )
 
         return placements
 

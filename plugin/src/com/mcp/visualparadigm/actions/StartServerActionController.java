@@ -31,6 +31,10 @@ public class StartServerActionController implements VPActionController {
         } else {
             try {
                 server.start(MCPSyncServer.DEFAULT_PORT);
+                try {
+                    ApplicationManager.instance().getActionManager().queryStatus();
+                } catch (Throwable ignored) {
+                }
                 if (viewManager != null) {
                     viewManager.showMessage("MCP: Live Sync CONNECTED on http://127.0.0.1:" + server.getPort());
                     viewManager.showMessageDialog(
@@ -56,7 +60,7 @@ public class StartServerActionController implements VPActionController {
     @Override
     public void update(VPAction action) {
         if (action != null) {
-            action.setEnabled(true);
+            action.setEnabled(!MCPSyncServer.getInstance().isRunning());
             action.setLabel("Connect");
             action.setTooltip("Start MCP Live Sync server (127.0.0.1:19842) for instant AI diagram rendering");
         }

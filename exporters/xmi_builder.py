@@ -1023,13 +1023,15 @@ class XMIBuilder:
             end_src_id = f"{rel.id}_end_src"
             end_tgt_id = f"{rel.id}_end_tgt"
 
+            # In UML Use Case diagrams, associations connecting Actors with Use Cases are clean lines without default title or role text
+            clean_assoc_name = rel.name if (rel.name and not rel.name.endswith("_Association")) else ""
             assoc_elem = ET.SubElement(
                 self.model,
                 "ownedMember",
                 {
                     f"{{{XMI_NS}}}type": "uml:Association",
                     f"{{{XMI_NS}}}id": rel.id,
-                    "name": rel.name or f"{src.name}_{tgt.name}_Association",
+                    "name": clean_assoc_name,
                     "visibility": "public",
                     "isAbstract": "false",
                     "isDerived": "false",
@@ -1043,7 +1045,7 @@ class XMIBuilder:
                 {
                     f"{{{XMI_NS}}}type": "uml:Property",
                     f"{{{XMI_NS}}}id": end_src_id,
-                    "name": src.name.lower(),
+                    "name": "",
                     "visibility": "public",
                     "type": src.id,
                     "association": rel.id,
@@ -1067,7 +1069,7 @@ class XMIBuilder:
                 {
                     f"{{{XMI_NS}}}type": "uml:Property",
                     f"{{{XMI_NS}}}id": end_tgt_id,
-                    "name": tgt.name.lower(),
+                    "name": "",
                     "visibility": "public",
                     "type": tgt.id,
                     "association": rel.id,
@@ -1298,14 +1300,14 @@ class XMIBuilder:
             align = "4"
         elif shape_type == "System":
             effective_caption_side = 12
-            caption_bounds = f"0,0,{p.width},25"
+            caption_bounds = f"15,10,{max(20, p.width - 30)},28"
             align = "1"
             az_order = "1"
-            bg_color = "Cr:255,255,255,255"
-            fill_color = "Cr:255,255,255,255"
-            fill_trans = "80"
-            line_color = "Cr:120,120,120,255"
-            line_weight = "1.5"
+            bg_color = "Cr:240,247,255,255"
+            fill_color = "Cr:240,247,255,255"
+            fill_trans = "0"
+            line_color = "Cr:70,130,220,255"
+            line_weight = "2.0"
         elif shape_type == "NOTE":
             effective_caption_side = 12
             caption_bounds = f"0,0,{p.width},{p.height}"
@@ -1387,6 +1389,9 @@ class XMIBuilder:
 
         if shape_type == "Package":
             ET.SubElement(props, "ashowPackageNameStyle", {"value": "2"})
+        elif shape_type == "System":
+            ET.SubElement(props, "captionAlignment", {"value": "0"})
+            ET.SubElement(props, "ashowCaption", {"value": "true"})
         elif shape_type == "Actor":
             ET.SubElement(props, "arequestResetCaption", {"value": "true"})
         elif shape_type == "State2":
@@ -1410,7 +1415,10 @@ class XMIBuilder:
             ET.SubElement(shape_vp, "parentDiagramElement", {"idref": p.parent_shape_id})
 
         ET.SubElement(omg_elem, "elementFill", {"color1": fill_color, "color2": "", "style": "1", "transparency": fill_trans, "type": "1"})
-        ET.SubElement(omg_elem, "elementFont", {"bold": "false", "color": "Cr:0,0,0,255", "italic": "false", "name": "Dialog", "size": "11", "style": "0"})
+        font_bold = "true" if shape_type == "System" else "false"
+        font_size = "12" if shape_type == "System" else "11"
+        font_style = "1" if shape_type == "System" else "0"
+        ET.SubElement(omg_elem, "elementFont", {"bold": font_bold, "color": "Cr:0,0,0,255", "italic": "false", "name": "Dialog", "size": font_size, "style": font_style})
         ET.SubElement(omg_elem, "elementLine", {"color": line_color, "style": "1", "transparency": "0", "weight": line_weight})
         ET.SubElement(omg_elem, "CompartmentFont", {"value": "none"})
 
@@ -1447,7 +1455,11 @@ class XMIBuilder:
             for suffix in ("_Association", "_Composition", "_Aggregation", "_Generalization", "_Realization", "_Dependency")
         ) or rel_name in ("Association", "Composition", "Aggregation", "Generalization", "Realization", "Dependency", "")
 
-        if rel_type in ("Include", "Extend") or is_uc_stereotype:
+        if creator_diag_type == "UseCaseDiagram" and not is_uc_stereotype and rel_type not in ("Include", "Extend"):
+            # UML 2.5: Actor-to-UseCase associations are clean lines without default title or role text
+            show_name_val = "0"
+            caption_vis = "false"
+        elif rel_type in ("Include", "Extend") or is_uc_stereotype:
             show_name_val = "2"
             caption_vis = "true"
         elif effective_shape_type == "DBForeignKey" or creator_diag_type == "ERDiagram":
@@ -1479,8 +1491,13 @@ class XMIBuilder:
             },
         )
         conn_vp = ET.SubElement(omg_conn, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
-        c_bounds_w = "20" if effective_shape_type == "DBForeignKey" else "60"
-        c_bounds_h = "0" if effective_shape_type == "DBForeignKey" else "16"
+        if creator_diag_type == "UseCaseDiagram" and not is_uc_stereotype and rel_type not in ("Include", "Extend"):
+            c_bounds_w = "0"
+            c_bounds_h = "0"
+            caption_vis = "false"
+        else:
+            c_bounds_w = "20" if effective_shape_type == "DBForeignKey" else "60"
+            c_bounds_h = "0" if effective_shape_type == "DBForeignKey" else "16"
         ET.SubElement(conn_vp, "captionBounds", {"value": f"{mid_x},{mid_y},{c_bounds_w},{c_bounds_h}"})
         ET.SubElement(conn_vp, "captionInternalWidth", {"value": "-2147483648"})
         ET.SubElement(conn_vp, "captionInternalHeight", {"value": "-2147483648"})
@@ -1741,7 +1758,7 @@ class XMIBuilder:
 
         # Diagram 3: Use Case Diagram with 3-Tier Columnar Layout and System Boundary
         if self.state.actors or self.state.use_cases:
-            uc_layout = UseCaseTierLayout(col1_x=60, col2_x=360, col3_x=680, start_y=60, gap_y=130)
+            uc_layout = UseCaseTierLayout(col1_x=80, col2_x=340, start_y=60)
             uc_placements = uc_layout.layout(self.state)
             uc_title = getattr(self.state, "diagram_names", {}).get("UseCaseDiagram", "Use Case Diagram")
             _, omg_elements = self._create_diagram("omg_diag_uc_1", uc_title, "UseCaseDiagram")
@@ -1753,8 +1770,8 @@ class XMIBuilder:
                 if not target_ucs:
                     target_ucs = [p for p in uc_placements.values() if p.node_id in self.state.use_cases]
                 if target_ucs:
-                    pad_x = 35
-                    pad_y = 45
+                    pad_x = 45
+                    pad_y = 55
                     sb_min_x = min(p.x for p in target_ucs) - pad_x
                     sb_min_y = min(p.y for p in target_ucs) - pad_y
                     sb_max_x = max(p.x + p.width for p in target_ucs) + pad_x
@@ -1801,7 +1818,7 @@ class XMIBuilder:
                 if rel.source_id in uc_placements and rel.target_id in uc_placements:
                     src_p = uc_placements[rel.source_id]
                     tgt_p = uc_placements[rel.target_id]
-                    rel_lbl = "«Include»" if rel.type == "Include" else ("«Extend»" if rel.type == "Extend" else (rel.name or ""))
+                    rel_lbl = "«Include»" if rel.type == "Include" else ("«Extend»" if rel.type == "Extend" else "")
                     self._add_connector_element(
                         omg_elements,
                         rel_id=rel.id,
