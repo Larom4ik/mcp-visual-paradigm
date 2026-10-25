@@ -132,7 +132,7 @@ class ColumnModel(BaseNode):
     def validate_pk_not_nullable(self) -> "ColumnModel":
         if self.is_pk:
             self.is_nullable = False
-            self.is_unique = True
+            self.is_unique = False  # Primary Key is inherently unique; suppress redundant unique index
         return self
 
 

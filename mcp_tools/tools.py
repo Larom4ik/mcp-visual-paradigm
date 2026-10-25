@@ -821,14 +821,33 @@ def add_er_column(
         if not col_name:
             return "ERROR: Column name cannot be empty."
 
+        eff_is_pk = bool(is_pk)
+        eff_is_fk = bool(is_fk)
+
+        # Rule 1: Enforce exactly one Primary Key per entity. Prevent duplicate PKs (e.g. ID1 + ID2)
+        existing_pks = [c for c in ent.columns if c.is_pk]
+        if eff_is_pk and existing_pks:
+            return (
+                f"ERROR: ERD Rule Violation: Entity '{ent.name}' already has a Primary Key ('{existing_pks[0].name}'). "
+                f"An entity can only have ONE Primary Key column. Cannot add '{col_name}' as a second PK."
+            )
+
+        # Rule 2: Auto-detect Foreign Key by convention if column ends with '_id' or 'id' (and is not PK)
+        if not eff_is_pk and (col_name.lower().endswith("_id") or (col_name.lower().endswith("id") and len(col_name) > 2)) and not eff_is_fk:
+            eff_is_fk = True
+
+        # Rule 3: Suppress redundant UNIQUE constraint on PK (PK is inherently unique by standard)
+        eff_is_unique = False if eff_is_pk else bool(is_unique)
+        eff_is_nullable = False if eff_is_pk else bool(is_nullable)
+
         col = ColumnModel(
             name=col_name,
             type=type.strip(),
             length=length,
-            is_nullable=bool(is_nullable),
-            is_primary_key=bool(is_pk),
-            is_foreign_key=bool(is_fk),
-            is_unique=bool(is_unique),
+            is_nullable=eff_is_nullable,
+            is_primary_key=eff_is_pk,
+            is_foreign_key=eff_is_fk,
+            is_unique=eff_is_unique,
             description=description,
         )
         ent.columns.append(col)
@@ -1478,14 +1497,20 @@ def _build_erd_from_spec(spec: dict, log: list[str]) -> None:
         add_er_entity(name=e["name"], description=e.get("description", ""))
         for col in e.get("columns", []):
             if isinstance(col, dict) and "name" in col:
+                cname = col["name"].strip()
+                col_is_pk = bool(col.get("is_pk", False))
+                col_is_fk = bool(col.get("is_fk", False))
+                if not col_is_pk and (cname.lower().endswith("_id") or (cname.lower().endswith("id") and len(cname) > 2)) and not col_is_fk:
+                    col_is_fk = True
+
                 add_er_column(
                     entity_name=e["name"],
-                    name=col["name"],
+                    name=cname,
                     type=col.get("type", "VARCHAR"),
                     length=col.get("length"),
                     is_nullable=bool(col.get("is_nullable", True)),
-                    is_pk=bool(col.get("is_pk", False)),
-                    is_fk=bool(col.get("is_fk", False)),
+                    is_pk=col_is_pk,
+                    is_fk=col_is_fk,
                     is_unique=bool(col.get("is_unique", False)),
                     description=col.get("description", ""),
                 )

@@ -32,7 +32,15 @@ CRITICAL OPERATIONAL RULES:
    - When the user asks to add another diagram to the current project (e.g. "Теперь добавь диаграмму классов"), set `append=True` (the default).
    - This preserves all existing diagrams in the project, creating new tabs in Visual Paradigm side-by-side.
 
-6. AGENT VISION & VISUAL REFINEMENT LOOP:
+6. ERD MODELING RULES & DOMAIN SCOPING (STRICT):
+   - Entity Scoping (5 to 7 core tables): Model 5 to 7 core business entities / domain aggregates. Do NOT overcomplicate with 10-15 auxiliary tables (avoid gratuitous session, log, role-dictionary, or audit tables unless explicitly required).
+   - Exactly ONE Primary Key per Table: Every entity must have strictly ONE Primary Key column (`is_pk=True`). NEVER create multiple primary keys (e.g. `id1`, `id2`).
+   - No Redundant UNIQUE on Primary Key: NEVER mark a Primary Key column with `is_unique=True`. Primary keys are unique by definition; marking them unique causes ugly duplicate `[PK, U1]` markers in Visual Paradigm.
+   - Foreign Keys (FK) Recognition & Linking:
+     * Any foreign key column (e.g. `founder_id`, `role_id`, `company_id`) MUST have `is_fk=True`.
+     * Explicitly declare the foreign key relationship in the `relationships` array of `build_erd_diagram` (e.g. `{"source": "ChildTable", "target": "ParentTable", "type": "N:1"}`).
+
+7. AGENT VISION & VISUAL REFINEMENT LOOP:
    - After building or updating diagrams, ALWAYS call `export_diagram_image(diagram_name)` to export a high-resolution PNG image directly from Visual Paradigm.
    - Inspect the rendered diagram visually using `view_file` to verify layout aesthetics, connector routing, and completeness.
    - Evaluate the diagram like a human lead architect: ensure no shapes collide, labels are fully visible without truncation, and association lines flow cleanly without forming an entangled web.
