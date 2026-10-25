@@ -1642,7 +1642,8 @@ class XMIBuilder:
         if self.state.classes or self.state.packages:
             class_layout = HierarchicalClassLayout(start_x=60, start_y=60, gap_x=60, gap_y=100)
             class_placements = class_layout.layout(self.state)
-            _, omg_elements = self._create_diagram("omg_diag_class_1", "Class Diagram", "ClassDiagram")
+            class_title = getattr(self.state, "diagram_names", {}).get("ClassDiagram", "Class Diagram")
+            _, omg_elements = self._create_diagram("omg_diag_class_1", class_title, "ClassDiagram")
 
             # 1. Add Package shapes
             for pid, pkg in self.state.packages.items():
@@ -1700,7 +1701,8 @@ class XMIBuilder:
         if self.state.entities:
             erd_layout = ERDClusterLayout(start_x=60, start_y=60, gap_x=90, gap_y=110)
             er_placements = erd_layout.layout(self.state)
-            _, omg_elements = self._create_diagram("omg_diag_erd_1", "Entity Relationship Diagram", "ERDiagram")
+            erd_title = getattr(self.state, "diagram_names", {}).get("ERDiagram", "Entity Relationship Diagram")
+            _, omg_elements = self._create_diagram("omg_diag_erd_1", erd_title, "ERDiagram")
 
             for p in er_placements.values():
                 ent_node = self.state.entities[p.node_id]
@@ -1741,7 +1743,8 @@ class XMIBuilder:
         if self.state.actors or self.state.use_cases:
             uc_layout = UseCaseTierLayout(col1_x=60, col2_x=360, col3_x=680, start_y=60, gap_y=130)
             uc_placements = uc_layout.layout(self.state)
-            _, omg_elements = self._create_diagram("omg_diag_uc_1", "Use Case Diagram", "UseCaseDiagram")
+            uc_title = getattr(self.state, "diagram_names", {}).get("UseCaseDiagram", "Use Case Diagram")
+            _, omg_elements = self._create_diagram("omg_diag_uc_1", uc_title, "UseCaseDiagram")
 
             # 1. System Boundary shape (if defined)
             if self.state.system_boundary and self.state.use_cases:
@@ -1822,7 +1825,8 @@ class XMIBuilder:
         if self.state.states:
             sm_layout = StateMachineFlowLayout(start_x=60, start_y=150, gap_x=160)
             sm_placements = sm_layout.layout(self.state)
-            _, omg_elements = self._create_diagram("omg_diag_sm_1", "State Machine Diagram", "StateDiagram")
+            sm_title = getattr(self.state, "diagram_names", {}).get("StateDiagram", "State Machine Diagram")
+            _, omg_elements = self._create_diagram("omg_diag_sm_1", sm_title, "StateDiagram")
 
             for p in sm_placements.values():
                 st_obj = self.state.states[p.node_id]

@@ -238,12 +238,17 @@ python test_all_diagrams.py
 
 ## Полный справочник инструментов MCP
 
-Сервер предоставляет LLM-агенту **25 специализированных инструментов**, разделенных по архитектурным областям:
+Сервер предоставляет LLM-агенту **30 специализированных инструментов**, разделенных по архитектурным областям:
 
-### 1. Управление проектом и пакетная сборка
+### 1. Чтение ТЗ и пакетное построение диаграмм
 | Инструмент | Параметры | Описание |
 | :--- | :--- | :--- |
-| `batch_build_diagrams` | `spec: dict, filepath: Optional[str] = None` | Основной инструмент для ТЗ: создает сразу все 4 вида диаграмм (пакеты, классы, таблицы ERD, сценарии Use Case, конечные автоматы, заметки) за 1 вызов и автоматически генерирует готовый `.xmi`. |
+| `read_requirements_file` | `filepath: str` | Нативное чтение файлов ТЗ (`.docx`, `.txt`, `.md`, `.json`) в 1 шаг без вызова консольных команд и pip. |
+| `build_class_diagram` | `spec: dict, append: bool = True, diagram_name: str = "Class Diagram", filepath: Optional[str] = None` | Глубокое построение продакшн-диаграммы классов (15-30+ классов, интерфейсы, пакеты, методы, типы, связи). |
+| `build_erd_diagram` | `spec: dict, append: bool = True, diagram_name: str = "ER Diagram", filepath: Optional[str] = None` | Глубокое построение физической схемы БД (15-25 таблиц, нативные типы VP, PK/FK/Unique/NotNull, связи Crow's Foot). |
+| `build_use_case_diagram` | `spec: dict, append: bool = True, diagram_name: str = "Use Case Diagram", filepath: Optional[str] = None` | Построение диаграммы прецедентов (акторы, границы системы System Boundary, связи «Include» и «Extend»). |
+| `build_state_diagram` | `spec: dict, append: bool = True, diagram_name: str = "State Machine Diagram", filepath: Optional[str] = None` | Построение диаграммы состояний (Initial, State с активностями entry/do/exit, переходы с триггерами и guard). |
+| `batch_build_diagrams` | `spec: dict, append: bool = False, filepath: Optional[str] = None` | Универсальная пакетная сборка всех диаграмм одновременно в 1 вызов (с авто-генерацией .xmi и Live Sync). |
 | `init_project` | `name: str = "ProjectModel"` | Инициализирует новый проект с заданным именем и сбрасывает предыдущее состояние. |
 | `sync_with_visual_paradigm` | `filepath: Optional[str] = None` | Отправляет сгенерированную модель напрямую в запущенный Visual Paradigm через фоновый Live Sync плагин. |
 | `export_diagram_image` | `diagram_name: Optional[str] = None, output_path: Optional[str] = None` | Экспортирует активную или указанную диаграмму из Visual Paradigm в высоком разрешении (PNG) для визуальной валидации агентом (Agent Vision через `view_file`). |
@@ -384,12 +389,13 @@ python test_all_diagrams.py
 
 ### Возможности плагина:
 1. **Кнопки управления на ленте и в главном меню**:
-   - На ленте во вкладке **Plugin** (а также в выпадающем меню **MCP**) доступны две кнопки:
-     - **Import XMI**: быстрый диалог выбора и открытия любого сгенерированного файла `.xmi` в 1 клик.
-     - **Live Sync**: переключатель встроенного фонового сокет-сервера синхронизации (включение/отключение приема команд от агента).
+   - На ленте во вкладке **Plugin** (а также в меню **MCP**) доступны три кнопки:
+     - **Import XMI**: быстрый выбор и открытие любого сгенерированного файла `.xmi` в 1 клик.
+     - **Connect** (зелёная иконка): запуск встроенного фонового сервера Live Sync (`127.0.0.1:19842`) со всплывающим подтверждением статуса.
+     - **Disconnect** (красная иконка): остановка фонового сервера Live Sync.
 2. **Встроенный фоновый сервер Live Sync (`127.0.0.1:19842`)**:
    - Автоматически слушает команды от Python MCP-сервера.
-   - Когда модель или пользователь вызывает `export_xmi`, `batch_build_diagrams` или `sync_with_visual_paradigm`, диаграммы **мгновенно отрисовываются прямо на экране в активном окне Visual Paradigm** без ручного импорта.
+   - Когда модель или пользователь вызывает `export_xmi`, `build_class_diagram` или `sync_with_visual_paradigm`, диаграммы **мгновенно отрисовываются и распахиваются активной вкладкой на экране в Visual Paradigm** без ручного импорта.
 3. **Обратный экспорт диаграмм в PNG (Agent Vision)**:
    - Эндпоинт `/export_image` на базе `ModelConvertionManager.exportDiagramAsImage` генерирует растровое изображение PNG открытой диаграммы.
    - Мультимодальный AI-агент получает путь к файлу и с помощью инструмента `view_file` осматривает результат своими глазами, оценивая сетку, взаимное расположение блоков, читаемость и плотность связей.
@@ -410,17 +416,18 @@ powershell -ExecutionPolicy Bypass -File plugin/build.ps1
 ```
 mcp-visual-paradigm/
 ├── core/
+│   ├── doc_reader.py       # Нативный ридер ТЗ (.docx, .txt, .md, .json) без внешних зависимостей
 │   ├── models.py           # Строгие Pydantic v2 модели данных (Node с UUID, ограничения, валидаторы)
 │   ├── rules.py            # Архитектурный валидатор (циклы наследования, правила FK, интерфейсов)
-│   └── state.py            # Потокобезопасное хранилище Singleton (ProjectState)
+│   └── state.py            # Потокобезопасное хранилище Singleton (ProjectState) с реестром диаграмм
 ├── mcp_tools/
-│   └── tools.py            # 26 MCP-инструментов с типизацией и валидацией
+│   └── tools.py            # 30 MCP-инструментов с глубокими специализированными строителями
 ├── exporters/
 │   ├── layout_engine.py    # Двумерная сетка (2D Grid Layout) и иерархическое размещение
 │   └── xmi_builder.py      # Ядро генерации OMG XMI 2.1 и интеграции Visual Paradigm
 ├── plugin/                 # Нативный Java-плагин для Visual Paradigm (Live Sync и Agent Vision)
 │   ├── src/                # Исходный код Java (MCPPlugin, MCPSyncServer, Controllers)
-│   ├── plugin.xml          # Манифест плагина Visual Paradigm
+│   ├── plugin.xml          # Манифест плагина Visual Paradigm (кнопки Connect / Disconnect / Import)
 │   ├── build.ps1           # Скрипт компиляции и развертывания
 │   └── README.md           # Документация REST API плагина
 ├── install_plugin.bat      # 1-клик установка плагина в Visual Paradigm

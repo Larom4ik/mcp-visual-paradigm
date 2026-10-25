@@ -32,6 +32,7 @@ from core.models import (
 )
 from core.state import state
 from exporters.xmi_builder import XMIBuilder
+from core.doc_reader import RequirementsDocReader
 
 
 
@@ -1327,10 +1328,18 @@ def export_diagram_image(
                 )
             else:
                 return f"ERROR: Visual Paradigm image export failed: {data.get('error', 'Unknown error')}"
+    except urllib.error.HTTPError as e:
+        try:
+            body = e.read().decode("utf-8")
+            err_data = json.loads(body)
+            err_msg = err_data.get("error", body)
+        except Exception:
+            err_msg = str(e)
+        return f"ERROR: Visual Paradigm Live Sync export failed (HTTP {e.code}): {err_msg}"
     except urllib.error.URLError as e:
         return (
             f"ERROR: Cannot connect to Visual Paradigm Live Sync plugin at http://127.0.0.1:19842.\n"
-            f"Please ensure Visual Paradigm 18.1 is running and the MCP plugin is enabled.\n"
+            f"Please ensure Visual Paradigm 18.1 is running and the MCP plugin is enabled (click 'Connect' on the Plugin ribbon).\n"
             f"Details: {str(e)}"
         )
     except Exception as e:
@@ -1377,28 +1386,197 @@ def export_xmi(filepath: str) -> str:
         return f"ERROR: Failed to export XMI: {str(e)}"
 
 
-def batch_build_diagrams(spec: dict, filepath: Optional[str] = None) -> str:
-    """Batch build an entire architecture model (Class, ERD, Use Case, State Machine) from a single structured dictionary, and export to XMI.
+def read_requirements_file(filepath: str) -> str:
+    """Read a technical requirements document (.docx, .txt, .md, .json) directly.
 
-    This is the PREFERRED tool when transforming an entire specification or requirements document into diagrams.
-    It builds all elements, runs validation and the Visual Layout Engine, and exports the final .xmi file in one single call.
+    Eliminates the need for running terminal commands or installing python packages.
+    Parses sections, text, headings, and tables from Word documents (.docx) and plain text.
+
+    Args:
+        filepath: Path to the requirements file (e.g. 'C:/specs/tz.docx' or './requirements.md').
+
+    Returns:
+        Structured text content of the requirements document in clean Markdown.
+    """
+    try:
+        content = RequirementsDocReader.read_document(filepath)
+        return (
+            f"Successfully read requirements document '{filepath}' ({len(content)} characters):\n\n"
+            f"{content}"
+        )
+    except Exception as e:
+        return f"ERROR: Failed to read requirements document: {str(e)}"
+
+
+# ---------------------------------------------------------
+# Modular Diagram Population Helpers
+# ---------------------------------------------------------
+
+def _build_classes_from_spec(spec: dict, log: list[str]) -> None:
+    # 1. Packages
+    for p in spec.get("packages", []):
+        if isinstance(p, dict) and "name" in p:
+            add_package(p["name"], p.get("parent"))
+            log.append(f"  + Package: {p['name']}")
+
+    # 2. Classes & Interfaces
+    for c in spec.get("classes", []):
+        if not isinstance(c, dict) or "name" not in c:
+            continue
+        elem_type = "Interface" if (c.get("is_interface") or c.get("element_type", "").lower() == "interface") else "Class"
+        add_class(
+            name=c["name"],
+            is_abstract=bool(c.get("is_abstract", False)),
+            element_type=elem_type,
+            package=c.get("package"),
+            description=c.get("description", ""),
+        )
+        for a in c.get("attributes", []):
+            if isinstance(a, dict) and "name" in a:
+                add_class_attribute(
+                    class_name=c["name"],
+                    name=a["name"],
+                    type=a.get("type", "string"),
+                    visibility=a.get("visibility", "public"),
+                    multiplicity=a.get("multiplicity", ""),
+                    description=a.get("description", ""),
+                )
+        for m in c.get("methods", []):
+            if isinstance(m, dict) and "name" in m:
+                add_class_method(
+                    class_name=c["name"],
+                    name=m["name"],
+                    return_type=m.get("return_type", "void"),
+                    params=m.get("params") or m.get("parameters"),
+                    description=m.get("description", ""),
+                )
+        log.append(f"  + Class: {c['name']}")
+
+    # 3. Class Relations
+    for r in spec.get("class_relations", []):
+        if not isinstance(r, dict) or "source" not in r or "target" not in r:
+            continue
+        src_n = r["source"]
+        tgt_n = r["target"]
+        if "hint" in r or "relationship_hint" in r:
+            smart_add_relation(src_n, tgt_n, r.get("hint") or r.get("relationship_hint"))
+        else:
+            add_class_relation(
+                src_name=src_n,
+                tgt_name=tgt_n,
+                type=r.get("type", "Association"),
+                src_mult=r.get("source_multiplicity", "") or r.get("src_mult", ""),
+                tgt_mult=r.get("target_multiplicity", "") or r.get("tgt_mult", ""),
+            )
+
+
+def _build_erd_from_spec(spec: dict, log: list[str]) -> None:
+    # 1. ER Entities
+    for e in spec.get("entities", []):
+        if not isinstance(e, dict) or "name" not in e:
+            continue
+        add_er_entity(name=e["name"], description=e.get("description", ""))
+        for col in e.get("columns", []):
+            if isinstance(col, dict) and "name" in col:
+                add_er_column(
+                    entity_name=e["name"],
+                    name=col["name"],
+                    type=col.get("type", "VARCHAR"),
+                    length=col.get("length"),
+                    is_nullable=bool(col.get("is_nullable", True)),
+                    is_pk=bool(col.get("is_pk", False)),
+                    is_fk=bool(col.get("is_fk", False)),
+                    is_unique=bool(col.get("is_unique", False)),
+                    description=col.get("description", ""),
+                )
+        log.append(f"  + Entity: {e['name']} ({len(e.get('columns', []))} columns)")
+
+    # 2. ER Relations
+    for er in spec.get("er_relations", []):
+        if isinstance(er, dict) and "source" in er and "target" in er:
+            add_er_relation(src_name=er["source"], tgt_name=er["target"], type=er.get("type", "1:N"))
+
+
+def _build_use_cases_from_spec(spec: dict, log: list[str]) -> None:
+    # 1. Actors
+    for a in spec.get("actors", []):
+        if isinstance(a, dict) and "name" in a:
+            add_actor(a["name"], a.get("description", ""))
+
+    # 2. Use Cases
+    for uc in spec.get("use_cases", []):
+        if isinstance(uc, dict) and "name" in uc:
+            add_use_case(uc["name"], uc.get("description", ""))
+
+    # 3. System Boundary
+    sb = spec.get("system_boundary")
+    if isinstance(sb, dict) and "use_cases" in sb:
+        ucs = ",".join(sb["use_cases"]) if isinstance(sb["use_cases"], list) else str(sb["use_cases"])
+        set_system_boundary(name=sb.get("name", "System Boundary"), use_cases=ucs)
+
+    # 4. Use Case Relations
+    for ucr in spec.get("uc_relations", []):
+        if isinstance(ucr, dict) and "source" in ucr and "target" in ucr:
+            add_uc_relation(src_name=ucr["source"], tgt_name=ucr["target"], type=ucr.get("type", "Association"))
+
+
+def _build_states_from_spec(spec: dict, log: list[str]) -> None:
+    # 1. States
+    for s in spec.get("states", []):
+        if isinstance(s, dict) and "name" in s:
+            add_state(
+                name=s["name"],
+                type=s.get("type", "State"),
+                entry=s.get("entry", ""),
+                do=s.get("do", ""),
+                exit=s.get("exit", ""),
+                description=s.get("description", ""),
+            )
+
+    # 2. State Transitions
+    for t in spec.get("transitions", []):
+        if isinstance(t, dict) and "source" in t and "target" in t:
+            add_state_transition(
+                src_name=t["source"],
+                tgt_name=t["target"],
+                trigger=t.get("trigger", ""),
+                guard=t.get("guard", ""),
+            )
+
+
+def _build_notes_from_spec(spec: dict, log: list[str]) -> None:
+    for n in spec.get("notes", []):
+        if isinstance(n, dict) and "text" in n:
+            add_note(text=n["text"], target=n.get("attached_to"))
+
+
+# ---------------------------------------------------------
+# Specialized Deep Diagram Builders (Progressive Modeling)
+# ---------------------------------------------------------
+
+def build_class_diagram(
+    spec: dict,
+    append: bool = True,
+    diagram_name: str = "Class Diagram",
+    filepath: Optional[str] = None,
+) -> str:
+    """Build a comprehensive, production-grade UML Class Diagram with high detail.
+
+    Focuses 100% of LLM reasoning on object-oriented domain modeling:
+    nested packages, rich classes/interfaces, typed attributes, method signatures,
+    full relation types (Generalization, Realization, Composition, Aggregation, Association), and notes.
 
     Args:
         spec: Dictionary specification containing:
-            - "project_name": Optional[str] (e.g. "BankingSystem")
-            - "packages": list[dict] (e.g. [{"name": "Core", "parent": None}])
-            - "classes": list[dict] with attributes and methods
-            - "class_relations": list[dict] with source, target, type, etc.
-            - "entities": list[dict] with columns (type, is_pk, is_fk, is_unique, etc.)
-            - "er_relations": list[dict] with source, target, type ("1:1", "1:N", "M:N")
-            - "actors": list[dict] with name, description
-            - "use_cases": list[dict] with name, description
-            - "system_boundary": Optional[dict] with name, use_cases
-            - "uc_relations": list[dict] with source, target, type ("Association", "Include", "Extend")
-            - "states": list[dict] with name, type ("Initial", "State", "Final"), entry, do, exit
-            - "transitions": list[dict] with source, target, trigger, guard
+            - "project_name": Optional[str]
+            - "packages": list[dict] (e.g. [{"name": "Domain", "parent": None}])
+            - "classes": list[dict] with name, attributes, methods, is_abstract, is_interface, package
+            - "class_relations": list[dict] with source, target, type, source_multiplicity, target_multiplicity
             - "notes": list[dict] with text, attached_to
-        filepath: Optional output file path (e.g. "./model.xmi"). Defaults to '{project_name}.xmi'.
+        append: If True (default), appends this diagram to the active project without wiping
+                previously generated diagrams (e.g. Use Case or ERD). If False, resets project.
+        diagram_name: Title of this diagram tab in Visual Paradigm (default: 'Class Diagram').
+        filepath: Optional output .xmi path.
 
     Returns:
         Structured execution summary with export path and element counts.
@@ -1407,143 +1585,210 @@ def batch_build_diagrams(spec: dict, filepath: Optional[str] = None) -> str:
         if not isinstance(spec, dict):
             return "ERROR: 'spec' must be a dictionary."
 
-        proj_name = spec.get("project_name", "ArchitectureProject")
-        init_project(proj_name)
-        log = [f"=== Batch Building Project: {proj_name} ==="]
+        proj_name = spec.get("project_name", state.name or "ArchitectureProject")
+        if not append:
+            init_project(proj_name)
+        elif not state.name or state.name == "ProjectModel":
+            state.name = proj_name
 
-        # 1. Packages
-        for p in spec.get("packages", []):
-            if isinstance(p, dict) and "name" in p:
-                add_package(p["name"], p.get("parent"))
-                log.append(f"  + Package: {p['name']}")
+        state.set_diagram_name("ClassDiagram", diagram_name)
+        log = [f"=== Building Class Diagram: '{diagram_name}' (Project: {state.name}, append={append}) ==="]
 
-        # 2. Classes
-        for c in spec.get("classes", []):
-            if not isinstance(c, dict) or "name" not in c:
-                continue
-            elem_type = "Interface" if (c.get("is_interface") or c.get("element_type", "").lower() == "interface") else "Class"
-            add_class(
-                name=c["name"],
-                is_abstract=bool(c.get("is_abstract", False)),
-                element_type=elem_type,
-                package=c.get("package"),
-                description=c.get("description", ""),
-            )
-            for a in c.get("attributes", []):
-                if isinstance(a, dict) and "name" in a:
-                    add_class_attribute(
-                        class_name=c["name"],
-                        name=a["name"],
-                        type=a.get("type", "string"),
-                        visibility=a.get("visibility", "public"),
-                        multiplicity=a.get("multiplicity", ""),
-                        description=a.get("description", ""),
-                    )
-            for m in c.get("methods", []):
-                if isinstance(m, dict) and "name" in m:
-                    add_class_method(
-                        class_name=c["name"],
-                        name=m["name"],
-                        return_type=m.get("return_type", "void"),
-                        params=m.get("params") or m.get("parameters"),
-                        description=m.get("description", ""),
-                    )
-            log.append(f"  + Class: {c['name']}")
+        _build_classes_from_spec(spec, log)
+        _build_notes_from_spec(spec, log)
 
-        # 3. Class Relations
-        for r in spec.get("class_relations", []):
-            if not isinstance(r, dict) or "source" not in r or "target" not in r:
-                continue
-            src_n = r["source"]
-            tgt_n = r["target"]
-            if "hint" in r or "relationship_hint" in r:
-                smart_add_relation(src_n, tgt_n, r.get("hint") or r.get("relationship_hint"))
-            else:
-                add_class_relation(
-                    src_name=src_n,
-                    tgt_name=tgt_n,
-                    type=r.get("type", "Association"),
-                    src_mult=r.get("source_multiplicity", "") or r.get("src_mult", ""),
-                    tgt_mult=r.get("target_multiplicity", "") or r.get("tgt_mult", ""),
-                )
-
-        # 4. ER Entities
-        for e in spec.get("entities", []):
-            if not isinstance(e, dict) or "name" not in e:
-                continue
-            add_er_entity(name=e["name"], description=e.get("description", ""))
-            for col in e.get("columns", []):
-                if isinstance(col, dict) and "name" in col:
-                    add_er_column(
-                        entity_name=e["name"],
-                        name=col["name"],
-                        type=col.get("type", "VARCHAR"),
-                        length=col.get("length"),
-                        is_nullable=bool(col.get("is_nullable", True)),
-                        is_pk=bool(col.get("is_pk", False)),
-                        is_fk=bool(col.get("is_fk", False)),
-                        is_unique=bool(col.get("is_unique", False)),
-                        description=col.get("description", ""),
-                    )
-            log.append(f"  + Entity: {e['name']} ({len(e.get('columns', []))} columns)")
-
-        # 5. ER Relations
-        for er in spec.get("er_relations", []):
-            if isinstance(er, dict) and "source" in er and "target" in er:
-                add_er_relation(src_name=er["source"], tgt_name=er["target"], type=er.get("type", "1:N"))
-
-        # 6. Actors
-        for a in spec.get("actors", []):
-            if isinstance(a, dict) and "name" in a:
-                add_actor(a["name"], a.get("description", ""))
-
-        # 7. Use Cases
-        for uc in spec.get("use_cases", []):
-            if isinstance(uc, dict) and "name" in uc:
-                add_use_case(uc["name"], uc.get("description", ""))
-
-        # 8. System Boundary
-        sb = spec.get("system_boundary")
-        if isinstance(sb, dict) and "use_cases" in sb:
-            ucs = ",".join(sb["use_cases"]) if isinstance(sb["use_cases"], list) else str(sb["use_cases"])
-            set_system_boundary(name=sb.get("name", "System Boundary"), use_cases=ucs)
-
-        # 9. Use Case Relations
-        for ucr in spec.get("uc_relations", []):
-            if isinstance(ucr, dict) and "source" in ucr and "target" in ucr:
-                add_uc_relation(src_name=ucr["source"], tgt_name=ucr["target"], type=ucr.get("type", "Association"))
-
-        # 10. States
-        for s in spec.get("states", []):
-            if isinstance(s, dict) and "name" in s:
-                add_state(
-                    name=s["name"],
-                    type=s.get("type", "State"),
-                    entry=s.get("entry", ""),
-                    do=s.get("do", ""),
-                    exit=s.get("exit", ""),
-                    description=s.get("description", ""),
-                )
-
-        # 11. State Transitions
-        for t in spec.get("transitions", []):
-            if isinstance(t, dict) and "source" in t and "target" in t:
-                add_state_transition(
-                    src_name=t["source"],
-                    tgt_name=t["target"],
-                    trigger=t.get("trigger", ""),
-                    guard=t.get("guard", ""),
-                )
-
-        # 12. Notes
-        for n in spec.get("notes", []):
-            if isinstance(n, dict) and "text" in n:
-                add_note(text=n["text"], target=n.get("attached_to"))
-
-        # 13. Auto Export
-        out_path = filepath or spec.get("filepath") or f"{proj_name}.xmi"
+        out_path = filepath or spec.get("filepath") or f"{state.name}.xmi"
         export_result = export_xmi(out_path)
+        log.append(f"\n{export_result}")
+        return "\n".join(log)
+    except Exception as e:
+        return f"ERROR: Failed during build_class_diagram: {str(e)}"
 
+
+def build_erd_diagram(
+    spec: dict,
+    append: bool = True,
+    diagram_name: str = "ER Diagram",
+    filepath: Optional[str] = None,
+) -> str:
+    """Build an exhaustive, production-grade Physical Entity-Relationship Diagram (ERD).
+
+    Focuses 100% of LLM reasoning on relational database modeling:
+    normalized tables (3NF), columns with strict Visual Paradigm data types (UUID, BIGINT, VARCHAR, TIMESTAMP),
+    Primary Keys (PK), Foreign Keys (FK), Unique constraints, nullability, and Crow's Foot relations (1:1, 1:N, M:N).
+
+    Args:
+        spec: Dictionary specification containing:
+            - "project_name": Optional[str]
+            - "entities": list[dict] with name, columns (type, length, is_pk, is_fk, is_unique, is_nullable)
+            - "er_relations": list[dict] with source, target, type ("1:1", "1:N", "M:N")
+            - "notes": list[dict] with text, attached_to
+        append: If True (default), appends this ERD to the active project without wiping
+                previously generated diagrams. If False, resets project.
+        diagram_name: Title of this ERD tab in Visual Paradigm (default: 'ER Diagram').
+        filepath: Optional output .xmi path.
+
+    Returns:
+        Structured execution summary with export path and element counts.
+    """
+    try:
+        if not isinstance(spec, dict):
+            return "ERROR: 'spec' must be a dictionary."
+
+        proj_name = spec.get("project_name", state.name or "ArchitectureProject")
+        if not append:
+            init_project(proj_name)
+        elif not state.name or state.name == "ProjectModel":
+            state.name = proj_name
+
+        state.set_diagram_name("ERDiagram", diagram_name)
+        log = [f"=== Building ER Diagram: '{diagram_name}' (Project: {state.name}, append={append}) ==="]
+
+        _build_erd_from_spec(spec, log)
+        _build_notes_from_spec(spec, log)
+
+        out_path = filepath or spec.get("filepath") or f"{state.name}.xmi"
+        export_result = export_xmi(out_path)
+        log.append(f"\n{export_result}")
+        return "\n".join(log)
+    except Exception as e:
+        return f"ERROR: Failed during build_erd_diagram: {str(e)}"
+
+
+def build_use_case_diagram(
+    spec: dict,
+    append: bool = True,
+    diagram_name: str = "Use Case Diagram",
+    filepath: Optional[str] = None,
+) -> str:
+    """Build an exhaustive, production-grade UML Use Case Diagram from business requirements.
+
+    Focuses 100% of LLM reasoning on functional requirements and system boundaries:
+    primary and secondary Actors, external systems, detailed Use Cases, System Boundary containment,
+    and standardized UML 2.5 relationships («Include», «Extend», Actor Associations).
+
+    Args:
+        spec: Dictionary specification containing:
+            - "project_name": Optional[str]
+            - "actors": list[dict] with name, description
+            - "use_cases": list[dict] with name, description
+            - "system_boundary": Optional[dict] with name, use_cases
+            - "uc_relations": list[dict] with source, target, type ("Association", "Include", "Extend")
+            - "notes": list[dict] with text, attached_to
+        append: If True (default), appends this Use Case diagram to the active project. If False, resets project.
+        diagram_name: Title of this Use Case tab in Visual Paradigm (default: 'Use Case Diagram').
+        filepath: Optional output .xmi path.
+
+    Returns:
+        Structured execution summary with export path and element counts.
+    """
+    try:
+        if not isinstance(spec, dict):
+            return "ERROR: 'spec' must be a dictionary."
+
+        proj_name = spec.get("project_name", state.name or "ArchitectureProject")
+        if not append:
+            init_project(proj_name)
+        elif not state.name or state.name == "ProjectModel":
+            state.name = proj_name
+
+        state.set_diagram_name("UseCaseDiagram", diagram_name)
+        log = [f"=== Building Use Case Diagram: '{diagram_name}' (Project: {state.name}, append={append}) ==="]
+
+        _build_use_cases_from_spec(spec, log)
+        _build_notes_from_spec(spec, log)
+
+        out_path = filepath or spec.get("filepath") or f"{state.name}.xmi"
+        export_result = export_xmi(out_path)
+        log.append(f"\n{export_result}")
+        return "\n".join(log)
+    except Exception as e:
+        return f"ERROR: Failed during build_use_case_diagram: {str(e)}"
+
+
+def build_state_diagram(
+    spec: dict,
+    append: bool = True,
+    diagram_name: str = "State Machine Diagram",
+    filepath: Optional[str] = None,
+) -> str:
+    """Build an exhaustive UML State Machine Diagram modeling the lifecycle of a domain aggregate.
+
+    Focuses 100% of LLM reasoning on state transitions, lifecycle pipelines,
+    internal activities (entry, do, exit), event triggers, and boolean guard conditions [guard].
+
+    Args:
+        spec: Dictionary specification containing:
+            - "project_name": Optional[str]
+            - "states": list[dict] with name, type ("Initial", "State", "Final"), entry, do, exit, description
+            - "transitions": list[dict] with source, target, trigger, guard
+            - "notes": list[dict] with text, attached_to
+        append: If True (default), appends this State Machine to the active project. If False, resets project.
+        diagram_name: Title of this State Machine tab in Visual Paradigm (default: 'State Machine Diagram').
+        filepath: Optional output .xmi path.
+
+    Returns:
+        Structured execution summary with export path and element counts.
+    """
+    try:
+        if not isinstance(spec, dict):
+            return "ERROR: 'spec' must be a dictionary."
+
+        proj_name = spec.get("project_name", state.name or "ArchitectureProject")
+        if not append:
+            init_project(proj_name)
+        elif not state.name or state.name == "ProjectModel":
+            state.name = proj_name
+
+        state.set_diagram_name("StateDiagram", diagram_name)
+        log = [f"=== Building State Machine Diagram: '{diagram_name}' (Project: {state.name}, append={append}) ==="]
+
+        _build_states_from_spec(spec, log)
+        _build_notes_from_spec(spec, log)
+
+        out_path = filepath or spec.get("filepath") or f"{state.name}.xmi"
+        export_result = export_xmi(out_path)
+        log.append(f"\n{export_result}")
+        return "\n".join(log)
+    except Exception as e:
+        return f"ERROR: Failed during build_state_diagram: {str(e)}"
+
+
+def batch_build_diagrams(
+    spec: dict,
+    append: bool = False,
+    filepath: Optional[str] = None,
+) -> str:
+    """Build multiple architecture diagrams in a single call, and export to XMI with Live Sync.
+
+    Args:
+        spec: Dictionary specification containing all diagram elements.
+        append: If True, preserves existing project elements. If False (default), resets project.
+        filepath: Optional output file path.
+
+    Returns:
+        Structured execution summary with export path and element counts.
+    """
+    try:
+        if not isinstance(spec, dict):
+            return "ERROR: 'spec' must be a dictionary."
+
+        proj_name = spec.get("project_name", state.name or "ArchitectureProject")
+        if not append:
+            init_project(proj_name)
+        elif not state.name or state.name == "ProjectModel":
+            state.name = proj_name
+
+        log = [f"=== Batch Building Project: {state.name} (append={append}) ==="]
+
+        _build_classes_from_spec(spec, log)
+        _build_erd_from_spec(spec, log)
+        _build_use_cases_from_spec(spec, log)
+        _build_states_from_spec(spec, log)
+        _build_notes_from_spec(spec, log)
+
+        out_path = filepath or spec.get("filepath") or f"{state.name}.xmi"
+        export_result = export_xmi(out_path)
         log.append(f"\n{export_result}")
         return "\n".join(log)
     except Exception as e:
@@ -1663,6 +1908,11 @@ def register_all_tools(mcp: Any) -> None:
         set_element_documentation,
         add_note,
         export_xmi,
+        read_requirements_file,
+        build_class_diagram,
+        build_erd_diagram,
+        build_use_case_diagram,
+        build_state_diagram,
         batch_build_diagrams,
         sync_with_visual_paradigm,
         export_diagram_image,

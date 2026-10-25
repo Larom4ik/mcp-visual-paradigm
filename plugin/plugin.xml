@@ -31,14 +31,24 @@
             <separator id="com.mcp.visualparadigm.separator1"
                        menuPath="com.mcp.visualparadigm.menu/#"/>
 
-            <action id="com.mcp.visualparadigm.actions.ToggleServerAction"
-                    label="Live Sync"
-                    tooltip="Start/Stop local background HTTP server for instant diagram generation"
-                    icon="icons/live_sync.png"
+            <action id="com.mcp.visualparadigm.actions.StartServerAction"
+                    label="Connect"
+                    tooltip="Start Live Sync server on 127.0.0.1:19842"
+                    icon="icons/connect.png"
                     menuPath="com.mcp.visualparadigm.menu/#"
                     toolbarPath="Plugins"
                     style="normal">
-                <actionController class="com.mcp.visualparadigm.actions.ToggleServerActionController"/>
+                <actionController class="com.mcp.visualparadigm.actions.StartServerActionController"/>
+            </action>
+
+            <action id="com.mcp.visualparadigm.actions.StopServerAction"
+                    label="Disconnect"
+                    tooltip="Stop Live Sync background server"
+                    icon="icons/disconnect.png"
+                    menuPath="com.mcp.visualparadigm.menu/#"
+                    toolbarPath="Plugins"
+                    style="normal">
+                <actionController class="com.mcp.visualparadigm.actions.StopServerActionController"/>
             </action>
         </actionSet>
     </actionSets>

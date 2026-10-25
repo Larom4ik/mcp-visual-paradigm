@@ -224,8 +224,25 @@ public class MCPSyncServer {
                 if (ApplicationManager.instance() != null && ApplicationManager.instance().getModelConvertionManager() != null) {
                     ApplicationManager.instance().getModelConvertionManager().importXMI(targetFile);
 
+                    // Auto-open imported diagram in active editor tab
+                    try {
+                        if (ApplicationManager.instance().getProjectManager() != null &&
+                                ApplicationManager.instance().getDiagramManager() != null) {
+                            IProject proj = ApplicationManager.instance().getProjectManager().getProject();
+                            if (proj != null) {
+                                IDiagramUIModel[] diags = proj.toDiagramArray();
+                                if (diags != null && diags.length > 0) {
+                                    IDiagramUIModel latest = diags[diags.length - 1];
+                                    ApplicationManager.instance().getDiagramManager().openDiagram(latest);
+                                }
+                            }
+                        }
+                    } catch (Throwable t) {
+                        System.err.println("[MCP Plugin] Notice: Could not auto-open diagram: " + t.getMessage());
+                    }
+
                     if (ApplicationManager.instance().getViewManager() != null) {
-                        ApplicationManager.instance().getViewManager().showMessage("MCP: Successfully imported " + targetFile.getName());
+                        ApplicationManager.instance().getViewManager().showMessage("MCP: Successfully imported and opened " + targetFile.getName());
                     }
                 }
             } catch (Throwable ex) {
@@ -316,8 +333,19 @@ public class MCPSyncServer {
                     }
                 }
 
+                if (targetDiagram == null && ApplicationManager.instance().getProjectManager() != null &&
+                        ApplicationManager.instance().getProjectManager().getProject() != null) {
+                    IDiagramUIModel[] all = ApplicationManager.instance().getProjectManager().getProject().toDiagramArray();
+                    if (all != null && all.length > 0) {
+                        targetDiagram = all[all.length - 1];
+                        if (ApplicationManager.instance().getDiagramManager() != null) {
+                            ApplicationManager.instance().getDiagramManager().openDiagram(targetDiagram);
+                        }
+                    }
+                }
+
                 if (targetDiagram == null) {
-                    errorMsg[0] = "No active or opened diagram found in Visual Paradigm";
+                    errorMsg[0] = "No active or opened diagram found in Visual Paradigm. Please open a diagram or import an XMI.";
                     return;
                 }
 
@@ -353,7 +381,7 @@ public class MCPSyncServer {
         } else {
             String json = String.format("{\"success\":false,\"error\":\"%s\"}",
                     (errorMsg[0] != null ? errorMsg[0] : "Export failed").replace("\\", "\\\\").replace("\"", "\\\""));
-            sendResponse(out, 500, "Internal Server Error", "application/json", json);
+            sendResponse(out, 200, "OK", "application/json", json);
         }
     }
 

@@ -55,6 +55,7 @@ class ProjectState:
             self.states: dict[str, StateNode] = {}
             self.notes: dict[str, NoteNode] = {}
             self.system_boundary: Optional[SystemBoundaryNode] = None
+            self.diagram_names: dict[str, str] = {}
             self.relations: list[RelationModel] = []
             self._initialized = True
 
@@ -70,7 +71,14 @@ class ProjectState:
             self.states.clear()
             self.notes.clear()
             self.system_boundary = None
+            self.diagram_names.clear()
             self.relations.clear()
+
+    def set_diagram_name(self, diag_type: str, name: str) -> None:
+        """Set a custom title for a specific diagram type (e.g. 'ClassDiagram' -> 'Domain Model')."""
+        with self._lock:
+            if diag_type and name:
+                self.diagram_names[diag_type] = name.strip()
 
     # ---------------------------------------------------------
     # Core State Modification Methods
