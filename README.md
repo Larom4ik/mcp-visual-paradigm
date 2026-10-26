@@ -14,127 +14,177 @@
 
 <br/>
 
-> **MCP Visual Paradigm** позволяет любой модели (Claude, Gemini, GPT, Cursor) на лету превращать неструктурированные требования ТЗ в полноценные инженерные модели данных, диаграммы классов, сценарии использования и конечные автоматы, готовые к открытию в Visual Paradigm одним кликом без ручной вёрстки.
+> **MCP Visual Paradigm** позволяет современным моделям (Claude, Gemini, GPT, Cursor, Windsurf) преобразовывать технические требования в строгие архитектурные модели данных, диаграммы классов, сценарии использования и конечные автоматы с автоматической компоновкой элементов в Visual Paradigm.
 
 </div>
 
 ---
 
-## Оглавление
+## Содержание
 
-- [Ключевые возможности](#ключевые-возможности)
-- [Два режима использования: Standalone и Live Sync](#два-режима-использования-standalone-и-live-sync)
+- [Архитектура и режимы работы](#архитектура-и-режимы-работы)
+  - [1. Автономный режим (Standalone XMI)](#1-автономный-режим-standalone-xmi)
+  - [2. Интегрированный режим (Live Sync Plugin)](#2-интегрированный-режим-live-sync-plugin)
 - [Поддерживаемые типы диаграмм](#поддерживаемые-типы-диаграмм)
   - [1. UML Class Diagram](#1-uml-class-diagram)
-  - [2. ER Diagram (Физическая модель БД)](#2-er-diagram-физическая-модель-бд)
+  - [2. ER Diagram (Реляционная модель БД)](#2-er-diagram-реляционная-модель-бд)
   - [3. UML Use Case Diagram](#3-uml-use-case-diagram)
   - [4. UML State Machine Diagram](#4-uml-state-machine-diagram)
-- [Таблица типов данных ER-диаграмм](#таблица-типов-данных-er-диаграмм)
+- [Связи в ER-диаграммах и идентифицируемость](#связи-в-er-диаграммах-и-идентифицируемость)
+- [Поддержка типов данных PostgreSQL и ANSI SQL](#поддержка-типов-данных-postgresql-и-ansi-sql)
 - [Быстрый старт](#быстрый-старт)
 - [Подключение к MCP-клиентам](#подключение-к-mcp-клиентам)
-  - [Универсальная конфигурация (stdio)](#универсальная-конфигурация-stdio)
-  - [Настройка в Cursor](#настройка-в-cursor)
-  - [Настройка в Claude Desktop](#настройка-в-claude-desktop)
-  - [Настройка в Antigravity IDE / VS Code / Windsurf](#настройка-в-antigravity-ide--vs-code--windsurf)
-- [Полный справочник инструментов MCP](#полный-справочник-инструментов-mcp)
-- [Импорт модели в Visual Paradigm](#импорт-модели-в-visual-paradigm)
-- [Нативный Java-плагин (Live Sync и Agent Vision)](#нативный-java-плагин-live-sync-и-agent-vision)
-- [Архитектура и движки сервера](#архитектура-и-движки-сервера)
-- [Тестирование и валидация](#тестирование-и-валидация)
+  - [Cursor](#cursor)
+  - [Claude Desktop](#claude-desktop)
+  - [Antigravity IDE / VS Code / Windsurf](#antigravity-ide--vs-code--windsurf)
+- [Справочник MCP-инструментов](#справочник-mcp-инструментов)
+- [Нативный Java-плагин для Visual Paradigm](#нативный-java-плагин-для-visual-paradigm)
+- [Инженерные модули и валидация](#инженерные-модули-и-валидация)
+- [Тестирование](#тестирование)
 
 ---
 
-## Два режима использования: Standalone и Live Sync
+## Архитектура и режимы работы
 
-Архитектура проекта поддерживает два независимых сценария интеграции в зависимости от потребностей пользователя:
+Сервер реализован на базе спецификации **Model Context Protocol (MCP)** и поддерживает два сценария взаимодействия с Visual Paradigm:
 
-### 1. Автономный режим (Только MCP-сервер, без плагинов)
-* **Как работает**: Вы подключаете `main.py` к Cursor, Claude Desktop, Antigravity или Windsurf. Плагин в Visual Paradigm устанавливать **не требуется**.
-* **Процесс**:
-  1. Вы передаете AI-агенту текст технического задания.
-  2. Агент строит полную инженерную модель (2D-сетка пакетов, вложенные структуры, классы, таблицы ERD, Use Case, State Machine).
-  3. Сервер валидирует архитектурные правила и сохраняет файл формата OMG XMI 2.1 (например, `architecture.xmi`).
-  4. Вы открываете файл в Visual Paradigm штатным способом: **`Project` $\rightarrow$ `Import` $\rightarrow$ `XMI...`**.
-* **Кому подходит**: Тем, кому нужен быстрый старт без изменений конфигурации САПР или прав администратора.
+```
+[ AI-агент / IDE ]
+        │ (MCP stdio protocol)
+        ▼
+┌────────────────────────────────────────────────────────┐
+│              MCP Visual Paradigm Server                │
+│  - Rules Engine (проверка UML 2.5 / ERD ограничений)   │
+│  - Visual Layout Engine (расчет 2D-координат и связей) │
+│  - XMI 2.1 Generator (нативная метамодель VP)          │
+└──────────────────────────────────────┬─────────────────┘
+                                       │
+        ┌──────────────────────────────┴──────────────────────────────┐
+        ▼                                                             ▼
+[ 1. Standalone Режим ]                                   [ 2. Live Sync Режим ]
+Генерация файла OMG XMI 2.1                               HTTP REST API (порт 19842)
+Импорт через меню Visual Paradigm:                        Фоновый сокет Java-плагина
+Project → Import → XMI...                                 Отрисовка в реальном времени
+                                                          Agent Vision (обратный экспорт PNG)
+```
 
-### 2. Интегрированный режим (MCP-сервер + Java-плагин Live Sync)
-* **Как работает**: Устанавливается в 1 клик с помощью файла **`install_plugin.bat`**. В Visual Paradigm появляется панель управления и запускается локальный сокет-сервер (`127.0.0.1:19842`).
-* **Процесс (полная автоматизация)**:
-  1. Вы держите открытым окно Visual Paradigm.
-  2. Агент проектирует систему по ТЗ и вызывает `batch_build_diagrams`.
-  3. Модель **мгновенно и автоматически открывается прямо на экране в активном окне Visual Paradigm** (Live Sync без ручных действий).
-  4. Включается **Agent Vision**: агент вызывает инструмент `export_diagram_image`, получает отрендеренный PNG открытой диаграммы и осматривает разметку через зрение мультимодальной нейросети, оценивая читаемость и выравнивание.
-* **Кому подходит**: Для максимального комфорта и работы в режиме реального времени.
+### 1. Автономный режим (Standalone XMI)
 
----
+* **Принцип работы**: Сервер функционирует независимо от Visual Paradigm. Установка сторонних плагинов или прав администратора не требуется.
+* **Рабочий процесс**:
+  1. AI-агент получает спецификацию требований или ТЗ.
+  2. Модель формирует структуру диаграмм через специализированные строители или инструмент `batch_build_diagrams`.
+  3. Движок валидации правил (`Rules Engine`) проверяет корректность типов, цикличность связей и ограничения внешних ключей.
+  4. Движок визуального лейаута (`Visual Layout Engine`) рассчитывает 2D-координаты сущностей, геометрию соединителей и точки изломов.
+  5. Генерируется стандартизированный файл OMG XMI 2.1 (например, `output.xmi`).
+  6. Пользователь открывает полученный файл через штатный интерфейс Visual Paradigm: **`Project` → `Import` → `XMI...`**.
 
-## Ключевые возможности
+### 2. Интегрированный режим (Live Sync Plugin)
 
-* **Полная совместимость с Visual Paradigm**: Генерация нативных контейнеров метамоделей (`DBTable`, `DBColumn`, `DBForeignKey`, `State2`, `Transition2`, `uml:Component`), исключающая появление "битых" элементов или артефактов импорта.
-* **Visual Layout Engine (Встроенный умный лейаут)**: Автоматический расчет 2D-координат ($x, y, w, h$) и геометрии соединителей:
-  * Иерархическое DAG-размещение классов по уровням наследования и зависимостей.
-  * Глобально сбалансированная 2D-сетка ERD: количество таблиц в строках распределяется равномерно (разница не более 1 таблицы, без перекосов и бесконечных горизонтальных линий).
-  * Вертикальное выравнивание дочерних таблиц под родительскими для минимизации перекрестных связей.
-  * 3-колоночный лейаут прецедентов (Акторы $\rightarrow$ Основные прецеденты $\rightarrow$ Вложенные подсистемы).
-  * Автоматический расчет ширины меток (`captionBounds`): стереотипы `«Include»` и `«Extend»` не обрезаются многоточием `...`.
-* **Архитектурный валидатор (Rules Engine)**: Защита от логических ошибок:
-  * Проверка циклических зависимостей и наследования ($A \rightarrow B \rightarrow C \rightarrow A$).
-  * Запрет приватных членов в интерфейсах (`Interface`).
-  * Контроль первичных и внешних ключей в ERD: строго 1 Primary Key на сущность, подавление избыточного `UNIQUE` на PK (чистый маркер `[PK]` вместо загроможденного `[PK, U1]`), авто-распознавание внешних ключей по суффиксу `_id`.
-  * Валидация Use Case отношений (`Include`/`Extend` только между прецедентами).
-* **Семантический NLP-построитель (`smart_add_relation`)**: Позволяет модели соединять сущности естественным языком (*«заказ состоит из позиций»* $\rightarrow$ `Composition`, *«оплата использует шлюз»* $\rightarrow$ `Dependency`).
-* **Open Specification & HTML-документация**: Описания классов, колонок, методов, акторов и переходов прописываются в атрибуты документации Visual Paradigm.
-* **Нулевой визуальный шум и эстетика**: Очистка меток от дублирующихся ролей связей (`ashowFromRoleName='false'`), аккуратные соединители Crow's Foot, арочные мостики при пересечении линий (`aconnectorLineJumps="1"`) и чистая типографика.
+* **Принцип работы**: В среду Visual Paradigm устанавливается нативный Java-плагин, запускающий локальный HTTP/REST сервис на порту `127.0.0.1:19842`.
+* **Управление сервером**:
+  * На ленте **Plugin** и в меню **MCP** размещены кнопки управления:
+    * **Connect** — запускает локальный слушатель сокетов плагина.
+    * **Disconnect** — останавливает сервер плагина и освобождает сетевой порт.
+    * **Import XMI** — диалоговое окно быстрого импорта XMI в один клик.
+  * Реализована взаимоисключающая логика состояния (Mutual Exclusivity): активный сервер переводит кнопку **Connect** в неактивное состояние, оставляя доступной только кнопку **Disconnect**, что исключает конфликты сокетов.
+* **Рабочий процесс**:
+  1. При вызове агентом `sync_with_visual_paradigm` или `batch_build_diagrams` сгенерированная модель транслируется в запущенный сеанс Visual Paradigm по локальному сокету.
+  2. Диаграммы открываются в рабочей области САПР автоматически без ручных операций импорта.
+  3. Доступен инструмент обратной связи **Agent Vision** (`export_diagram_image`): плагин рендерит активную диаграмму в формат PNG, передает ее агенту для мультимодального анализа геометрии, взаимного перекрытия блоков и читаемости связей.
 
 ---
 
 ## Поддерживаемые типы диаграмм
 
 ### 1. UML Class Diagram
-* **Пакеты (Packages)**: Логическая и физическая вложенность (контейнеры пакетов с размещением дочерних классов внутри).
-* **Классификаторы**: Обычные классы, абстрактные классы (`isAbstract=True`), интерфейсы (`isInterface=True`).
-* **Члены**: Поля и методы с типами, значениями по умолчанию, модификаторами видимости (`public`, `private`, `protected`, `package`).
-* **Связи**: `Generalization`, `Realization`, `Association`, `Aggregation` ($1 \rightarrow *$), `Composition` ($1 \rightarrow 1..*$), `Dependency`.
-* **Заметки (Notes)**: Блоки комментариев (`Note`) с коннекторами `Anchor` к целевым классам.
 
-### 2. ER Diagram (Физическая модель БД)
-* **Нативные таблицы Visual Paradigm**: Формирование `DBTable` в фирменном персиковом оформлении (`#F5B67A`).
-* **Колонки (`DBColumn`)**:
-  * Строго один Primary Key на таблицу: защита от случайного создания дублирующих первичных ключей (`id1`, `id2`).
-  * Автоматическое подавление флага UNIQUE у Primary Key: исключает визуальный мусор `[PK, U1]`, оставляя каноничный маркер `[PK]`.
-  * Автоматическое определение Foreign Key: колонки с окончанием `_id` или `id` автоматически распознаются как `[FK]` с генерацией нативных `foreignKeyConstraints`.
-  * Поддержка ограничений `Unique`, `Not Null`, длины и масштаба.
-* **Сбалансированная сетка 2D-раскладки**: Таблицы автоматически формируют аккуратный прямоугольный блок (3–4 таблицы в ряд) без вытягивания в бесконечную горизонтальную полосу.
-* **Нативные связи `DBForeignKey`**: Отображение соединений в нотации «Воронья лапка» (Crow's Foot) с кратностями `1:1`, `1:N`, `M:N`.
+* **Пакеты (Packages)**: Логическая и физическая организация пространства имен с поддержкой вложенности и корректным визуальным содержанием дочерних классификаторов внутри границ пакета.
+* **Классификаторы**: Обычные классы, абстрактные классы (`isAbstract=True`), интерфейсы (`isInterface=True`).
+* **Члены классификаторов**:
+  * Атрибуты с типизацией, значениями по умолчанию и модификаторами видимости (`public`, `private`, `protected`, `package`).
+  * Методы со списком типизированных параметров и сигнатурой возвращаемого значения.
+* **Отношения между классами**:
+  * Наследование / Генерализация (`Generalization`).
+  * Реализация интерфейсов (`Realization`).
+  * Ассоциация (`Association`) с настройкой кратностей на концах связей.
+  * Агрегация (`Aggregation`, `1 → *`).
+  * Композиция (`Composition`, `1 → 1..*`).
+  * Зависимость (`Dependency`).
+* **Заметки (Notes)**: Элементы комментариев `Note` с соединителями `Anchor`, привязанными к целевым классам.
+
+### 2. ER Diagram (Реляционная модель БД)
+
+* **Нативные таблицы Visual Paradigm**: Формирование специализированных метамоделей `DBTable` и `DBColumn` с сохранением свойств в блоке `vpumlChildModels`.
+* **Управление ключами и ограничениями**:
+  * Строгий контроль первичного ключа: валидатор пресекает случайное дублирование PK.
+  * Подавление избыточных маркеров: исключается дублирование флагов уникальности на первичном ключе (чистый индикатор `[PK]` вместо `[PK, U1]`).
+  * Автоматическое распознавание внешних ключей (`is_fk=True`, эвристика суффикса `_id`).
+  * Поддержка ограничений `Unique`, `Not Null`, длины и числового масштаба.
+* **Сбалансированная сетка 2D-компоновки**: Таблицы группируются в сбалансированный двумерный массив с вертикальным позиционированием дочерних таблиц для минимизации пересечения линий.
 
 ### 3. UML Use Case Diagram
-* **Субъекты и сценарии**: Акторы (`uml:Actor`) и Прецеденты (`uml:UseCase`) с пропорциональными размерами эллипсов.
-* **Системные границы (System Boundary)**: Контейнеры границ системы (`uml:Component`) в мягком фирменном синем стиле (`#F0F7FF`, рамка `#4682DC` толщиной 2.0, жирный заголовок 12pt).
-* **Отношения**: Чистые ассоциации акторов со сценариями (без паразитного текста ролей), стандартизированные стереотипы `«Include»` и `«Extend»` с динамической шириной меток без обрезки текста.
+
+* **Субъекты и варианты использования**: Акторы (`uml:Actor`) и прецеденты (`uml:UseCase`) с пропорциональным масштабированием геометрии.
+* **Границы системы (System Boundary)**: Контейнеры подсистем (`uml:Component`) с группировкой входящих сценариев.
+* **Отношения**:
+  * Ассоциации между акторами и прецедентами.
+  * Отношения включения (`Include`) и расширения (`Extend`) с соблюдением правил UML 2.5 (строго между прецедентами) и адаптивным расчетом габаритов меток стереотипов (`captionBounds`).
 
 ### 4. UML State Machine Diagram
-* **Узлы**: Начальное состояние (`Initial Pseudostate` со сплошной черной заливкой), финальное состояние (`FinalState`), рабочие состояния (`State2`).
-* **Внутренние активности**: Поддержка блоков `entry`, `do` и `exit` прямо в теле состояния.
+
+* **Узлы автомата**:
+  * Начальное псевдосостояние (`Initial Pseudostate`).
+  * Рабочие состояния (`State2`).
+  * Финальное состояние (`FinalState`).
+* **Внутренние активности**: Разделы `entry`, `do` и `exit` внутри тела состояния.
 * **Переходы (`Transition2`)**: События-триггеры (`trigger`) и сторожевые условия (`[guard]`).
 
 ---
 
-## Таблица типов данных ER-диаграмм
+## Связи в ER-диаграммах и идентифицируемость
 
-В Visual Paradigm физические ER-диаграммы поддерживают 19 стандартных типов данных из системной палитры, а также основные типы СУБД (PostgreSQL/MySQL):
+В генераторе реализована поддержка полной матрицы кардинальностей и типов реляционных связей:
 
-| Категория | Поддерживаемые типы Visual Paradigm | Дополнительные типы СУБД | Авто-нормализация лишних типов |
+| Тип связи | Обозначение | Описание и требования к метамодели |
+| :--- | :--- | :--- |
+| **Один к одному** | `1:1` | Родительская сущность связывается с уникальной записью дочерней сущности. В дочерней таблице требуется внешний ключ (`is_fk=True`). |
+| **Один ко многим** | `1:N` | Классическое отношение "родитель → потомки". Внешний ключ размещается в целевой таблице (`tgt_name`). |
+| **Многие к одному** | `N:1` | Обратное отношение "потомок → родитель". Внешний ключ размещается в исходной таблице (`src_name`), что подтверждается валидатором. |
+| **Многие ко многим** | `M:N` | Ассоциативное отношение между равноправными сущностями (с поддержкой связующих таблиц). |
+
+### Идентифицирующие и неидентифицирующие связи
+
+Visual Paradigm разделяет физические связи по критерию участия внешнего ключа в составе первичного ключа дочерней таблицы:
+
+* **Идентифицирующая связь (Identifying, `identifying="true"`)**:
+  * Возникает, когда колонка внешнего ключа одновременно является частью составного первичного ключа (`is_pk=True` и `is_fk=True`).
+  * Дочерняя сущность не может существовать без родительской (зависимость по идентификатору).
+  * В интерфейсе Visual Paradigm отображается сплошной линией.
+* **Неидентифицирующая связь (Non-Identifying, `identifying="false"`)**:
+  * Колонка внешнего ключа не входит в первичный ключ дочерней таблицы (`is_pk=False`, `is_fk=True`).
+  * Дочерняя сущность обладает собственным независимым идентификатором.
+  * В интерфейсе Visual Paradigm отображается пунктирной линией.
+
+Генератор `XMI Builder` анализирует флаги колонок целевой сущности и автоматически выставляет атрибут `identifying` в дескрипторе `uml:dbForeignKey`.
+
+---
+
+## Поддержка типов данных PostgreSQL и ANSI SQL
+
+При проектировании реляционных схем в Visual Paradigm через меню:
+**`Tools` → `DB` → `Database Configuration`** в качестве целевой СУБД может быть выбран профиль **PostgreSQL**.
+
+Генератор XMI поддерживает как стандартную палитру ANSI SQL, так и нативные типы данных диалекта PostgreSQL, предотвращая нежелательную замену типов:
+
+| Категория данных | Нативные типы PostgreSQL в Visual Paradigm | Стандартные типы ANSI SQL | Поведение нормализации |
 | :--- | :--- | :--- | :--- |
-| **Целочисленные** | `bigint`, `integer`, `smallint`, `tinyint` | `int8`, `int4`, `int2` | `SERIAL`, `BIGSERIAL` $\rightarrow$ `integer` / `bigint` |
-| **С плавающей точкой / Точные** | `decimal`, `numeric`, `double`, `float`, `real` | `float8`, `float4` | `money`, `dec` $\rightarrow$ `decimal` |
-| **Символьные / Строковые** | `varchar`, `char`, `clob` | — | `text`, `json`, `jsonb` $\rightarrow$ `clob`; `interval` $\rightarrow$ `varchar` |
-| **Бинарные данные** | `binary`, `varbinary`, `blob` | `bytea` | `bytea` $\rightarrow$ `blob` |
-| **Логические** | `bit` | `bool`, `boolean` | `bool` сохраняется или сопоставляется с `bit` |
-| **Дата и время** | `date`, `time`, `timestamp` | — | `timestamptz` $\rightarrow$ `timestamp`; `timetz` $\rightarrow$ `time` |
-| **Идентификаторы** | — | `uuid` | `uuid` сохраняется как отдельный тип |
-
-> [!TIP]
-> При указании типов можно использовать как верхний, так и нижний регистр, а также указывать длину: `VARCHAR(255)`, `NUMERIC(10, 2)`, `BIGINT`. Сервер автоматически извлечет длину и сопоставит тип с нативным кодом Visual Paradigm.
+| **Целочисленные** | `int4` (основной тип), `int2`, `int8` | `integer`, `smallint`, `bigint`, `tinyint` | `SERIAL` → `int4`, `BIGSERIAL` → `int8` |
+| **С плавающей точкой** | `float4`, `float8`, `numeric` | `float`, `double`, `real`, `decimal` | Точные типы `numeric(p, s)` сохраняют размерность |
+| **Текстовые / Строковые** | `text`, `varchar`, `char` | `varchar`, `char`, `clob` | Тип `text` сохраняется как нативный PostgreSQL `text` (без конвертации в `clob`) |
+| **Дата и время** | `timestamp`, `timestamp with time zone`, `time`, `date` | `timestamp`, `time`, `date` | Псевдонимы `timestamptz` сопоставляются с `timestamp with time zone` |
+| **Бинарные данные** | `bytea`, `bit` | `binary`, `varbinary`, `blob` | Тип `bytea` сохраняется в нативном формате |
+| **Специализированные** | `uuid`, `bool` | `boolean` | `uuid` и `bool` регистрируются напрямую в реестре типов |
 
 ---
 
@@ -147,36 +197,37 @@ git clone https://github.com/Larom4ik/mcp-visual-paradigm.git
 cd mcp-visual-paradigm
 ```
 
-### 2. Установка зависимостей
+### 2. Настройка виртуального окружения
 
 Требуется **Python 3.10+**:
 
 ```bash
 python -m venv .venv
-# Активация окружения:
-# Windows (PowerShell):
+
+# Активация окружения в Windows PowerShell:
 .venv\Scripts\Activate.ps1
-# Linux / macOS:
+
+# Активация окружения в Linux / macOS:
 source .venv/bin/activate
 
 pip install -r requirements.txt
 ```
 
-### 3. Проверка работоспособности тестами
+### 3. Проверка тестами
 
 ```bash
 python test_all_diagrams.py
 ```
-
-> Тест создает полную демонстрационную систему (все 4 диаграммы со связями), генерирует файл `enterprise_system.xmi` и выполняет 100% валидацию XML-дерева по стандартам OMG XMI 2.1.
 
 ---
 
 ## Подключение к MCP-клиентам
 
-Все современные AI-среды поддерживают протокол MCP через стандартный ввод/вывод (`stdio`). Подключение выполняется единообразно через конфигурационный JSON.
+Сервер взаимодействует с клиентами через стандартные потоки ввода-вывода (`stdio`).
 
-### Универсальная конфигурация (stdio)
+### Cursor
+
+Добавьте конфигурацию в файл `.cursor/mcp.json` в корне рабочего каталога:
 
 ```json
 {
@@ -189,298 +240,147 @@ python test_all_diagrams.py
 }
 ```
 
-> [!NOTE]
-> Замените `E:\\mcp-visual-paradigm\\main.py` на абсолютный путь к вашему файлу `main.py`. Если используется виртуальное окружение, в поле `command` укажите полный путь к интерпретатору (например, `E:\\mcp-visual-paradigm\\.venv\\Scripts\\python.exe`).
+Либо добавьте сервер через графический интерфейс: **`Settings` → `Features` → `MCP Servers` → `+ Add New MCP Server`**.
+
+### Claude Desktop
+
+Отредактируйте конфигурационный файл Claude Desktop:
+* **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+* **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "visual-paradigm": {
+      "command": "python",
+      "args": ["E:\\mcp-visual-paradigm\\main.py"]
+    }
+  }
+}
+```
+
+### Antigravity IDE / VS Code / Windsurf
+
+В Antigravity IDE добавьте секцию в файл `.agents/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "visual-paradigm": {
+      "command": "python",
+      "args": ["E:\\mcp-visual-paradigm\\main.py"]
+    }
+  }
+}
+```
 
 ---
 
-<details open>
-<summary><b>Настройка в Cursor</b></summary>
+## Справочник MCP-инструментов
 
-1. Перейдите в **Settings** $\rightarrow$ **Features** $\rightarrow$ **MCP Servers**.
-2. Нажмите **+ Add New MCP Server**.
-3. Заполните поля:
-   - **Name**: `visual-paradigm`
-   - **Type**: `command`
-   - **Command**: `python E:\mcp-visual-paradigm\main.py`
-4. Либо откройте/создайте файл `.cursor/mcp.json` в корне рабочего пространства и добавьте блок конфигурации выше.
-</details>
+Сервер предоставляет 30 специализированных инструментов для управления архитектурной моделью:
 
-<details>
-<summary><b>Настройка в Claude Desktop</b></summary>
+### 1. Чтение ТЗ и комплексная сборка
+* `read_requirements_file(filepath)` — чтение технического задания (`.docx`, `.txt`, `.md`, `.json`).
+* `batch_build_diagrams(spec, append, filepath)` — пакетная сборка всех диаграмм в одном вызове.
+* `build_class_diagram(spec, append, diagram_name, filepath)` — генерация диаграммы классов.
+* `build_erd_diagram(spec, append, diagram_name, filepath)` — генерация реляционной схемы БД.
+* `build_use_case_diagram(spec, append, diagram_name, filepath)` — генерация диаграммы вариантов использования.
+* `build_state_diagram(spec, append, diagram_name, filepath)` — генерация диаграммы состояний.
+* `init_project(name)` — инициализация чистого контекста проекта.
+* `sync_with_visual_paradigm(filepath)` — отправка модели в активный Visual Paradigm через фоновый плагин.
+* `export_diagram_image(diagram_name, output_path)` — экспорт активной диаграммы в PNG (Agent Vision).
+* `get_project_summary()` — получение структурированного дампа текущей модели.
+* `export_xmi(filepath)` — экспорт модели в файл OMG XMI 2.1.
+* `set_element_documentation(element_name, documentation)` — заполнение Open Specification / описания элемента.
 
-Откройте файл конфигурации Claude Desktop:
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+### 2. Диаграмма классов (Class Diagram)
+* `add_package(name, parent_package)` — создание пакета с поддержкой иерархии.
+* `move_class_to_package(class_name, package_name)` — перемещение классификатора в пакет.
+* `add_class(name, element_type, is_abstract, package, description)` — добавление класса или интерфейса.
+* `add_class_attribute(class_name, name, type, visibility, default_value, description)` — добавление поля.
+* `add_class_method(class_name, name, return_type, visibility, parameters, description)` — добавление метода.
+* `add_class_relation(src_name, tgt_name, type, src_mult, tgt_mult)` — создание отношения между классами.
+* `suggest_relation(source, target, description)` — рекомендация типа связи на основе описания.
+* `smart_add_relation(source, target, relationship_hint, description)` — создание связи по текстовой подсказке.
 
-Вставьте:
-```json
-{
-  "mcpServers": {
-    "visual-paradigm": {
-      "command": "python",
-      "args": ["E:\\mcp-visual-paradigm\\main.py"]
-    }
-  }
-}
-```
-Перезапустите Claude Desktop (на Windows закройте приложение через трей).
-</details>
-
-<details>
-<summary><b>Настройка в Antigravity IDE / VS Code (Cline / Roo Code / Continue)</b></summary>
-
-В Antigravity IDE добавьте сервер в файл конфигурации `.agents/mcp_config.json` или глобальный `~/.gemini/config/mcp_config.json`:
-```json
-{
-  "mcpServers": {
-    "visual-paradigm": {
-      "command": "python",
-      "args": ["E:\\mcp-visual-paradigm\\main.py"]
-    }
-  }
-}
-```
-Для плагинов VS Code (например, Cline / Roo Code) перейдите в настройки расширения в раздел **MCP Settings** и добавьте ту же секцию.
-</details>
-
----
-
-## Полный справочник инструментов MCP
-
-Сервер предоставляет LLM-агенту **30 специализированных инструментов**, разделенных по архитектурным областям:
-
-### 1. Чтение ТЗ и пакетное построение диаграмм
-| Инструмент | Параметры | Описание |
-| :--- | :--- | :--- |
-| `read_requirements_file` | `filepath: str` | Нативное чтение файлов ТЗ (`.docx`, `.txt`, `.md`, `.json`) в 1 шаг без вызова консольных команд и pip. |
-| `build_class_diagram` | `spec: dict, append: bool = True, diagram_name: str = "Class Diagram", filepath: Optional[str] = None` | Глубокое построение продакшн-диаграммы классов (15-30+ классов, интерфейсы, пакеты, методы, типы, связи). |
-| `build_erd_diagram` | `spec: dict, append: bool = True, diagram_name: str = "ER Diagram", filepath: Optional[str] = None` | Глубокое построение физической схемы БД (15-25 таблиц, нативные типы VP, PK/FK/Unique/NotNull, связи Crow's Foot). |
-| `build_use_case_diagram` | `spec: dict, append: bool = True, diagram_name: str = "Use Case Diagram", filepath: Optional[str] = None` | Построение диаграммы прецедентов (акторы, границы системы System Boundary, связи «Include» и «Extend»). |
-| `build_state_diagram` | `spec: dict, append: bool = True, diagram_name: str = "State Machine Diagram", filepath: Optional[str] = None` | Построение диаграммы состояний (Initial, State с активностями entry/do/exit, переходы с триггерами и guard). |
-| `batch_build_diagrams` | `spec: dict, append: bool = False, filepath: Optional[str] = None` | Универсальная пакетная сборка всех диаграмм одновременно в 1 вызов (с авто-генерацией .xmi и Live Sync). |
-| `init_project` | `name: str = "ProjectModel"` | Инициализирует новый проект с заданным именем и сбрасывает предыдущее состояние. |
-| `sync_with_visual_paradigm` | `filepath: Optional[str] = None` | Отправляет сгенерированную модель напрямую в запущенный Visual Paradigm через фоновый Live Sync плагин. |
-| `export_diagram_image` | `diagram_name: Optional[str] = None, output_path: Optional[str] = None` | Экспортирует активную или указанную диаграмму из Visual Paradigm в высоком разрешении (PNG) для визуальной валидации агентом (Agent Vision через `view_file`). |
-| `get_project_summary` | — | Возвращает подробное структурированное дерево всех элементов по всем диаграммам (для саморефлексии модели). |
-| `set_element_documentation` | `element_name: str, documentation: str` | Добавляет или обновляет подробное описание (Open Specification / HTML-документацию) для любого элемента. |
-| `export_xmi` | `filepath: str` | Запускает Visual Layout Engine и сохраняет чистый файл формата OMG XMI 2.1. |
-
-<details>
-<summary><b>Пример структуры JSON для <code>batch_build_diagrams</code></b></summary>
-
-```json
-{
-  "project_name": "ECommerceSystem",
-  "packages": [
-    {"name": "DomainModel"}
-  ],
-  "classes": [
-    {
-      "name": "Order",
-      "package": "DomainModel",
-      "attributes": [
-        {"name": "id", "type": "uuid", "visibility": "private"},
-        {"name": "totalAmount", "type": "decimal", "visibility": "private"}
-      ],
-      "methods": [
-        {"name": "calculateTotal", "return_type": "decimal", "visibility": "public", "parameters": []}
-      ]
-    }
-  ],
-  "class_relations": [
-    {"source": "Order", "target": "OrderItem", "type": "Composition", "source_multiplicity": "1", "target_multiplicity": "1..*"}
-  ],
-  "entities": [
-    {
-      "name": "orders",
-      "columns": [
-        {"name": "id", "type": "uuid", "is_pk": true, "is_nullable": false},
-        {"name": "status", "type": "varchar", "length": 50, "is_nullable": false}
-      ]
-    }
-  ],
-  "er_relations": [
-    {"source": "customers", "target": "orders", "type": "1:N"}
-  ],
-  "actors": [
-    {"name": "Customer", "description": "Покупатель интернет-магазина"}
-  ],
-  "use_cases": [
-    {"name": "CheckoutOrder", "description": "Оформление заказа"}
-  ],
-  "system_boundary": {
-    "name": "E-Commerce System",
-    "use_cases": ["CheckoutOrder"]
-  },
-  "uc_relations": [
-    {"source": "Customer", "target": "CheckoutOrder", "type": "Association"}
-  ],
-  "states": [
-    {"name": "Initial", "type": "Initial"},
-    {"name": "PendingPayment", "type": "State", "entry": "startTimer()"},
-    {"name": "Paid", "type": "State"},
-    {"name": "Completed", "type": "Final"}
-  ],
-  "transitions": [
-    {"source": "Initial", "target": "PendingPayment"},
-    {"source": "PendingPayment", "target": "Paid", "trigger": "paymentReceived", "guard": "amount > 0"},
-    {"source": "Paid", "target": "Completed"}
-  ],
-  "notes": [
-    {"text": "Все цены рассчитываются с учетом НДС", "attached_to": "Order"}
-  ]
-}
-```
-</details>
-
-### 2. Диаграмма классов (UML Class Diagram)
-| Инструмент | Параметры | Описание |
-| :--- | :--- | :--- |
-| `add_package` | `name: str, parent_package: Optional[str] = None` | Создает пакет для организации пространства имен и визуального контейнера (поддерживает вложенность). |
-| `move_class_to_package` | `class_name: str, package_name: str` | Перемещает существующий класс или интерфейс внутрь указанного пакета. |
-| `add_class` | `name: str, element_type: str = "Class", is_abstract: bool = False, package: Optional[str] = None, description: str = ""` | Создает обычный класс, абстрактный класс или интерфейс (`element_type="Interface"`). |
-| `add_class_attribute`| `class_name: str, name: str, type: str = "String", visibility: str = "public", default_value: Optional[str] = None, description: str = ""` | Добавляет поле с типом, видимостью (`public`, `private`, `protected`) и значением по умолчанию. |
-| `add_class_method` | `class_name: str, name: str, return_type: str = "void", visibility: str = "public", parameters: Optional[list] = None, description: str = ""` | Добавляет метод с возвращаемым типом и списком параметров `[{"name": "...", "type": "..."}]`. |
-| `add_class_relation` | `src_name: str, tgt_name: str, type: str, src_mult: str = "", tgt_mult: str = ""` | Создает связь (`Generalization`, `Realization`, `Association`, `Aggregation`, `Composition`, `Dependency`) с кратностями. |
-| `suggest_relation` | `source: str, target: str, description: str` | Анализирует текстовое описание взаимосвязи двух сущностей и рекомендует наиболее подходящий тип отношения. |
-| `smart_add_relation` | `source: str, target: str, relationship_hint: str = "", description: str = ""` | Семантический NLP-построитель: распознает намерение из подсказки на естественном языке и автоматически создает связь. |
-
-### 3. Диаграмма сущностей (ER Diagram)
-| Инструмент | Параметры | Описание |
-| :--- | :--- | :--- |
-| `add_er_entity` | `name: str, description: str = ""` | Создает нативную таблицу базы данных Visual Paradigm (`DBTable`). |
-| `add_er_column` | `entity_name: str, name: str, type: str = "VARCHAR", length: Optional[int] = None, is_nullable: bool = True, is_pk: bool = False, is_fk: bool = False, is_unique: bool = False, description: str = ""` | Добавляет колонку с ограничениями PK/FK/Unique/NotNull и нативными типами VP (с авто-извлечением длины). |
-| `add_er_relation` | `src_name: str, tgt_name: str, type: str` | Создает соединение Crow's Foot (`1:1`, `1:N`, `M:N`) с проверкой наличия внешнего ключа в дочерней таблице. |
+### 3. Реляционная схема (ER Diagram)
+* `add_er_entity(name, description)` — создание таблицы БД (`DBTable`).
+* `add_er_column(entity_name, name, type, length, is_nullable, is_pk, is_fk, is_unique, description)` — добавление колонки.
+* `add_er_relation(src_name, tgt_name, type)` — создание связи (`1:1`, `1:N`, `N:1`, `M:N`) с проверкой внешних ключей.
 
 ### 4. Диаграмма прецедентов (Use Case Diagram)
-| Инструмент | Параметры | Описание |
-| :--- | :--- | :--- |
-| `add_actor` | `name: str, description: str = ""` | Создает актора системы (`uml:Actor`). |
-| `add_use_case` | `name: str, description: str = ""` | Создает прецедент использования (`uml:UseCase`). |
-| `set_system_boundary`| `name: str = "System", use_cases: Optional[str] = None` | Устанавливает визуальный прямоугольный контейнер границы системы (`uml:Component`), охватывающий прецеденты. |
-| `add_uc_relation` | `src_name: str, tgt_name: str, type: str` | Создает отношение (`Association` для акторов; `Include` и `Extend` строго между прецедентами по правилам UML 2.5). |
+* `add_actor(name, description)` — создание актора.
+* `add_use_case(name, description)` — создание прецедента.
+* `set_system_boundary(name, use_cases)` — создание границы системы (`System Boundary`).
+* `add_uc_relation(src_name, tgt_name, type)` — создание связи (`Association`, `Include`, `Extend`).
 
 ### 5. Диаграмма состояний (State Machine Diagram)
-| Инструмент | Параметры | Описание |
-| :--- | :--- | :--- |
-| `add_state` | `name: str, type: str = "State", entry: str = "", do: str = "", exit: str = "", description: str = ""` | Создает состояние (`Initial`, `State`, `Final`) с активностями `entry`, `do`, `exit`. |
-| `add_state_behavior`| `state_name: str, entry: str = "", do: str = "", exit: str = "", description: str = ""` | Добавляет или изменяет внутренние действия `entry`, `doActivity`, `exit` или описание у существующего состояния. |
-| `add_state_transition`| `src_name: str, tgt_name: str, trigger: str = "", guard: str = ""` | Создает переход (`Transition2`) с событием-триггером и сторожевым условием `[guard]`. |
+* `add_state(name, type, entry, do, exit, description)` — создание состояния.
+* `add_state_behavior(state_name, entry, do, exit, description)` — настройка активностей состояния.
+* `add_state_transition(src_name, tgt_name, trigger, guard)` — создание перехода с триггером и сторожевым условием.
 
-### 6. Заметки (Notes & Anchors)
-| Инструмент | Параметры | Описание |
-| :--- | :--- | :--- |
-| `add_note` | `text: str, target: Optional[str] = None` | Создает визуальный блок заметки (`Note`) с коннектором привязки `Anchor` к любому элементу диаграммы. |
+### 6. Аннотации и комментарии
+* `add_note(text, target)` — создание визуального блока `Note` с коннектором `Anchor`.
 
 ---
 
-## Импорт модели в Visual Paradigm
+## Нативный Java-плагин для Visual Paradigm
 
-После того как модель сгенерировала XMI-файл (например, `output.xmi`):
+Для обеспечения синхронизации в реальном времени разработан плагин на базе OpenAPI Visual Paradigm 18.1+.
 
-1. Запустите **Visual Paradigm**.
-2. В верхнем главном меню выберите:  
-   **`Project` $\rightarrow$ `Import` $\rightarrow$ `XMI...`**
-3. В появившемся диалоговом окне:
-   - Выберите сгенерированный файл `.xmi`.
-   - Оставьте опцию импорта диаграмм включенной.
-4. Нажмите **OK**.
-5. Все 4 диаграммы появятся в **Diagram Navigator**, а сущности — в **Model Explorer**. При открытии диаграммы все элементы будут визуально разложены и выровнены.
+### Архитектура плагина
+* **Встроенный HTTP-сервер (`MCPSyncServer`)**: обслуживает локальный порт `127.0.0.1:19842` и обрабатывает команды импорта XMI и экспорта графики.
+* **Панель управления**: кнопки **Connect**, **Disconnect** и **Import XMI** интегрируются в панель ленты и главное меню.
+* **Автоматическое открытие диаграмм**: после передачи XMI плагин автоматически открывает созданные диаграммы в активной рабочей области.
+* **Agent Vision**: эндпоинт `/export_image` генерирует растровое изображение текущей диаграммы для верификации нейросетью.
 
-> [!IMPORTANT]
-> Если в проекте уже были открыты другие диаграммы, Visual Paradigm добавит новые диаграммы в текущую рабочую область без затирания существующих данных.
+### Установка плагина
 
----
+Запустите командный файл:
 
-## Нативный Java-плагин (Live Sync и Agent Vision)
+```cmd
+install_plugin.bat
+```
 
-Для максимальной автоматизации в каталог `plugin/` включен нативный Java-плагин для Visual Paradigm 18.1+, созданный на базе Visual Paradigm OpenAPI.
+Либо выполните скрипт сборки напрямую:
 
-### Возможности плагина:
-1. **Кнопки управления на ленте и в главном меню**:
-   - На ленте во вкладке **Plugin** (а также в меню **MCP**) доступны три кнопки:
-     - **Import XMI**: быстрый выбор и открытие любого сгенерированного файла `.xmi` в 1 клик.
-     - **Connect** (зелёная иконка): запуск встроенного фонового сервера Live Sync (`127.0.0.1:19842`) со всплывающим подтверждением статуса.
-     - **Disconnect** (красная иконка): остановка фонового сервера Live Sync.
-   - **Умное состояние кнопок (Mutual Exclusivity)**: При работающем сервере кнопка Connect автоматически становится неактивной (серой), а Disconnect — активной; при остановке сервера состояния зеркально переключаются. При запуске Visual Paradigm плагин мгновенно опрашивает статус и исключает случайные повторные клики.
-2. **Встроенный фоновый сервер Live Sync (`127.0.0.1:19842`)**:
-   - Автоматически слушает команды от Python MCP-сервера.
-   - Когда модель или пользователь вызывает `export_xmi`, `build_class_diagram` или `sync_with_visual_paradigm`, диаграммы **мгновенно отрисовываются и распахиваются активной вкладкой на экране в Visual Paradigm** без ручного импорта.
-3. **Обратный экспорт диаграмм в PNG (Agent Vision)**:
-   - Эндпоинт `/export_image` на базе `ModelConvertionManager.exportDiagramAsImage` генерирует растровое изображение PNG открытой диаграммы.
-   - Мультимодальный AI-агент получает путь к файлу и с помощью инструмента `view_file` осматривает результат своими глазами, оценивая сетку, взаимное расположение блоков, читаемость и плотность связей.
-
-### Быстрая установка (в 1 клик):
-Дважды запустите файл **`install_plugin.bat`** в корне репозитория (или выполните команду в консоли):
 ```powershell
 powershell -ExecutionPolicy Bypass -File plugin/build.ps1
 ```
-Скрипт компилирует Java-исходники под целевую платформу Java 11 (стандартная среда Visual Paradigm 18.1), собирает `lib/mcp-plugin.jar`, копирует иконки интерфейса и устанавливает плагин в пользовательский каталог `%APPDATA%\VisualParadigm\plugins\com.mcp.visualparadigm\`.
 
-После выполнения команды запустите или перезапустите Visual Paradigm — плагин активируется автоматически.
-
----
-
-## Архитектура и движки сервера
-
-```
-mcp-visual-paradigm/
-├── core/
-│   ├── doc_reader.py       # Нативный ридер ТЗ (.docx, .txt, .md, .json) без внешних зависимостей
-│   ├── models.py           # Строгие Pydantic v2 модели данных (Node с UUID, ограничения, валидаторы)
-│   ├── rules.py            # Архитектурный валидатор (циклы наследования, правила FK, интерфейсов)
-│   └── state.py            # Потокобезопасное хранилище Singleton (ProjectState) с реестром диаграмм
-├── mcp_tools/
-│   └── tools.py            # 30 MCP-инструментов с глубокими специализированными строителями
-├── exporters/
-│   ├── layout_engine.py    # Двумерная сетка (2D Grid Layout) и иерархическое размещение
-│   └── xmi_builder.py      # Ядро генерации OMG XMI 2.1 и интеграции Visual Paradigm
-├── plugin/                 # Нативный Java-плагин для Visual Paradigm (Live Sync и Agent Vision)
-│   ├── src/                # Исходный код Java (MCPPlugin, MCPSyncServer, Controllers)
-│   ├── plugin.xml          # Манифест плагина Visual Paradigm (кнопки Connect / Disconnect / Import)
-│   ├── build.ps1           # Скрипт компиляции и развертывания
-│   └── README.md           # Документация REST API плагина
-├── install_plugin.bat      # 1-клик установка плагина в Visual Paradigm
-├── main.py                 # Точка входа stdio-сервера
-├── requirements.txt        # Зависимости проекта
-├── test_all_diagrams.py    # E2E тестирование экспорта всех 4 диаграмм
-└── test_erd_types.py       # Юнит-тестирование палитры типов данных ERD
-```
-
-1. **State Store (`core/state.py`)**: Потокобезопасный singleton-реестр, хранящий карты классификаторов, сущностей БД, акторов, состояний и связей.
-2. **Rules Engine (`core/rules.py`)**: Обеспечивает обратную связь для LLM: при обнаружении некорректного вызова возвращает подробную ошибку валидации вместо падения сервера, позволяя агенту исправить действие на следующем шаге.
-3. **XMI Builder & Visual Layout Engine (`exporters/xmi_builder.py`)**:
-   - Формирует корректное пространство имен XML: `xmlns:uml="http://schema.omg.org/spec/UML/2.1"`, `xmlns:xmi="http://schema.omg.org/spec/XMI/2.1"`.
-   - Включает расширения Visual Paradigm (`xmi:Extension extender="Visual Paradigm"`).
-   - Вычисляет абсолютные координаты фигур и точек соединителей (`geometry="x1,y1;x2,y2;"`).
-   - Настраивает цветовые палитры (персиковый для DBTable, классический черный для State, чистые контейнеры для системных границ).
+Скрипт компилирует исходные тексты Java, собирает `lib/mcp-plugin.jar` и копирует манифест в каталог:
+`%APPDATA%\VisualParadigm\plugins\com.mcp.visualparadigm\`.
 
 ---
 
-## Тестирование и валидация
+## Инженерные модули и валидация
 
-В репозитории предусмотрен комплекс тестов:
+1. **State Store (`core/state.py`)**: Потокобезопасный реестр проекта, инкапсулирующий списки классификаторов, сущностей, акторов, состояний и связей.
+2. **Rules Engine (`core/rules.py`)**: Архитектурный валидатор, предотвращающий формирование некорректных структур:
+   * Проверка циклических зависимостей в наследовании (`A → B → C → A`).
+   * Запрет объявления приватных полей и методов в интерфейсах.
+   * Контроль целостности ERD: проверка наличия хотя бы одной колонки внешнего ключа (`is_fk=True`) в зависимой таблице при создании связей `1:N` и `N:1`.
+   * Контроль правил UML 2.5 для связей прецедентов: отношения `Include` и `Extend` разрешены строго между сущностями `UseCase`.
+3. **Visual Layout Engine (`exporters/layout_engine.py` и `exporters/xmi_builder.py`)**:
+   * Расчет двумерных координат и габаритов фигур.
+   * Вычисление геометрии соединительных линий и точек изломов.
+   * Генерация метамоделей Visual Paradigm (`DBTable`, `DBForeignKey`, `State2`, `Transition2`).
+   * Подавление паразитных подписей ролей связей для сохранения чистоты диаграмм.
+
+---
+
+## Тестирование
+
+Комплекс тестов обеспечивает автономную проверку всех подсистем без необходимости запуска внешних приложений:
 
 ```bash
-# 1. Тестирование всех 19 типов данных ERD и нормализации
+# 1. Проверка палитры типов данных ERD (ANSI SQL и PostgreSQL)
 python test_erd_types.py
 
-# 2. Полный сквозной тест создания всех 4 диаграмм и проверка валидности XMI
+# 2. Сквозное тестирование генерации всех 4 видов диаграмм и валидация XMI 2.1
 python test_all_diagrams.py
 
-# 3. Тестирование бизнес-правил валидатора и движка визуального лейаута
+# 3. Проверка архитектурных правил валидатора и движка визуального лейаута
 python test_rules_and_visual.py
 ```
-
-Все тесты работают автономно без необходимости запуска САПР и завершаются со статусом 100% успеха.
-
----
-
-<div align="center">
-
-Разработано для бесшовной автоматизации системного анализа и проектирования архитектуры ПО с помощью AI-агентов.
-
-Если проект оказался вам полезен, вы можете поставить звезду репозиторию на GitHub.
-
-</div>

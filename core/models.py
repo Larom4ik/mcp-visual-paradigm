@@ -253,6 +253,14 @@ class RelationModel(BaseNode):
                             f"ERD Rule Violation: Relation 1:N requires target entity '{tgt_node.name}' "
                             f"to have at least one Foreign Key column defined (is_fk=True)."
                         )
+            elif self.type in ("N:1", "M:1"):
+                src_node = state.find_node_by_id(self.source_id)
+                if src_node is not None and isinstance(src_node, EntityNode):
+                    if not src_node.has_foreign_key():
+                        raise ValueError(
+                            f"ERD Rule Violation: Relation N:1 requires source entity '{src_node.name}' "
+                            f"to have at least one Foreign Key column defined (is_fk=True)."
+                        )
 
             # Rule: Cyclic inheritance detection
             if self.type == "Generalization":

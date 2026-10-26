@@ -45,9 +45,15 @@ def test_erd_data_types():
         ("int8", "int8", 9),
         ("int4", "int4", 9),
         ("int2", "int2", 8),
+        ("text", "text", 27),
         ("bool", "bool", 3),
         ("boolean", "bool", 3),
         ("uuid", "uuid", 28),
+        ("float4", "float4", 12),
+        ("float8", "float8", 13),
+        ("bytea", "bytea", 25),
+        ("timestamptz", "timestamp with time zone", 17),
+        ("timestamp with time zone", "timestamp with time zone", 17),
     ]
 
     for type_input, expected_name, expected_type_int in retained_types:
@@ -55,10 +61,9 @@ def test_erd_data_types():
         assert type_name == expected_name, f"Input '{type_input}': expected typeName '{expected_name}', got '{type_name}'"
         assert type_int == expected_type_int, f"Input '{type_input}': expected type_int {expected_type_int}, got {type_int}"
 
-    # 3. Test that removed/superfluous types are normalized cleanly
+    # 3. Test that normalized types map cleanly
     normalized_types = [
         ("money", "decimal", 11),
-        ("timestamptz", "timestamp", 17),
         ("timetz", "time", 16),
         ("interval", "varchar", 27),
     ]

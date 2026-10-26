@@ -80,15 +80,19 @@ def _normalize_er_rel_type(rel_type: str) -> ERRelationType:
     allowed: dict[str, ERRelationType] = {
         "1:1": "1:1",
         "1:N": "1:N",
+        "N:1": "N:1",
+        "M:1": "N:1",
         "M:N": "M:N",
         "1..1": "1:1",
         "1..N": "1:N",
+        "N..1": "N:1",
+        "M..1": "N:1",
         "M..N": "M:N",
         "N:M": "M:N",
     }
     if clean not in allowed:
         raise ValueError(
-            f"Invalid ER relation type '{rel_type}'. Allowed types: 1:1, 1:N, M:N"
+            f"Invalid ER relation type '{rel_type}'. Allowed types: 1:1, 1:N, N:1, M:N"
         )
     return allowed[clean]
 
@@ -901,13 +905,20 @@ def add_er_relation(src_name: str, tgt_name: str, type: str) -> str:
 
         norm_type = _normalize_er_rel_type(type)
 
-        # Rules Engine: 1:N requires FK in target entity
+        # Rules Engine: 1:N requires FK in target entity; N:1 requires FK in source entity
         if norm_type == "1:N":
             if not state.validate_er_1_to_n(tgt.id):
                 return (
                     f"ERROR: ERD Rule Violation: Relation 1:N from '{src.name}' to '{tgt.name}' "
                     f"requires target entity '{tgt.name}' to have at least one column marked as Foreign Key (is_fk=True). "
                     f"Please add a foreign key column to '{tgt.name}' first using add_er_column()."
+                )
+        elif norm_type == "N:1":
+            if not state.validate_er_1_to_n(src.id):
+                return (
+                    f"ERROR: ERD Rule Violation: Relation N:1 from '{src.name}' to '{tgt.name}' "
+                    f"requires source entity '{src.name}' to have at least one column marked as Foreign Key (is_fk=True). "
+                    f"Please add a foreign key column to '{src.name}' first using add_er_column()."
                 )
 
         rel = ERRelation(source_id=src.id, target_id=tgt.id, type=norm_type)

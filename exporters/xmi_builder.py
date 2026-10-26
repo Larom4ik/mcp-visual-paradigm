@@ -215,10 +215,14 @@ class XMIBuilder:
             return 27, "char", length or 1
         elif "CLOB" in t_upper:
             return 27, "clob", 0
-        elif any(k in t_upper for k in ("TEXT", "STRING", "JSONB", "JSON")):
-            return 27, "clob", 0
+        elif "TEXT" in t_upper:
+            return 27, "text", 0
+        elif any(k in t_upper for k in ("STRING", "JSONB", "JSON")):
+            return 27, "text", 0
 
-        # 4. Date & Time types (timestamptz -> timestamp, timetz -> time)
+        # 4. Date & Time types (timestamptz -> timestamp with time zone, timetz -> time)
+        elif "ZONE" in t_upper or "TIMESTAMPTZ" in t_upper:
+            return 17, "timestamp with time zone", 0
         elif "TIMESTAMP" in t_upper or "DATETIME" in t_upper:
             return 17, "timestamp", 0
         elif "TIME" in t_upper:
@@ -901,8 +905,10 @@ class XMIBuilder:
                 ET.SubElement(fk_props, "property", {"name": "name", "type": "string", "value": ""})
                 ET.SubElement(fk_props, "property", {"name": "modelType", "type": "string", "value": "DBForeignKey"})
                 ET.SubElement(fk_props, "property", {"name": "from", "type": "fromTo", "modelRef": rel.source_id})
-                ET.SubElement(fk_props, "property", {"name": "to", "type": "fromTo", "modelRef": rel.target_id})
-                ET.SubElement(fk_props, "property", {"name": "identifying", "type": "boolean", "value": "false"})
+                # Auto-detect identifying relationship: child entity's FK column is also part of its Primary Key
+                child_ent = tgt if rel.type in ("1:1", "1:N") else src
+                is_identifying = any(c.is_pk and c.is_fk for c in child_ent.columns)
+                ET.SubElement(fk_props, "property", {"name": "identifying", "type": "boolean", "value": str(is_identifying).lower()})
                 ET.SubElement(fk_props, "property", {"name": "subtype", "type": "boolean", "value": "false"})
                 ET.SubElement(fk_props, "property", {"name": "syncType", "type": "int", "value": "1"})
                 ET.SubElement(fk_props, "property", {"name": "fromMultiplicity", "type": "stringSelection", "value": from_mult})
