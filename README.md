@@ -4,7 +4,7 @@
 
 **Интеллектуальный мост между LLM-агентами и САПР Visual Paradigm**
 
-Автоматическое проектирование, генерация и визуальная расстановка 4 видов диаграмм по тексту ТЗ в стандарте **OMG XMI 2.1 (UML 2.x)** для **Visual Paradigm**.
+Автоматическое проектирование, генерация и визуальная расстановка 6 видов диаграмм по тексту ТЗ в стандарте **OMG XMI 2.1 (UML 2.x)** для **Visual Paradigm**.
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![MCP](https://img.shields.io/badge/MCP-Model_Context_Protocol-412991?style=for-the-badge&logo=anthropic&logoColor=white)](https://modelcontextprotocol.io/)
@@ -14,7 +14,7 @@
 
 <br/>
 
-> **MCP Visual Paradigm** позволяет современным моделям (Claude, Gemini, GPT, Cursor, Windsurf) преобразовывать технические требования в строгие архитектурные модели данных, диаграммы классов, сценарии использования и конечные автоматы с автоматической компоновкой элементов в Visual Paradigm.
+> **MCP Visual Paradigm** позволяет современным моделям (Claude, Gemini, GPT, Cursor, Windsurf) преобразовывать технические требования в строгие архитектурные модели данных, диаграммы классов, сценарии использования, конечные автоматы, диаграммы процессов (деятельности) и топологии инфраструктуры развертывания с автоматической компоновкой элементов в Visual Paradigm.
 
 </div>
 
@@ -30,6 +30,8 @@
   - [2. ER Diagram (Реляционная модель БД)](#2-er-diagram-реляционная-модель-бд)
   - [3. UML Use Case Diagram](#3-uml-use-case-diagram)
   - [4. UML State Machine Diagram](#4-uml-state-machine-diagram)
+  - [5. UML Activity Diagram](#5-uml-activity-diagram)
+  - [6. UML Deployment Diagram](#6-uml-deployment-diagram)
 - [Связи в ER-диаграммах и идентифицируемость](#связи-в-er-диаграммах-и-идентифицируемость)
 - [Поддержка типов данных PostgreSQL и ANSI SQL](#поддержка-типов-данных-postgresql-и-ansi-sql)
 - [Быстрый старт](#быстрый-старт)
@@ -139,6 +141,39 @@ Project → Import → XMI...                                 Отрисовка
   * Финальное состояние (`FinalState`).
 * **Внутренние активности**: Разделы `entry`, `do` и `exit` внутри тела состояния.
 * **Переходы (`Transition2`)**: События-триггеры (`trigger`) и сторожевые условия (`[guard]`).
+
+### 5. UML Activity Diagram (Диаграмма деятельности)
+
+* **Дорожки и зоны ответственности (Partitions / Swimlanes)**: Вертикальные и горизонтальные дорожки (`uml:ActivityPartition`) для разделения зон ответственности между пользователями, сервисами и внешними шлюзами.
+* **Узлы потока управления**:
+  * Начальный узел (`InitialNode`).
+  * Действия и шаги процесса (`Action` / `OpaqueAction`).
+  * Узлы принятия решений (`DecisionNode`) и слияния альтернативных путей (`MergeNode`).
+  * Узлы параллелизма: разделение (`ForkNode`) и синхронизация (`JoinNode`).
+  * Финальные узлы завершения процесса (`ActivityFinalNode`) и потока (`FlowFinalNode`).
+* **Потоки управления и данных**:
+  * Соединители потоков управления (`ControlFlow`) и потоков данных/объектов (`ObjectFlow`).
+  * Поддержка сторожевых условий (`[guard]`), отображаемых вдоль соединительной линии.
+* **Автоматический алгоритмический лейаут (`ActivityFlowLayout`)**:
+  * Расчет топологических уровней графа (DAG) от истока к стокам.
+  * Автоматическое выравнивание элементов по соответствующим полосам Swimlane с точным вложением геометрии (`parentDiagramElement`).
+
+### 6. UML Deployment Diagram (Диаграмма развертывания)
+
+* **Узлы вычислительной инфраструктуры**:
+  * Физические серверы и хосты (`Node`).
+  * Аппаратные устройства и рабочие станции клиентов (`Device`).
+  * Среды исполнения (`ExecutionEnvironment`: контейнеры Docker, Kubernetes, JVM, виртуальные машины, движки СУБД).
+  * Поддержка вложенности сред исполнения внутрь физических хостов.
+* **Программные артефакты (`Artifact`)**:
+  * Исполняемые файлы, сборки (`.jar`, `.war`, `.exe`), файлы конфигурации, образы контейнеров и SQL-скрипты.
+  * Визуальное размещение артефактов внутри соответствующих узлов развертывания.
+* **Сетевые соединения и пути взаимодействия**:
+  * Коммуникационные пути (`CommunicationPath`) с явным указанием сетевых протоколов и портов (например, `HTTPS (Port 443)`, `gRPC (Port 50051)`, `TCP/IP (Port 5432)`).
+  * Отношения явного развертывания (`Deployment`, стереотип `«deploy»`).
+* **Ярусная топологическая компоновка (`DeploymentTopologyLayout`)**:
+  * Автоматическая классификация инфраструктуры по архитектурным ярусам: `Client Tier` → `Gateway / Ingress Tier` → `Application Tier` → `Database / Cache Tier`.
+  * Эстетичная визуализация нативной палитры Visual Paradigm (синий градиент `#7ACFF5` для узлов и теплый бежевый для артефактов).
 
 ---
 
@@ -278,7 +313,7 @@ python test_all_diagrams.py
 
 ## Справочник MCP-инструментов
 
-Сервер предоставляет 30 специализированных инструментов для управления архитектурной моделью:
+Сервер предоставляет 39 специализированных инструментов для управления архитектурной моделью:
 
 ### 1. Чтение ТЗ и комплексная сборка
 * `read_requirements_file(filepath)` — чтение технического задания (`.docx`, `.txt`, `.md`, `.json`).
@@ -287,6 +322,8 @@ python test_all_diagrams.py
 * `build_erd_diagram(spec, append, diagram_name, filepath)` — генерация реляционной схемы БД.
 * `build_use_case_diagram(spec, append, diagram_name, filepath)` — генерация диаграммы вариантов использования.
 * `build_state_diagram(spec, append, diagram_name, filepath)` — генерация диаграммы состояний.
+* `build_activity_diagram(spec, append, diagram_name, filepath)` — генерация диаграммы деятельности (процессов).
+* `build_deployment_diagram(spec, append, diagram_name, filepath)` — генерация диаграммы развертывания (инфраструктуры).
 * `init_project(name)` — инициализация чистого контекста проекта.
 * `sync_with_visual_paradigm(filepath)` — отправка модели в активный Visual Paradigm через фоновый плагин.
 * `export_diagram_image(diagram_name, output_path)` — экспорт активной диаграммы в PNG (Agent Vision).
@@ -320,7 +357,18 @@ python test_all_diagrams.py
 * `add_state_behavior(state_name, entry, do, exit, description)` — настройка активностей состояния.
 * `add_state_transition(src_name, tgt_name, trigger, guard)` — создание перехода с триггером и сторожевым условием.
 
-### 6. Аннотации и комментарии
+### 6. Диаграмма деятельности (Activity Diagram)
+* `add_activity_partition(name, description)` — создание дорожки / зоны ответственности (`ActivityPartition` / Swimlane).
+* `add_activity_node(name, type, partition, description)` — создание узла действия, решения, слияния, ветвления или завершения.
+* `add_control_flow(src_name, tgt_name, guard, flow_type)` — создание потока управления (`ControlFlow`) или объекта (`ObjectFlow`) со сторожевым условием.
+
+### 7. Диаграмма развертывания (Deployment Diagram)
+* `add_deployment_node(name, node_type, parent_node, description)` — создание вычислительного узла (`Node`, `Device`, `ExecutionEnvironment`).
+* `add_artifact(name, deployed_on_node, file_name, description)` — создание программного артефакта (`Artifact`), привязанного к хосту.
+* `add_communication_path(src_node, tgt_node, protocol, description)` — создание коммуникационного пути с сетевым протоколом и портом.
+* `add_deployment_link(artifact_name, node_name, description)` — создание явной зависимости развертывания (`«deploy»`).
+
+### 8. Аннотации и комментарии
 * `add_note(text, target)` — создание визуального блока `Note` с коннектором `Anchor`.
 
 ---

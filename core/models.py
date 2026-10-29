@@ -298,6 +298,88 @@ class SystemBoundaryNode(BaseNode):
     use_case_ids: list[str] = Field(default_factory=list, description="IDs of use cases inside this boundary")
 
 
+# ---------------------------------------------------------
+# 7. Activity Diagram Models
+# ---------------------------------------------------------
+
+ActivityNodeType = Literal[
+    "Initial",
+    "Action",
+    "Decision",
+    "Merge",
+    "Fork",
+    "Join",
+    "Final",
+    "FlowFinal",
+]
+
+
+class ActivityNode(BaseNode):
+    """Represents a node in a UML Activity Diagram (Action, Decision, Fork, Join, Initial, Final)."""
+
+    name: str = Field(..., min_length=1, description="Activity node name or action description")
+    type: ActivityNodeType = Field(default="Action", description="Type: Initial, Action, Decision, Merge, Fork, Join, Final, FlowFinal")
+    partition_id: Optional[str] = Field(default=None, description="Optional ID of enclosing swimlane / partition")
+
+
+class ActivityPartitionNode(BaseNode):
+    """Represents a swimlane / partition in an Activity Diagram for organizational grouping."""
+
+    name: str = Field(..., min_length=1, description="Partition / Swimlane name (e.g. 'Customer', 'PaymentGateway')")
+    activity_node_ids: list[str] = Field(default_factory=list, description="IDs of activity nodes assigned to this partition")
+
+
+class ActivityFlow(RelationModel):
+    """Represents a ControlFlow or ObjectFlow in an Activity Diagram."""
+
+    type: str = Field(default="ControlFlow", description="Flow type: ControlFlow or ObjectFlow")
+    guard: str = Field(default="", description="Guard condition expression, e.g. '[is_valid == true]'")
+    weight: str = Field(default="", description="Optional edge weight")
+
+
+# ---------------------------------------------------------
+# 8. Deployment Diagram Models
+# ---------------------------------------------------------
+
+DeploymentNodeType = Literal[
+    "Node",
+    "Device",
+    "ExecutionEnvironment",
+]
+
+
+class DeployNode(BaseNode):
+    """Represents a hardware, virtual machine, or container node in a Deployment Diagram."""
+
+    name: str = Field(..., min_length=1, description="Node or server name (e.g. 'App Server', 'PostgreSQL DB')")
+    node_type: DeploymentNodeType = Field(default="Node", description="Node type: Node, Device, ExecutionEnvironment")
+    parent_node_id: Optional[str] = Field(default=None, description="Optional parent node ID for nested environments")
+    deployed_artifact_ids: list[str] = Field(default_factory=list, description="IDs of artifacts deployed on this node")
+
+
+class ArtifactNode(BaseNode):
+    """Represents a software artifact (.jar, .war, docker image, binary, config file)."""
+
+    name: str = Field(..., min_length=1, description="Artifact name (e.g. 'order-service.jar', 'schema.sql')")
+    file_name: str = Field(default="", description="Optional physical file name")
+    deployed_on_node_id: Optional[str] = Field(default=None, description="ID of node where this artifact is deployed")
+
+
+DeploymentRelationType = Literal[
+    "CommunicationPath",
+    "Deployment",
+    "Manifestation",
+    "Dependency",
+]
+
+
+class DeploymentRelation(RelationModel):
+    """Represents a communication path, deployment link, or dependency in a Deployment Diagram."""
+
+    type: str = Field(default="CommunicationPath", description="CommunicationPath, Deployment, Manifestation, Dependency")
+    protocol: str = Field(default="", description="Network protocol or port (e.g. 'HTTPS (Port 443)', 'TCP/IP (5432)')")
+
+
 # Backwards compatibility aliases
 ClassRelation = RelationModel
 ERRelation = RelationModel
@@ -305,3 +387,10 @@ UCRelation = RelationModel
 TransitionModel = RelationModel
 NoteModel = NoteNode
 SystemBoundaryModel = SystemBoundaryNode
+ActivityModel = ActivityNode
+ActivityPartition = ActivityPartitionNode
+DeploymentNode = DeployNode
+ArtifactModel = ArtifactNode
+DeploymentRelationModel = DeploymentRelation
+
+

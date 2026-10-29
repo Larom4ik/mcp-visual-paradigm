@@ -3,9 +3,13 @@
 import threading
 from typing import Optional, Union
 from core.models import (
+    ActivityNode,
+    ActivityPartitionNode,
     ActorNode,
+    ArtifactNode,
     BaseNode,
     ClassNode,
+    DeployNode,
     EntityNode,
     NoteNode,
     PackageNode,
@@ -53,6 +57,10 @@ class ProjectState:
             self.actors: dict[str, ActorNode] = {}
             self.use_cases: dict[str, UseCaseNode] = {}
             self.states: dict[str, StateNode] = {}
+            self.activity_nodes: dict[str, ActivityNode] = {}
+            self.activity_partitions: dict[str, ActivityPartitionNode] = {}
+            self.deployment_nodes: dict[str, DeployNode] = {}
+            self.deployment_artifacts: dict[str, ArtifactNode] = {}
             self.notes: dict[str, NoteNode] = {}
             self.system_boundary: Optional[SystemBoundaryNode] = None
             self.diagram_names: dict[str, str] = {}
@@ -69,6 +77,10 @@ class ProjectState:
             self.actors.clear()
             self.use_cases.clear()
             self.states.clear()
+            self.activity_nodes.clear()
+            self.activity_partitions.clear()
+            self.deployment_nodes.clear()
+            self.deployment_artifacts.clear()
             self.notes.clear()
             self.system_boundary = None
             self.diagram_names.clear()
@@ -99,6 +111,14 @@ class ProjectState:
                 self.use_cases[node.id] = node
             elif isinstance(node, StateNode):
                 self.states[node.id] = node
+            elif isinstance(node, ActivityNode):
+                self.activity_nodes[node.id] = node
+            elif isinstance(node, ActivityPartitionNode):
+                self.activity_partitions[node.id] = node
+            elif isinstance(node, DeployNode):
+                self.deployment_nodes[node.id] = node
+            elif isinstance(node, ArtifactNode):
+                self.deployment_artifacts[node.id] = node
             elif isinstance(node, NoteNode):
                 self.notes[node.id] = node
             elif isinstance(node, SystemBoundaryNode):
@@ -128,6 +148,14 @@ class ProjectState:
                 return self.use_cases[node_id]
             if node_id in self.states:
                 return self.states[node_id]
+            if node_id in self.activity_nodes:
+                return self.activity_nodes[node_id]
+            if node_id in self.activity_partitions:
+                return self.activity_partitions[node_id]
+            if node_id in self.deployment_nodes:
+                return self.deployment_nodes[node_id]
+            if node_id in self.deployment_artifacts:
+                return self.deployment_artifacts[node_id]
             if node_id in self.notes:
                 return self.notes[node_id]
             if self.system_boundary and self.system_boundary.id == node_id:
@@ -137,8 +165,21 @@ class ProjectState:
     def find_node_by_name(self, name: str) -> Optional[BaseNode]:
         """Find any node by exact or case-insensitive name across all collections."""
         with self._lock:
+            all_collections = (
+                self.packages,
+                self.classes,
+                self.entities,
+                self.actors,
+                self.use_cases,
+                self.states,
+                self.activity_nodes,
+                self.activity_partitions,
+                self.deployment_nodes,
+                self.deployment_artifacts,
+                self.notes,
+            )
             # 1. Exact match
-            for collection in (self.packages, self.classes, self.entities, self.actors, self.use_cases, self.states, self.notes):
+            for collection in all_collections:
                 for item in collection.values():
                     if item.name == name:
                         return item
@@ -146,7 +187,7 @@ class ProjectState:
                 return self.system_boundary
             # 2. Case-insensitive match
             name_lower = name.lower()
-            for collection in (self.packages, self.classes, self.entities, self.actors, self.use_cases, self.states, self.notes):
+            for collection in all_collections:
                 for item in collection.values():
                     if item.name.lower() == name_lower:
                         return item
@@ -276,6 +317,46 @@ class ProjectState:
                     return st
             return None
 
+    def find_activity_node(self, identifier: str) -> Optional[ActivityNode]:
+        """Find an ActivityNode by ID or Name."""
+        with self._lock:
+            if identifier in self.activity_nodes:
+                return self.activity_nodes[identifier]
+            for act in self.activity_nodes.values():
+                if act.name == identifier or act.name.lower() == identifier.lower():
+                    return act
+            return None
+
+    def find_activity_partition(self, identifier: str) -> Optional[ActivityPartitionNode]:
+        """Find an ActivityPartitionNode (Swimlane) by ID or Name."""
+        with self._lock:
+            if identifier in self.activity_partitions:
+                return self.activity_partitions[identifier]
+            for part in self.activity_partitions.values():
+                if part.name == identifier or part.name.lower() == identifier.lower():
+                    return part
+            return None
+
+    def find_deploy_node(self, identifier: str) -> Optional[DeployNode]:
+        """Find a DeployNode by ID or Name."""
+        with self._lock:
+            if identifier in self.deployment_nodes:
+                return self.deployment_nodes[identifier]
+            for dnode in self.deployment_nodes.values():
+                if dnode.name == identifier or dnode.name.lower() == identifier.lower():
+                    return dnode
+            return None
+
+    def find_artifact(self, identifier: str) -> Optional[ArtifactNode]:
+        """Find an ArtifactNode by ID or Name."""
+        with self._lock:
+            if identifier in self.deployment_artifacts:
+                return self.deployment_artifacts[identifier]
+            for art in self.deployment_artifacts.values():
+                if art.name == identifier or art.name.lower() == identifier.lower():
+                    return art
+            return None
+
     def set_state_behavior(
         self,
         state_ref: str,
@@ -319,7 +400,7 @@ class ProjectState:
 
     @property
     def er_relations(self) -> list[RelationModel]:
-        items = [r for r in self.relations if r.type in ("1:1", "1:N", "M:N")]
+        items = [r for r in self.relations if r.type in ("1:1", "1:N", "N:1", "M:1", "M:N", "N:M")]
         return _RelationList(items, self)
 
     @property
@@ -336,6 +417,25 @@ class ProjectState:
         items = [
             r for r in self.relations
             if r.type == "Transition" or (r.source_id in self.states and r.target_id in self.states)
+        ]
+        return _RelationList(items, self)
+
+    @property
+    def activity_flows(self) -> list[RelationModel]:
+        items = [
+            r for r in self.relations
+            if r.type in ("ControlFlow", "ObjectFlow")
+            or (r.source_id in self.activity_nodes and r.target_id in self.activity_nodes)
+        ]
+        return _RelationList(items, self)
+
+    @property
+    def deployment_relations(self) -> list[RelationModel]:
+        items = [
+            r for r in self.relations
+            if r.type in ("CommunicationPath", "Deployment", "Manifestation")
+            or (r.source_id in self.deployment_nodes or r.target_id in self.deployment_nodes
+                or r.source_id in self.deployment_artifacts or r.target_id in self.deployment_artifacts)
         ]
         return _RelationList(items, self)
 

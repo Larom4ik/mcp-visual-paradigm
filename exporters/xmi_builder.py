@@ -20,8 +20,12 @@ import xml.etree.ElementTree as ET
 from typing import Optional
 try:
     from core.models import (
+        ActivityNode,
+        ActivityPartitionNode,
+        ArtifactNode,
         BaseNode,
         ClassNode,
+        DeployNode,
         EntityNode,
         MethodModel,
         NoteNode,
@@ -32,7 +36,9 @@ try:
     )
     from core.state import ProjectState
     from exporters.layout_engine import (
+        ActivityFlowLayout,
         BoundingBoxCalculator,
+        DeploymentTopologyLayout,
         ERDClusterLayout,
         HierarchicalClassLayout,
         NodePlacement,
@@ -42,8 +48,12 @@ try:
     )
 except ImportError:
     from ..core.models import (
+        ActivityNode,
+        ActivityPartitionNode,
+        ArtifactNode,
         BaseNode,
         ClassNode,
+        DeployNode,
         EntityNode,
         MethodModel,
         NoteNode,
@@ -54,7 +64,9 @@ except ImportError:
     )
     from ..core.state import ProjectState
     from .layout_engine import (
+        ActivityFlowLayout,
         BoundingBoxCalculator,
+        DeploymentTopologyLayout,
         ERDClusterLayout,
         HierarchicalClassLayout,
         NodePlacement,
@@ -1293,6 +1305,257 @@ class XMIBuilder:
                     },
                 )
 
+    def _build_activity_metamodel(self) -> None:
+        assert self.model is not None
+        if not self.state.activity_nodes and not self.state.activity_flows:
+            return
+
+        act_root = ET.SubElement(
+            self.model,
+            "ownedMember",
+            {
+                f"{{{XMI_NS}}}type": "uml:Activity",
+                f"{{{XMI_NS}}}id": create_uuid_id("activity_root"),
+                "name": f"{self.state.name}_Activity",
+                "isAbstract": "false",
+                "isReadOnly": "false",
+                "isSingleExecution": "false",
+            },
+        )
+        act_root_vp = ET.SubElement(act_root, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+        ET.SubElement(act_root_vp, "modelType", {"value": "Activity"})
+        ET.SubElement(act_root_vp, "qualityScore", {"value": "-1"})
+
+        # 1. Partitions (Swimlanes)
+        partition_elems: dict[str, ET.Element] = {}
+        for part in self.state.activity_partitions.values():
+            p_elem = ET.SubElement(
+                act_root,
+                "group",
+                {
+                    f"{{{XMI_NS}}}type": "uml:ActivityPartition",
+                    f"{{{XMI_NS}}}id": part.id,
+                    "name": part.name,
+                },
+            )
+            p_vp = ET.SubElement(p_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(p_vp, "modelType", {"value": "ActivityPartition"})
+            ET.SubElement(p_vp, "qualityScore", {"value": "-1"})
+            partition_elems[part.id] = p_elem
+
+        # 2. Activity Nodes
+        node_type_map = {
+            "Initial": "uml:InitialNode",
+            "Action": "uml:OpaqueAction",
+            "Decision": "uml:DecisionNode",
+            "Merge": "uml:MergeNode",
+            "Fork": "uml:ForkNode",
+            "Join": "uml:JoinNode",
+            "Final": "uml:ActivityFinalNode",
+            "FlowFinal": "uml:FlowFinalNode",
+        }
+        vp_model_type_map = {
+            "Initial": "InitialNode",
+            "Action": "Action",
+            "Decision": "DecisionNode",
+            "Merge": "MergeNode",
+            "Fork": "ForkNode",
+            "Join": "JoinNode",
+            "Final": "ActivityFinalNode",
+            "FlowFinal": "FlowFinalNode",
+        }
+
+        for node in self.state.activity_nodes.values():
+            xmi_type = node_type_map.get(node.type, "uml:OpaqueAction")
+            vp_type = vp_model_type_map.get(node.type, "Action")
+
+            node_elem = ET.SubElement(
+                act_root,
+                "node",
+                {
+                    f"{{{XMI_NS}}}type": xmi_type,
+                    f"{{{XMI_NS}}}id": node.id,
+                    "name": node.name,
+                },
+            )
+            node_vp = ET.SubElement(node_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(node_vp, "modelType", {"value": vp_type})
+            ET.SubElement(node_vp, "qualityScore", {"value": "-1"})
+
+            if getattr(node, "description", ""):
+                ET.SubElement(
+                    node_elem,
+                    "ownedComment",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Comment",
+                        f"{{{XMI_NS}}}id": f"{node.id}_comment",
+                        "body": node.description,
+                    },
+                )
+                ET.SubElement(node_vp, "documentation", {"value": node.description})
+
+            if node.partition_id and node.partition_id in partition_elems:
+                ET.SubElement(partition_elems[node.partition_id], "node", {f"{{{XMI_NS}}}idref": node.id})
+
+        # 3. Control & Object Flows
+        for flow in self.state.activity_flows:
+            flow_type = "uml:ObjectFlow" if flow.type == "ObjectFlow" else "uml:ControlFlow"
+            vp_flow_type = "ObjectFlow" if flow.type == "ObjectFlow" else "ControlFlow"
+
+            flow_elem = ET.SubElement(
+                act_root,
+                "edge",
+                {
+                    f"{{{XMI_NS}}}type": flow_type,
+                    f"{{{XMI_NS}}}id": flow.id,
+                    "name": flow.name or (f"[{flow.guard}]" if getattr(flow, "guard", "") else ""),
+                    "source": flow.source_id,
+                    "target": flow.target_id,
+                },
+            )
+            flow_vp = ET.SubElement(flow_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(flow_vp, "modelType", {"value": vp_flow_type})
+            ET.SubElement(flow_vp, "qualityScore", {"value": "-1"})
+
+            guard_str = getattr(flow, "guard", "") or getattr(flow, "guard_condition", "")
+            if guard_str:
+                ET.SubElement(
+                    flow_elem,
+                    "guard",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:LiteralString",
+                        f"{{{XMI_NS}}}id": f"{flow.id}_guard",
+                        "value": guard_str,
+                    },
+                )
+
+    def _build_deployment_metamodel(self) -> None:
+        assert self.model is not None
+        if not self.state.deployment_nodes and not self.state.deployment_artifacts:
+            return
+
+        for node in self.state.deployment_nodes.values():
+            node_xmi_type = "uml:Node"
+            node_vp_type = "Node"
+            if node.node_type == "Device":
+                node_xmi_type = "uml:Device"
+                node_vp_type = "Device"
+            elif node.node_type == "ExecutionEnvironment":
+                node_xmi_type = "uml:ExecutionEnvironment"
+                node_vp_type = "ExecutionEnvironment"
+
+            node_elem = ET.SubElement(
+                self.model,
+                "ownedMember",
+                {
+                    f"{{{XMI_NS}}}type": node_xmi_type,
+                    f"{{{XMI_NS}}}id": node.id,
+                    "name": node.name,
+                    "visibility": "public",
+                },
+            )
+            node_vp = ET.SubElement(node_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(node_vp, "modelType", {"value": node_vp_type})
+            ET.SubElement(node_vp, "qualityScore", {"value": "-1"})
+
+            if getattr(node, "description", ""):
+                ET.SubElement(
+                    node_elem,
+                    "ownedComment",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Comment",
+                        f"{{{XMI_NS}}}id": f"{node.id}_comment",
+                        "body": node.description,
+                    },
+                )
+                ET.SubElement(node_vp, "documentation", {"value": node.description})
+
+        for art in self.state.deployment_artifacts.values():
+            art_elem = ET.SubElement(
+                self.model,
+                "ownedMember",
+                {
+                    f"{{{XMI_NS}}}type": "uml:Artifact",
+                    f"{{{XMI_NS}}}id": art.id,
+                    "name": art.name,
+                    "fileName": getattr(art, "file_name", "") or art.name,
+                    "visibility": "public",
+                },
+            )
+            art_vp = ET.SubElement(art_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+            ET.SubElement(art_vp, "modelType", {"value": "Artifact"})
+            ET.SubElement(art_vp, "qualityScore", {"value": "-1"})
+
+            if getattr(art, "description", ""):
+                ET.SubElement(
+                    art_elem,
+                    "ownedComment",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Comment",
+                        f"{{{XMI_NS}}}id": f"{art.id}_comment",
+                        "body": art.description,
+                    },
+                )
+                ET.SubElement(art_vp, "documentation", {"value": art.description})
+
+        for rel in self.state.deployment_relations:
+            if rel.type == "Deployment":
+                deploy_elem = ET.SubElement(
+                    self.model,
+                    "ownedMember",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Deployment",
+                        f"{{{XMI_NS}}}id": rel.id,
+                        "name": rel.name or "«deploy»",
+                        "client": rel.source_id,
+                        "supplier": rel.target_id,
+                    },
+                )
+                deploy_vp = ET.SubElement(deploy_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+                ET.SubElement(deploy_vp, "modelType", {"value": "Deployment"})
+                ET.SubElement(deploy_vp, "qualityScore", {"value": "-1"})
+            else:
+                comm_name = getattr(rel, "protocol", "") or rel.name or "CommunicationPath"
+                comm_elem = ET.SubElement(
+                    self.model,
+                    "ownedMember",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:CommunicationPath",
+                        f"{{{XMI_NS}}}id": rel.id,
+                        "name": comm_name,
+                        "visibility": "public",
+                    },
+                )
+                comm_vp = ET.SubElement(comm_elem, f"{{{XMI_NS}}}Extension", {"extender": "Visual Paradigm"})
+                ET.SubElement(comm_vp, "modelType", {"value": "CommunicationPath"})
+                ET.SubElement(comm_vp, "qualityScore", {"value": "-1"})
+
+                end_src_id = f"{rel.id}_end_src"
+                end_tgt_id = f"{rel.id}_end_tgt"
+                ET.SubElement(comm_elem, "memberEnd", {f"{{{XMI_NS}}}idref": end_src_id})
+                ET.SubElement(comm_elem, "memberEnd", {f"{{{XMI_NS}}}idref": end_tgt_id})
+
+                ET.SubElement(
+                    comm_elem,
+                    "ownedEnd",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Property",
+                        f"{{{XMI_NS}}}id": end_src_id,
+                        "type": rel.source_id,
+                        "association": rel.id,
+                    },
+                )
+                ET.SubElement(
+                    comm_elem,
+                    "ownedEnd",
+                    {
+                        f"{{{XMI_NS}}}type": "uml:Property",
+                        f"{{{XMI_NS}}}id": end_tgt_id,
+                        "type": rel.target_id,
+                        "association": rel.id,
+                    },
+                )
+
     # ---------------------------------------------------------
     # Visual Layout Engine (OMG <uml:Diagram> and <uml:DiagramElement>)
     # ---------------------------------------------------------
@@ -1382,6 +1645,75 @@ class XMIBuilder:
             az_order = "2"
             bg_color = "Cr:245,182,122,255"
             fill_color = "Cr:245,182,122,255"
+            fill_trans = "0"
+            line_color = "Cr:0,0,0,255"
+            line_weight = "1.0"
+        elif shape_type in ("Action", "ActivityAction"):
+            effective_caption_side = 12
+            caption_bounds = f"0,0,{p.width},{p.height}"
+            caption_vis = "true"
+            align = "4"
+            az_order = "2"
+            bg_color = "Cr:255,248,220,255"
+            fill_color = "Cr:255,248,220,255"
+            line_color = "Cr:0,0,0,255"
+        elif shape_type in ("DecisionNode", "MergeNode"):
+            effective_caption_side = 1
+            caption_bounds = "0,0,0,0"
+            caption_vis = "false"
+            align = "4"
+            az_order = "2"
+            bg_color = "Cr:255,255,220,255"
+            fill_color = "Cr:255,255,220,255"
+            line_color = "Cr:0,0,0,255"
+        elif shape_type in ("ForkNode", "JoinNode"):
+            effective_caption_side = 1
+            caption_bounds = "0,0,0,0"
+            caption_vis = "false"
+            align = "4"
+            az_order = "2"
+            bg_color = "Cr:0,0,0,255"
+            fill_color = "Cr:0,0,0,255"
+            line_color = "Cr:0,0,0,255"
+        elif shape_type in ("ActivityFinalNode", "FlowFinalNode"):
+            effective_caption_side = 1
+            caption_bounds = "0,0,0,0"
+            caption_vis = "false"
+            align = "4"
+            az_order = "3"
+            bg_color = "Cr:255,255,255,255"
+            fill_color = "Cr:255,255,255,255"
+            line_color = "Cr:0,0,0,255"
+        elif shape_type == "ActivitySwimlane2":
+            effective_caption_side = 12
+            caption_bounds = f"0,0,{p.width},30"
+            caption_vis = "true"
+            align = "4"
+            az_order = "1"
+            bg_color = "Cr:250,250,250,255"
+            fill_color = "Cr:250,250,250,255"
+            fill_trans = "0"
+            line_color = "Cr:70,130,220,255"
+            line_weight = "1.5"
+        elif shape_type in ("Node", "Device", "ExecutionEnvironment"):
+            effective_caption_side = 12
+            caption_bounds = f"0,0,{p.width},34"
+            caption_vis = "true"
+            align = "4"
+            az_order = "1"
+            bg_color = "Cr:122,207,245,255"
+            fill_color = "Cr:122,207,245,255"
+            fill_trans = "0"
+            line_color = "Cr:0,0,0,255"
+            line_weight = "1.0"
+        elif shape_type == "Artifact":
+            effective_caption_side = 12
+            caption_bounds = f"0,0,{p.width},{p.height}"
+            caption_vis = "true"
+            align = "4"
+            az_order = "2"
+            bg_color = "Cr:255,255,240,255"
+            fill_color = "Cr:255,255,240,255"
             fill_trans = "0"
             line_color = "Cr:0,0,0,255"
             line_weight = "1.0"
@@ -1925,6 +2257,138 @@ class XMIBuilder:
                 "StateDiagram",
             )
 
+        # Diagram 5: Activity Diagram with DAG Flow and Swimlane Layout
+        if self.state.activity_nodes:
+            act_layout = ActivityFlowLayout(start_x=350, start_y=60, gap_y=60)
+            act_placements = act_layout.layout(self.state)
+            act_title = getattr(self.state, "diagram_names", {}).get("ActivityDiagram", "Activity Diagram")
+            _, omg_elements = self._create_diagram("omg_diag_act_1", act_title, "ActivityDiagram")
+
+            # 1. Partitions (Swimlanes) if present
+            for pid, part in self.state.activity_partitions.items():
+                if pid in act_placements:
+                    p = act_placements[pid]
+                    self._add_shape_element(
+                        omg_elements,
+                        p,
+                        part,
+                        shape_type="ActivitySwimlane2",
+                        creator_diag_type="ActivityDiagram",
+                        caption_side=12,
+                    )
+
+            # 2. Activity Nodes
+            for nid, node in self.state.activity_nodes.items():
+                if nid in act_placements:
+                    p = act_placements[nid]
+                    shape_type_map = {
+                        "Initial": "InitialNode",
+                        "Action": "Action",
+                        "Decision": "DecisionNode",
+                        "Merge": "MergeNode",
+                        "Fork": "ForkNode",
+                        "Join": "JoinNode",
+                        "Final": "ActivityFinalNode",
+                        "FlowFinal": "FlowFinalNode",
+                    }
+                    shape_t = shape_type_map.get(node.type, "Action")
+                    self._add_shape_element(
+                        omg_elements,
+                        p,
+                        node,
+                        shape_type=shape_t,
+                        creator_diag_type="ActivityDiagram",
+                        caption_side=12 if shape_t == "Action" else 1,
+                    )
+
+            # 3. Control and Object Flows
+            for flow in self.state.activity_flows:
+                if flow.source_id in act_placements and flow.target_id in act_placements:
+                    src_p = act_placements[flow.source_id]
+                    tgt_p = act_placements[flow.target_id]
+                    guard_text = getattr(flow, "guard", "") or getattr(flow, "guard_condition", "")
+                    lbl = f"[{guard_text}]" if guard_text and not guard_text.startswith("[") else guard_text
+                    if flow.name and not lbl:
+                        lbl = flow.name
+
+                    flow_shape = "ObjectFlow" if flow.type == "ObjectFlow" else "ControlFlow"
+                    self._add_connector_element(
+                        omg_elements,
+                        rel_id=flow.id,
+                        rel_type=flow_shape,
+                        rel_name=lbl,
+                        src_p=src_p,
+                        tgt_p=tgt_p,
+                        creator_diag_type="ActivityDiagram",
+                    )
+
+            # 4. Render Notes for Activity Diagram
+            self._render_notes_for_diagram(
+                omg_elements,
+                set(self.state.activity_nodes.keys()),
+                act_placements,
+                "ActivityDiagram",
+            )
+
+        # Diagram 6: Deployment Diagram with Tiered Architecture Layout
+        if self.state.deployment_nodes:
+            dep_layout = DeploymentTopologyLayout(start_x=60, start_y=80, tier_gap_x=120, node_gap_y=60)
+            dep_placements = dep_layout.layout(self.state)
+            dep_title = getattr(self.state, "diagram_names", {}).get("DeploymentDiagram", "Deployment Diagram")
+            _, omg_elements = self._create_diagram("omg_diag_dep_1", dep_title, "DeploymentDiagram")
+
+            # 1. Nodes & Environments
+            for nid, node in self.state.deployment_nodes.items():
+                if nid in dep_placements:
+                    p = dep_placements[nid]
+                    shape_t = "Device" if node.node_type == "Device" else ("ExecutionEnvironment" if node.node_type == "ExecutionEnvironment" else "Node")
+                    self._add_shape_element(
+                        omg_elements,
+                        p,
+                        node,
+                        shape_type=shape_t,
+                        creator_diag_type="DeploymentDiagram",
+                        caption_side=12,
+                    )
+
+            # 2. Artifacts
+            for aid, art in self.state.deployment_artifacts.items():
+                if aid in dep_placements:
+                    p = dep_placements[aid]
+                    self._add_shape_element(
+                        omg_elements,
+                        p,
+                        art,
+                        shape_type="Artifact",
+                        creator_diag_type="DeploymentDiagram",
+                        caption_side=12,
+                    )
+
+            # 3. Connectors (CommunicationPath & Deployment)
+            for rel in self.state.deployment_relations:
+                if rel.source_id in dep_placements and rel.target_id in dep_placements:
+                    src_p = dep_placements[rel.source_id]
+                    tgt_p = dep_placements[rel.target_id]
+                    rel_shape = "Deployment" if rel.type == "Deployment" else "CommunicationPath"
+                    lbl = getattr(rel, "protocol", "") or rel.name or ""
+                    self._add_connector_element(
+                        omg_elements,
+                        rel_id=rel.id,
+                        rel_type=rel_shape,
+                        rel_name=lbl,
+                        src_p=src_p,
+                        tgt_p=tgt_p,
+                        creator_diag_type="DeploymentDiagram",
+                    )
+
+            # 4. Render Notes for Deployment Diagram
+            self._render_notes_for_diagram(
+                omg_elements,
+                set(self.state.deployment_nodes.keys()) | set(self.state.deployment_artifacts.keys()),
+                dep_placements,
+                "DeploymentDiagram",
+            )
+
     def build_tree(self) -> ET.ElementTree:
         """Construct full XML ElementTree with Metamodel and Visual Layout."""
         ET.register_namespace("xmi", XMI_NS)
@@ -1967,6 +2431,8 @@ class XMIBuilder:
         self._build_er_metamodel()
         self._build_uc_metamodel()
         self._build_sm_metamodel()
+        self._build_activity_metamodel()
+        self._build_deployment_metamodel()
 
         # 1b. Emit Universal Notes (UML Comments)
         for note in self.state.notes.values():

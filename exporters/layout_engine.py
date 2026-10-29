@@ -12,9 +12,13 @@ import math
 from typing import Optional
 try:
     from core.models import (
+        ActivityNode,
+        ActivityPartitionNode,
         ActorNode,
+        ArtifactNode,
         BaseNode,
         ClassNode,
+        DeployNode,
         EntityNode,
         PackageNode,
         RelationModel,
@@ -24,9 +28,13 @@ try:
     from core.state import ProjectState
 except ImportError:
     from ..core.models import (
+        ActivityNode,
+        ActivityPartitionNode,
         ActorNode,
+        ArtifactNode,
         BaseNode,
         ClassNode,
+        DeployNode,
         EntityNode,
         PackageNode,
         RelationModel,
@@ -752,6 +760,236 @@ class StateMachineFlowLayout:
                 height=h,
             )
             curr_x += w + self.gap_x
+
+        return placements
+
+
+# ---------------------------------------------------------
+# 5. Activity Diagram Flow & Swimlane Layout Engine
+# ---------------------------------------------------------
+
+class ActivityFlowLayout:
+    """Calculates top-to-bottom DAG execution flow with Decision/Fork branching and Swimlanes."""
+
+    def __init__(self, start_x: int = 350, start_y: int = 60, gap_y: int = 60, col_gap_x: int = 80) -> None:
+        self.start_x = start_x
+        self.start_y = start_y
+        self.gap_y = gap_y
+        self.col_gap_x = col_gap_x
+
+    def layout(self, state: "ProjectState") -> dict[str, NodePlacement]:
+        placements: dict[str, NodePlacement] = {}
+        if not state.activity_nodes:
+            return placements
+
+        # Check if partitions (swimlanes) are defined
+        if state.activity_partitions:
+            lane_x = self.start_x
+            lane_width = 320
+            header_h = 36
+
+            for part_id, part in state.activity_partitions.items():
+                lane_nodes = [
+                    state.activity_nodes[nid]
+                    for nid in part.activity_node_ids
+                    if nid in state.activity_nodes
+                ]
+                for n in state.activity_nodes.values():
+                    if n.partition_id == part_id and n not in lane_nodes:
+                        lane_nodes.append(n)
+
+                curr_y = self.start_y + header_h + 30
+                for node in lane_nodes:
+                    w, h = self._calculate_node_dimension(node)
+                    x = lane_x + (lane_width - w) // 2
+                    placements[node.id] = NodePlacement(
+                        node_id=node.id,
+                        shape_id=f"shape_{node.id}",
+                        x=x,
+                        y=curr_y,
+                        width=w,
+                        height=h,
+                        parent_shape_id=f"shape_{part_id}",
+                    )
+                    curr_y += h + self.gap_y
+
+                total_lane_h = max(400, curr_y - self.start_y + 40)
+                placements[part_id] = NodePlacement(
+                    node_id=part_id,
+                    shape_id=f"shape_{part_id}",
+                    x=lane_x,
+                    y=self.start_y,
+                    width=lane_width,
+                    height=total_lane_h,
+                )
+                lane_x += lane_width + 15
+            return placements
+
+        # Single pipeline / directed graph flow
+        initial_nodes = [n for n in state.activity_nodes.values() if n.type == "Initial"]
+        final_nodes = [n for n in state.activity_nodes.values() if n.type in ("Final", "FlowFinal")]
+        intermediate_nodes = [n for n in state.activity_nodes.values() if n.type not in ("Initial", "Final", "FlowFinal")]
+
+        # Topological depth assignment
+        depth_map: dict[str, int] = {}
+        for init in initial_nodes:
+            depth_map[init.id] = 0
+
+        changed = True
+        iterations = 0
+        while changed and iterations < 50:
+            changed = False
+            iterations += 1
+            for flow in state.activity_flows:
+                if flow.source_id in depth_map:
+                    new_depth = depth_map[flow.source_id] + 1
+                    if flow.target_id not in depth_map or depth_map[flow.target_id] < new_depth:
+                        depth_map[flow.target_id] = new_depth
+                        changed = True
+
+        for node in intermediate_nodes:
+            if node.id not in depth_map:
+                depth_map[node.id] = 1
+
+        max_depth = max(depth_map.values(), default=0)
+        for f in final_nodes:
+            if f.id not in depth_map or depth_map[f.id] <= max_depth:
+                depth_map[f.id] = max_depth + 1
+
+        layers: dict[int, list[ActivityNode]] = {}
+        for nid, depth in depth_map.items():
+            node = state.activity_nodes.get(nid)
+            if node:
+                layers.setdefault(depth, []).append(node)
+
+        curr_y = self.start_y
+        for depth in sorted(layers.keys()):
+            layer_nodes = layers[depth]
+            total_layer_w = sum(self._calculate_node_dimension(n)[0] for n in layer_nodes) + (len(layer_nodes) - 1) * self.col_gap_x
+            start_x = max(60, self.start_x - total_layer_w // 2)
+
+            node_x = start_x
+            max_h = 0
+            for node in layer_nodes:
+                w, h = self._calculate_node_dimension(node)
+                placements[node.id] = NodePlacement(
+                    node_id=node.id,
+                    shape_id=f"shape_{node.id}",
+                    x=node_x,
+                    y=curr_y,
+                    width=w,
+                    height=h,
+                )
+                node_x += w + self.col_gap_x
+                if h > max_h:
+                    max_h = h
+
+            curr_y += max_h + self.gap_y
+
+        return placements
+
+    def _calculate_node_dimension(self, node: ActivityNode) -> tuple[int, int]:
+        if node.type == "Initial":
+            return 24, 24
+        elif node.type in ("Final", "FlowFinal"):
+            return 24, 24
+        elif node.type in ("Decision", "Merge"):
+            return 40, 40
+        elif node.type in ("Fork", "Join"):
+            return 90, 8
+        else:
+            w = max(160, int(len(node.name) * 8.5) + 36)
+            return w, 50
+
+
+# ---------------------------------------------------------
+# 6. Deployment Diagram Topology Layout Engine
+# ---------------------------------------------------------
+
+class DeploymentTopologyLayout:
+    """Calculates tiered layout for nodes, devices, and deployed artifacts in a Deployment Diagram."""
+
+    def __init__(self, start_x: int = 60, start_y: int = 80, tier_gap_x: int = 120, node_gap_y: int = 60) -> None:
+        self.start_x = start_x
+        self.start_y = start_y
+        self.tier_gap_x = tier_gap_x
+        self.node_gap_y = node_gap_y
+
+    def layout(self, state: "ProjectState") -> dict[str, NodePlacement]:
+        placements: dict[str, NodePlacement] = {}
+        if not state.deployment_nodes:
+            return placements
+
+        # Categorize nodes into 4 architectural tiers:
+        # 0: Client / Edge
+        # 1: Reverse Proxy / Gateway
+        # 2: Application / Services
+        # 3: Database / Storage
+        tiers: dict[int, list[DeployNode]] = {0: [], 1: [], 2: [], 3: []}
+
+        for node in state.deployment_nodes.values():
+            name_lower = node.name.lower()
+            if any(k in name_lower for k in ("client", "browser", "mobile", "frontend", "desktop", "user pc")):
+                tiers[0].append(node)
+            elif any(k in name_lower for k in ("gateway", "proxy", "nginx", "balancer", "ingress", "edge", "router")):
+                tiers[1].append(node)
+            elif any(k in name_lower for k in ("db", "database", "postgres", "sql", "mysql", "redis", "mongo", "storage", "s3", "kafka")):
+                tiers[3].append(node)
+            else:
+                tiers[2].append(node)
+
+        curr_x = self.start_x
+        active_tiers = [t for t in sorted(tiers.keys()) if tiers[t]]
+
+        for tier_idx in active_tiers:
+            nodes_in_tier = tiers[tier_idx]
+            curr_y = self.start_y
+            max_tier_w = 320
+
+            for node in nodes_in_tier:
+                # Find artifacts deployed on this node
+                node_artifacts = [
+                    art for art in state.deployment_artifacts.values()
+                    if art.deployed_on_node_id == node.id or art.id in node.deployed_artifact_ids
+                ]
+
+                node_w = max(300, max((len(a.name) * 8 + 40 for a in node_artifacts), default=280))
+                if len(node.name) * 9 > node_w:
+                    node_w = int(len(node.name) * 9) + 40
+
+                node_h = max(200, 90 + len(node_artifacts) * 55)
+
+                placements[node.id] = NodePlacement(
+                    node_id=node.id,
+                    shape_id=f"shape_{node.id}",
+                    x=curr_x,
+                    y=curr_y,
+                    width=node_w,
+                    height=node_h,
+                )
+
+                # Place deployed artifacts visually inside the node
+                art_y = curr_y + 55
+                for art in node_artifacts:
+                    art_w = max(180, int(len(art.name) * 8.5) + 30)
+                    art_h = 42
+                    art_x = curr_x + (node_w - art_w) // 2
+                    placements[art.id] = NodePlacement(
+                        node_id=art.id,
+                        shape_id=f"shape_{art.id}",
+                        x=art_x,
+                        y=art_y,
+                        width=art_w,
+                        height=art_h,
+                        parent_shape_id=f"shape_{node.id}",
+                    )
+                    art_y += art_h + 12
+
+                curr_y += node_h + self.node_gap_y
+                if node_w > max_tier_w:
+                    max_tier_w = node_w
+
+            curr_x += max_tier_w + self.tier_gap_x
 
         return placements
 

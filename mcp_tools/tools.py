@@ -2,8 +2,16 @@
 
 from typing import Any, Optional
 from core.models import (
+    ActivityFlow,
+    ActivityModel,
+    ActivityNode,
+    ActivityNodeType,
+    ActivityPartition,
+    ActivityPartitionNode,
     ActorModel,
     ActorNode,
+    ArtifactModel,
+    ArtifactNode,
     AttributeModel,
     ClassElementType,
     ClassModel,
@@ -11,6 +19,11 @@ from core.models import (
     ClassRelation,
     ClassRelationType,
     ColumnModel,
+    DeployNode,
+    DeploymentNode,
+    DeploymentNodeType,
+    DeploymentRelation,
+    DeploymentRelationType,
     EntityModel,
     EntityNode,
     ERRelation,
@@ -1206,6 +1219,340 @@ def add_state_transition(
         return f"ERROR: Failed to create transition: {str(e)}"
 
 
+# --- UML Activity Diagram Tools ---
+
+def add_activity_partition(name: str, description: str = "") -> str:
+    """Create a Swimlane / Activity Partition in an Activity Diagram.
+
+    Partitions visually divide the diagram into vertical lanes representing departments,
+    actors, or microservices responsible for executing the enclosed actions.
+
+    Args:
+        name: Name of the partition (e.g. 'Customer', 'PaymentGateway', 'Warehouse').
+        description: Optional documentation description.
+
+    Returns:
+        Confirmation message with Partition ID.
+    """
+    try:
+        clean_name = name.strip()
+        if not clean_name:
+            return "ERROR: Partition name cannot be empty."
+
+        existing = state.find_activity_partition(clean_name)
+        if existing:
+            if description:
+                existing.description = description
+            return f"Activity Partition '{clean_name}' already exists with ID: {existing.id}."
+
+        part = ActivityPartitionNode(name=clean_name, description=description)
+        state.add_node(part)
+        return f"Created Activity Partition '{clean_name}' (ID: {part.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create activity partition: {str(e)}"
+
+
+def add_activity_node(
+    name: str,
+    type: str = "Action",
+    partition: Optional[str] = None,
+    description: str = "",
+) -> str:
+    """Create a node or action in a UML Activity Diagram.
+
+    Args:
+        name: Action description or control node name (e.g., 'Validate Order', 'Check Balance').
+        type: 'Initial', 'Action', 'Decision', 'Merge', 'Fork', 'Join', 'Final', 'FlowFinal'.
+        partition: Optional name or ID of the Swimlane / Partition to place this action into.
+        description: Optional documentation for Open Specification.
+
+    Returns:
+        Confirmation message with Node ID.
+    """
+    try:
+        clean_name = name.strip()
+        if not clean_name:
+            return "ERROR: Activity node name cannot be empty."
+
+        valid_types = ("Initial", "Action", "Decision", "Merge", "Fork", "Join", "Final", "FlowFinal")
+        normalized_type = "Action"
+        for vt in valid_types:
+            if type.strip().lower() == vt.lower():
+                normalized_type = vt
+                break
+
+        part_id = None
+        part = None
+        if partition and partition.strip():
+            part = state.find_activity_partition(partition.strip())
+            if not part:
+                part = ActivityPartitionNode(name=partition.strip())
+                state.add_node(part)
+            part_id = part.id
+
+        existing = state.find_activity_node(clean_name)
+        if existing:
+            existing.type = normalized_type
+            if part_id:
+                existing.partition_id = part_id
+                if part and existing.id not in part.activity_node_ids:
+                    part.activity_node_ids.append(existing.id)
+            if description:
+                existing.description = description
+            return f"Activity Node '{clean_name}' ({normalized_type}) updated (ID: {existing.id})."
+
+        node = ActivityNode(
+            name=clean_name,
+            type=normalized_type,
+            partition_id=part_id,
+            description=description,
+        )
+        state.add_node(node)
+        if part_id and part:
+            part.activity_node_ids.append(node.id)
+
+        part_info = f" in Partition '{partition.strip()}'" if part_id else ""
+        return f"Created Activity [{normalized_type}] '{clean_name}'{part_info} (ID: {node.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create activity node: {str(e)}"
+
+
+def add_control_flow(
+    src_name: str,
+    tgt_name: str,
+    guard: str = "",
+    flow_type: str = "ControlFlow",
+) -> str:
+    """Create a directed flow (ControlFlow or ObjectFlow) between activity nodes.
+
+    Args:
+        src_name: Source activity node name or ID.
+        tgt_name: Target activity node name or ID.
+        guard: Optional guard condition expression (e.g. '[balance >= total]', '[valid]').
+        flow_type: 'ControlFlow' (default) or 'ObjectFlow'.
+
+    Returns:
+        Confirmation message with Flow ID.
+    """
+    try:
+        src = state.find_activity_node(src_name.strip())
+        tgt = state.find_activity_node(tgt_name.strip())
+        if not src:
+            return f"ERROR: Source activity node '{src_name}' not found."
+        if not tgt:
+            return f"ERROR: Target activity node '{tgt_name}' not found."
+
+        clean_guard = guard.strip()
+        clean_flow_type = "ObjectFlow" if flow_type.strip().lower() == "objectflow" else "ControlFlow"
+
+        flow = ActivityFlow(
+            source_id=src.id,
+            target_id=tgt.id,
+            type=clean_flow_type,
+            guard=clean_guard,
+            guard_condition=clean_guard,
+        )
+        state.add_relation(flow)
+        guard_info = f" (guard: {clean_guard})" if clean_guard else ""
+        return f"Created {clean_flow_type}: '{src.name}' -> '{tgt.name}'{guard_info} (ID: {flow.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create activity flow: {str(e)}"
+
+
+# --- UML Deployment Diagram Tools ---
+
+def add_deployment_node(
+    name: str,
+    node_type: str = "Node",
+    parent_node: Optional[str] = None,
+    description: str = "",
+) -> str:
+    """Create a physical node, hardware device, or execution environment in a Deployment Diagram.
+
+    Args:
+        name: Name of the node (e.g., 'Web Server', 'Worker Machine', 'Docker Host').
+        node_type: 'Node' (default 3D box), 'Device', or 'ExecutionEnvironment'.
+        parent_node: Optional name or ID of a parent node for nested environments.
+        description: Optional documentation description.
+
+    Returns:
+        Confirmation message with Node ID.
+    """
+    try:
+        clean_name = name.strip()
+        if not clean_name:
+            return "ERROR: Node name cannot be empty."
+
+        clean_nt = "Node"
+        for nt in ("Node", "Device", "ExecutionEnvironment"):
+            if node_type.strip().lower() == nt.lower():
+                clean_nt = nt
+                break
+
+        parent_id = None
+        if parent_node and parent_node.strip():
+            p_node = state.find_deploy_node(parent_node.strip())
+            if p_node:
+                parent_id = p_node.id
+
+        existing = state.find_deploy_node(clean_name)
+        if existing:
+            existing.node_type = clean_nt
+            if parent_id:
+                existing.parent_node_id = parent_id
+            if description:
+                existing.description = description
+            return f"Deployment Node '{clean_name}' ({clean_nt}) updated (ID: {existing.id})."
+
+        node = DeployNode(
+            name=clean_name,
+            node_type=clean_nt,
+            parent_node_id=parent_id,
+            description=description,
+        )
+        state.add_node(node)
+        parent_info = f" nested inside '{parent_node.strip()}'" if parent_id else ""
+        return f"Created Deployment [{clean_nt}] '{clean_name}'{parent_info} (ID: {node.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create deployment node: {str(e)}"
+
+
+def add_artifact(
+    name: str,
+    deployed_on_node: Optional[str] = None,
+    file_name: str = "",
+    description: str = "",
+) -> str:
+    """Create a software artifact (.jar, .war, docker image, config, binary) in a Deployment Diagram.
+
+    Args:
+        name: Artifact name (e.g. 'order-api.jar', 'nginx.conf', 'database.sql').
+        deployed_on_node: Optional name or ID of the host node where this artifact is deployed.
+        file_name: Optional physical file name.
+        description: Optional documentation description.
+
+    Returns:
+        Confirmation message with Artifact ID.
+    """
+    try:
+        clean_name = name.strip()
+        if not clean_name:
+            return "ERROR: Artifact name cannot be empty."
+
+        host_node_id = None
+        h_node = None
+        if deployed_on_node and deployed_on_node.strip():
+            h_node = state.find_deploy_node(deployed_on_node.strip())
+            if h_node:
+                host_node_id = h_node.id
+
+        existing = state.find_artifact(clean_name)
+        if existing:
+            if host_node_id:
+                existing.deployed_on_node_id = host_node_id
+            if file_name:
+                existing.file_name = file_name
+            if description:
+                existing.description = description
+            return f"Artifact '{clean_name}' updated (ID: {existing.id})."
+
+        art = ArtifactNode(
+            name=clean_name,
+            file_name=file_name or clean_name,
+            deployed_on_node_id=host_node_id,
+            description=description,
+        )
+        state.add_node(art)
+        if host_node_id and h_node:
+            h_node.deployed_artifact_ids.append(art.id)
+
+        host_info = f" deployed on '{deployed_on_node.strip()}'" if host_node_id else ""
+        return f"Created Artifact '{clean_name}'{host_info} (ID: {art.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create artifact: {str(e)}"
+
+
+def add_communication_path(
+    src_node: str,
+    tgt_node: str,
+    protocol: str = "",
+    description: str = "",
+) -> str:
+    """Create a network communication path or protocol link between two deployment nodes.
+
+    Args:
+        src_node: Source node name or ID.
+        tgt_node: Target node name or ID.
+        protocol: Network protocol and port (e.g., 'HTTPS (Port 443)', 'TCP/IP (5432)', 'gRPC').
+        description: Optional documentation description.
+
+    Returns:
+        Confirmation message with Connection ID.
+    """
+    try:
+        src = state.find_deploy_node(src_node.strip())
+        tgt = state.find_deploy_node(tgt_node.strip())
+        if not src:
+            return f"ERROR: Source deployment node '{src_node}' not found."
+        if not tgt:
+            return f"ERROR: Target deployment node '{tgt_node}' not found."
+
+        clean_proto = protocol.strip()
+        rel = DeploymentRelation(
+            source_id=src.id,
+            target_id=tgt.id,
+            type="CommunicationPath",
+            name=clean_proto,
+            protocol=clean_proto,
+            description=description,
+        )
+        state.add_relation(rel)
+        proto_info = f" via {clean_proto}" if clean_proto else ""
+        return f"Created CommunicationPath: '{src.name}' -> '{tgt.name}'{proto_info} (ID: {rel.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create communication path: {str(e)}"
+
+
+def add_deployment_link(
+    artifact_name: str,
+    node_name: str,
+    description: str = "",
+) -> str:
+    """Create an explicit «deploy» dependency from an Artifact to a Deployment Node.
+
+    Args:
+        artifact_name: Name or ID of the artifact being deployed.
+        node_name: Name or ID of the target host node.
+        description: Optional documentation description.
+
+    Returns:
+        Confirmation message with Deployment relation ID.
+    """
+    try:
+        art = state.find_artifact(artifact_name.strip())
+        node = state.find_deploy_node(node_name.strip())
+        if not art:
+            return f"ERROR: Artifact '{artifact_name}' not found."
+        if not node:
+            return f"ERROR: Deployment node '{node_name}' not found."
+
+        art.deployed_on_node_id = node.id
+        if art.id not in node.deployed_artifact_ids:
+            node.deployed_artifact_ids.append(art.id)
+
+        rel = DeploymentRelation(
+            source_id=art.id,
+            target_id=node.id,
+            type="Deployment",
+            name="«deploy»",
+            description=description,
+        )
+        state.add_relation(rel)
+        return f"Created Deployment: Artifact '{art.name}' -> Node '{node.name}' (ID: {rel.id})."
+    except Exception as e:
+        return f"ERROR: Failed to create deployment link: {str(e)}"
+
+
 # --- Universal Annotation & Boundary Tools ---
 
 def add_note(text: str, target: Optional[str] = None) -> str:
@@ -1591,6 +1938,76 @@ def _build_notes_from_spec(spec: dict, log: list[str]) -> None:
             add_note(text=n["text"], target=n.get("attached_to"))
 
 
+def _build_activities_from_spec(spec: dict, log: list[str]) -> None:
+    # 1. Activity Partitions / Swimlanes
+    for p in spec.get("activity_partitions", spec.get("swimlanes", [])):
+        if isinstance(p, dict) and "name" in p:
+            add_activity_partition(name=p["name"], description=p.get("description", ""))
+        elif isinstance(p, str):
+            add_activity_partition(name=p)
+
+    # 2. Activity Nodes
+    for an in spec.get("activity_nodes", spec.get("actions", [])):
+        if isinstance(an, dict) and "name" in an:
+            add_activity_node(
+                name=an["name"],
+                type=an.get("type", "Action"),
+                partition=an.get("partition", an.get("swimlane")),
+                description=an.get("description", ""),
+            )
+
+    # 3. Control Flows / Object Flows
+    for f in spec.get("control_flows", spec.get("activity_flows", [])):
+        if isinstance(f, dict) and "source" in f and "target" in f:
+            add_control_flow(
+                src_name=f["source"],
+                tgt_name=f["target"],
+                guard=f.get("guard", ""),
+                flow_type=f.get("type", "ControlFlow"),
+            )
+
+
+def _build_deployment_from_spec(spec: dict, log: list[str]) -> None:
+    # 1. Deployment Nodes
+    for n in spec.get("deployment_nodes", spec.get("nodes", [])):
+        if isinstance(n, dict) and "name" in n:
+            add_deployment_node(
+                name=n["name"],
+                node_type=n.get("type", n.get("node_type", "Node")),
+                parent_node=n.get("parent", n.get("parent_node")),
+                description=n.get("description", ""),
+            )
+
+    # 2. Artifacts
+    for a in spec.get("artifacts", []):
+        if isinstance(a, dict) and "name" in a:
+            add_artifact(
+                name=a["name"],
+                deployed_on_node=a.get("deployed_on", a.get("node")),
+                file_name=a.get("file_name", ""),
+                description=a.get("description", ""),
+            )
+
+    # 3. Communication Paths
+    for cp in spec.get("communication_paths", spec.get("deployment_paths", [])):
+        if isinstance(cp, dict) and "source" in cp and "target" in cp:
+            add_communication_path(
+                src_node=cp["source"],
+                tgt_node=cp["target"],
+                protocol=cp.get("protocol", cp.get("name", "")),
+                description=cp.get("description", ""),
+            )
+
+    # 4. Explicit Deployment Links
+    for dl in spec.get("deployment_links", spec.get("deployments", [])):
+        if isinstance(dl, dict) and "artifact" in dl and "node" in dl:
+            add_deployment_link(
+                artifact_name=dl["artifact"],
+                node_name=dl["node"],
+                description=dl.get("description", ""),
+            )
+
+
 # ---------------------------------------------------------
 # Specialized Deep Diagram Builders (Progressive Modeling)
 # ---------------------------------------------------------
@@ -1795,6 +2212,108 @@ def build_state_diagram(
         return f"ERROR: Failed during build_state_diagram: {str(e)}"
 
 
+def build_activity_diagram(
+    spec: dict,
+    append: bool = True,
+    diagram_name: str = "Activity Diagram",
+    filepath: Optional[str] = None,
+) -> str:
+    """Build an exhaustive, production-grade UML Activity Diagram (Workflow/Business Process).
+
+    Focuses 100% of LLM reasoning on procedural workflows and control logic:
+    horizontal/vertical Swimlanes (Partitions), Initial Node, Actions, Decision & Merge diamonds,
+    Fork & Join synchronization bars, Activity Final & Flow Final nodes, and guarded Control/Object flows.
+
+    Args:
+        spec: Dictionary specification containing:
+            - "project_name": Optional[str]
+            - "activity_partitions": list[dict] with name, description (or list[str])
+            - "activity_nodes": list[dict] with name, type ('Initial', 'Action', 'Decision', 'Merge', 'Fork', 'Join', 'Final'), partition, description
+            - "control_flows": list[dict] with source, target, guard, type ('ControlFlow', 'ObjectFlow')
+            - "notes": list[dict] with text, attached_to
+        append: If True (default), appends this Activity diagram to the active project. If False, resets project.
+        diagram_name: Title of this Activity tab in Visual Paradigm (default: 'Activity Diagram').
+        filepath: Optional output .xmi path.
+
+    Returns:
+        Structured execution summary with export path and element counts.
+    """
+    try:
+        if not isinstance(spec, dict):
+            return "ERROR: 'spec' must be a dictionary."
+
+        proj_name = spec.get("project_name", state.name or "ArchitectureProject")
+        if not append:
+            init_project(proj_name)
+        elif not state.name or state.name == "ProjectModel":
+            state.name = proj_name
+
+        state.set_diagram_name("ActivityDiagram", diagram_name)
+        log = [f"=== Building Activity Diagram: '{diagram_name}' (Project: {state.name}, append={append}) ==="]
+
+        _build_activities_from_spec(spec, log)
+        _build_notes_from_spec(spec, log)
+
+        out_path = filepath or spec.get("filepath") or f"{state.name}.xmi"
+        export_result = export_xmi(out_path)
+        log.append(f"\n{export_result}")
+        return "\n".join(log)
+    except Exception as e:
+        return f"ERROR: Failed during build_activity_diagram: {str(e)}"
+
+
+def build_deployment_diagram(
+    spec: dict,
+    append: bool = True,
+    diagram_name: str = "Deployment Diagram",
+    filepath: Optional[str] = None,
+) -> str:
+    """Build an exhaustive, production-grade UML Deployment Diagram modeling physical infrastructure and runtime topology.
+
+    Focuses 100% of LLM reasoning on deployment architecture:
+    Hardware nodes (servers, devices, load balancers), Execution Environments (Docker, Kubernetes, JVM, DB engines),
+    software Artifacts (.jar, .war, SPA bundles, containers) deployed inside nodes,
+    and Communication Paths with network protocols/ports (HTTPS 443, gRPC 50051, TCP/IP 5432).
+
+    Args:
+        spec: Dictionary specification containing:
+            - "project_name": Optional[str]
+            - "deployment_nodes": list[dict] with name, node_type ('Node', 'Device', 'ExecutionEnvironment'), parent_node, description
+            - "artifacts": list[dict] with name, deployed_on, file_name, description
+            - "communication_paths": list[dict] with source, target, protocol, description
+            - "deployment_links": list[dict] with artifact, node, description
+            - "notes": list[dict] with text, attached_to
+        append: If True (default), appends this Deployment diagram to the active project. If False, resets project.
+        diagram_name: Title of this Deployment tab in Visual Paradigm (default: 'Deployment Diagram').
+        filepath: Optional output .xmi path.
+
+    Returns:
+        Structured execution summary with export path and element counts.
+    """
+    try:
+        if not isinstance(spec, dict):
+            return "ERROR: 'spec' must be a dictionary."
+
+        proj_name = spec.get("project_name", state.name or "ArchitectureProject")
+        if not append:
+            init_project(proj_name)
+        elif not state.name or state.name == "ProjectModel":
+            state.name = proj_name
+
+        state.set_diagram_name("DeploymentDiagram", diagram_name)
+        log = [f"=== Building Deployment Diagram: '{diagram_name}' (Project: {state.name}, append={append}) ==="]
+
+        _build_deployment_from_spec(spec, log)
+        _build_notes_from_spec(spec, log)
+
+        out_path = filepath or spec.get("filepath") or f"{state.name}.xmi"
+        export_result = export_xmi(out_path)
+        log.append(f"\n{export_result}")
+        return "\n".join(log)
+    except Exception as e:
+        return f"ERROR: Failed during build_deployment_diagram: {str(e)}"
+
+
 def batch_build_diagrams(
     spec: dict,
     append: bool = False,
@@ -1826,6 +2345,8 @@ def batch_build_diagrams(
         _build_erd_from_spec(spec, log)
         _build_use_cases_from_spec(spec, log)
         _build_states_from_spec(spec, log)
+        _build_activities_from_spec(spec, log)
+        _build_deployment_from_spec(spec, log)
         _build_notes_from_spec(spec, log)
 
         out_path = filepath or spec.get("filepath") or f"{state.name}.xmi"
@@ -1921,6 +2442,35 @@ def get_project_summary() -> str:
             tgt_str = f" [attached to '{tgt_node.name}']" if tgt_node else ""
             lines.append(f"  Note: \"{n.text}\"{tgt_str}")
 
+    if state.activity_nodes or state.activity_partitions:
+        lines.append(f"\n6. Activity Diagram (Partitions: {len(state.activity_partitions)}, Nodes: {len(state.activity_nodes)}, Flows: {len(state.activity_flows)}):")
+        for part in state.activity_partitions.values():
+            lines.append(f"  Partition / Swimlane: {part.name}")
+        for an in state.activity_nodes.values():
+            part_str = f" [in Swimlane: {state.activity_partitions[an.partition_id].name}]" if (an.partition_id and an.partition_id in state.activity_partitions) else ""
+            lines.append(f"  ActivityNode [{an.type}]: {an.name}{part_str}")
+        for fl in state.activity_flows:
+            s = state.find_activity_node(fl.source_id)
+            t = state.find_activity_node(fl.target_id)
+            g_str = f" [{fl.guard}]" if fl.guard else ""
+            lines.append(f"  Flow [{fl.type}{g_str}]: {s.name if s else fl.source_id} -> {t.name if t else fl.target_id}")
+
+    if state.deployment_nodes or state.deployment_artifacts:
+        lines.append(f"\n7. Deployment Diagram (Nodes: {len(state.deployment_nodes)}, Artifacts: {len(state.deployment_artifacts)}, Connections: {len(state.deployment_relations)}):")
+        for dn in state.deployment_nodes.values():
+            p_str = f" [inside: {state.deployment_nodes[dn.parent_node_id].name}]" if (dn.parent_node_id and dn.parent_node_id in state.deployment_nodes) else ""
+            lines.append(f"  Node [{dn.node_type}]: {dn.name}{p_str}")
+        for art in state.deployment_artifacts.values():
+            h_str = f" [on Node: {state.deployment_nodes[art.deployed_on_node_id].name}]" if (art.deployed_on_node_id and art.deployed_on_node_id in state.deployment_nodes) else ""
+            lines.append(f"  Artifact: {art.name}{h_str}")
+        for dr in state.deployment_relations:
+            s = state.find_node_by_id(dr.source_id)
+            t = state.find_node_by_id(dr.target_id)
+            s_name = s.name if s else dr.source_id
+            t_name = t.name if t else dr.target_id
+            proto_str = f" via {dr.protocol}" if dr.protocol else ""
+            lines.append(f"  Relation [{dr.type}{proto_str}]: {s_name} -> {t_name}")
+
     return "\n".join(lines)
 
 
@@ -1946,6 +2496,13 @@ def register_all_tools(mcp: Any) -> None:
         add_state,
         add_state_behavior,
         add_state_transition,
+        add_activity_partition,
+        add_activity_node,
+        add_control_flow,
+        add_deployment_node,
+        add_artifact,
+        add_communication_path,
+        add_deployment_link,
         set_element_documentation,
         add_note,
         export_xmi,
@@ -1954,6 +2511,8 @@ def register_all_tools(mcp: Any) -> None:
         build_erd_diagram,
         build_use_case_diagram,
         build_state_diagram,
+        build_activity_diagram,
+        build_deployment_diagram,
         batch_build_diagrams,
         sync_with_visual_paradigm,
         export_diagram_image,

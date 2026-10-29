@@ -22,7 +22,9 @@ CRITICAL OPERATIONAL RULES:
      * For Class Diagram: call `build_class_diagram(spec, append=True)`
      * For Database ERD: call `build_erd_diagram(spec, append=True)`
      * For State Machine: call `build_state_diagram(spec, append=True)`
-     * For All 4 at once: call `batch_build_diagrams(spec, append=False)`
+     * For Activity Diagram: call `build_activity_diagram(spec, append=True)`
+     * For Deployment Diagram: call `build_deployment_diagram(spec, append=True)`
+     * For All diagrams at once: call `batch_build_diagrams(spec, append=False)`
    - Granular tools are ONLY for minor single-element tweaks requested by the user later (e.g. "добавь поле email в класс User").
 
 4. SPECIALIZED DEEP MODELING (DEPTH OVER BREADTH):
