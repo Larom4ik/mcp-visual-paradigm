@@ -47,10 +47,14 @@ try:
     from core.state import state
     from exporters.xmi_builder import XMIBuilder
     from core.doc_reader import RequirementsDocReader
+    from core.linter import ArchitectureLinter
+    from core.blueprints import get_architecture_blueprint as _get_architecture_blueprint
 except ImportError:
     from ..core.state import state
     from ..exporters.xmi_builder import XMIBuilder
     from ..core.doc_reader import RequirementsDocReader
+    from ..core.linter import ArchitectureLinter
+    from ..core.blueprints import get_architecture_blueprint as _get_architecture_blueprint
 
 
 
@@ -2474,6 +2478,42 @@ def get_project_summary() -> str:
     return "\n".join(lines)
 
 
+def lint_project_architecture(auto_fix: bool = True) -> str:
+    """Run comprehensive architectural validation on the project model.
+
+    Checks:
+    - Activity: Missing initial/final nodes, single-flow branches, unbracketed guards, unpartitioned nodes.
+    - Class: Loose entity naming, wrong compositions (many-to-many composition), cycle inheritances.
+    - Use Case: Direction of include/extend, actor-to-actor non-inheritance relations.
+    - Deployment: Artifacts floating without execution host, communication paths between non-devices.
+    - ERD: Missing primary keys, dangling foreign keys.
+
+    Args:
+        auto_fix: When True, automatically repairs missing bracketed guards, missing initial/final nodes, and cleans fluff labels.
+
+    Returns:
+        Structured diagnostic report with issue codes, severity, descriptions, and auto-fix status.
+    """
+    report = ArchitectureLinter(state).lint(auto_fix=auto_fix)
+    return report.format_report()
+
+
+def get_architecture_blueprint(diagram_type: str, domain: str = "enterprise") -> str:
+    """Retrieve industry-standard OMG reference architecture blueprints and topologies.
+
+    Use this tool before creating diagrams to get the golden pattern of nodes, relationships,
+    swimlanes, and conventions for standard enterprise software architectures.
+
+    Args:
+        diagram_type: One of 'class', 'activity', 'deployment', 'erd', 'use_case', 'state'.
+        domain: Architecture domain pattern (e.g. 'enterprise', 'microservices', 'ecommerce', 'fintech').
+
+    Returns:
+        Comprehensive golden blueprint with element lists, relationship topologies, and best practices.
+    """
+    return _get_architecture_blueprint(diagram_type, domain)
+
+
 def register_all_tools(mcp: Any) -> None:
     """Register all architecture tools with the provided FastMCP or MCPServer instance."""
     tools = [
@@ -2514,9 +2554,12 @@ def register_all_tools(mcp: Any) -> None:
         build_activity_diagram,
         build_deployment_diagram,
         batch_build_diagrams,
+        lint_project_architecture,
+        get_architecture_blueprint,
         sync_with_visual_paradigm,
         export_diagram_image,
         get_project_summary,
     ]
     for tool_fn in tools:
         mcp.tool()(tool_fn)
+

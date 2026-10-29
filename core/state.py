@@ -32,6 +32,14 @@ class _RelationList(list):
         if self._state is not None and item not in self._state.relations:
             self._state.add_relation(item)
 
+    def extend(self, items: list[RelationModel]) -> None:
+        super().extend(items)
+        if self._state is not None:
+            for item in items:
+                if item not in self._state.relations:
+                    self._state.add_relation(item)
+
+
 
 class ProjectState:
     """Thread-safe in-memory store for all architectural diagram models with graph validation."""

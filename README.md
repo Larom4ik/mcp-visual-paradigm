@@ -313,7 +313,7 @@ python test_all_diagrams.py
 
 ## Справочник MCP-инструментов
 
-Сервер предоставляет 39 специализированных инструментов для управления архитектурной моделью:
+Сервер предоставляет 41 специализированный инструмент для управления архитектурной моделью:
 
 ### 1. Чтение ТЗ и комплексная сборка
 * `read_requirements_file(filepath)` — чтение технического задания (`.docx`, `.txt`, `.md`, `.json`).
@@ -324,6 +324,8 @@ python test_all_diagrams.py
 * `build_state_diagram(spec, append, diagram_name, filepath)` — генерация диаграммы состояний.
 * `build_activity_diagram(spec, append, diagram_name, filepath)` — генерация диаграммы деятельности (процессов).
 * `build_deployment_diagram(spec, append, diagram_name, filepath)` — генерация диаграммы развертывания (инфраструктуры).
+* `lint_project_architecture(auto_fix)` — запуск архитектурного линтера с автоматическим устранением дефектов модели.
+* `get_architecture_blueprint(diagram_type, domain)` — получение эталонных канонических шаблонов архитектуры (DDD, Deployment, ERD, Use Case, Activity).
 * `init_project(name)` — инициализация чистого контекста проекта.
 * `sync_with_visual_paradigm(filepath)` — отправка модели в активный Visual Paradigm через фоновый плагин.
 * `export_diagram_image(diagram_name, output_path)` — экспорт активной диаграммы в PNG (Agent Vision).
@@ -416,6 +418,12 @@ powershell -ExecutionPolicy Bypass -File plugin/build.ps1
    * Генерация метамоделей Visual Paradigm (`DBTable`, `DBForeignKey`, `State2`, `Transition2`).
    * Подавление паразитных подписей ролей связей для сохранения чистоты диаграмм.
 
+4. **4-Уровневая система качества архитектуры**:
+   * **Level 1 (Semantic Label Sanitizer, `core/sanitizer.py`)**: Автоматическая фильтрация паразитных глаголов («has», «contains», «manages», «содержит», «вызывает») на линиях связей, форматирование скобок сторожевых условий `[condition]` и нормализация сетевых протоколов и портов.
+   * **Level 2 (Architecture Linter & Auto-Fix, `core/linter.py`)**: Диагностический движок топологии диаграмм. Проверяет наличие начальных и конечных узлов в Activity (`ACT-001`, `ACT-002`), ветвление развилок (`ACT-004`), скобки guard (`ACT-005`), привязку к дорожкам (`ACT-006`), связи между акторами в Use Case (`UC-001`, `UC-002`), бесхозные артефакты в Deployment (`DEP-001`) и первичные ключи в ERD (`ERD-001`). При `auto_fix=True` автоматически восстанавливает недостающие элементы перед генерацией XMI.
+   * **Level 3 (Decision Matrices)**: Матрицы архитектурных решений, встроенные в системные инструкции MCP-сервера для строгого выбора связей (композиция vs агрегация vs ассоциация).
+   * **Level 4 (Canonical Blueprints, `core/blueprints.py`)**: Эталонные золотые шаблоны топологий для всех 6 типов диаграмм.
+
 ---
 
 ## Тестирование
@@ -423,12 +431,18 @@ powershell -ExecutionPolicy Bypass -File plugin/build.ps1
 Комплекс тестов обеспечивает автономную проверку всех подсистем без необходимости запуска внешних приложений:
 
 ```bash
-# 1. Проверка палитры типов данных ERD (ANSI SQL и PostgreSQL)
+# 1. Проверка архитектурного линтера, очистки меток и эталонных шаблонов
+python test_architectural_quality.py
+
+# 2. Проверка генерации диаграмм деятельности и развертывания
+python test_activity_and_deployment.py
+
+# 3. Проверка палитры типов данных ERD (ANSI SQL и PostgreSQL)
 python test_erd_types.py
 
-# 2. Сквозное тестирование генерации всех 4 видов диаграмм и валидация XMI 2.1
+# 4. Сквозное тестирование генерации всех видов диаграмм и валидация XMI 2.1
 python test_all_diagrams.py
 
-# 3. Проверка архитектурных правил валидатора и движка визуального лейаута
+# 5. Проверка архитектурных правил валидатора и движка визуального лейаута
 python test_rules_and_visual.py
 ```

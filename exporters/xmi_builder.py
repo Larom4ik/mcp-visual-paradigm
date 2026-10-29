@@ -46,6 +46,13 @@ try:
         UseCaseTierLayout,
         WaypointRoutingEngine,
     )
+    from core.sanitizer import (
+        sanitize_activity_flow,
+        sanitize_class_relation,
+        sanitize_deployment_relation,
+        sanitize_use_case_relation,
+    )
+    from core.linter import ArchitectureLinter
 except ImportError:
     from ..core.models import (
         ActivityNode,
@@ -74,6 +81,13 @@ except ImportError:
         UseCaseTierLayout,
         WaypointRoutingEngine,
     )
+    from ..core.sanitizer import (
+        sanitize_activity_flow,
+        sanitize_class_relation,
+        sanitize_deployment_relation,
+        sanitize_use_case_relation,
+    )
+    from ..core.linter import ArchitectureLinter
 
 XMI_NS = "http://schema.omg.org/spec/XMI/2.1"
 UML_NS = "http://schema.omg.org/spec/UML/2.0"
@@ -2060,16 +2074,22 @@ class XMIBuilder:
                 if rel.source_id in class_placements and rel.target_id in class_placements:
                     src_p = class_placements[rel.source_id]
                     tgt_p = class_placements[rel.target_id]
+                    clean_name, s_mult, t_mult = sanitize_class_relation(
+                        rel.type,
+                        rel.name,
+                        rel.source_multiplicity,
+                        rel.target_multiplicity,
+                    )
                     self._add_connector_element(
                         omg_elements,
                         rel_id=rel.id,
                         rel_type=rel.type,
-                        rel_name=rel.name or rel.type,
+                        rel_name=clean_name,
                         src_p=src_p,
                         tgt_p=tgt_p,
                         creator_diag_type="ClassDiagram",
-                        src_mult=rel.source_multiplicity,
-                        tgt_mult=rel.target_multiplicity,
+                        src_mult=s_mult,
+                        tgt_mult=t_mult,
                     )
 
             # 4. Render Notes for Class Diagram
@@ -2184,12 +2204,12 @@ class XMIBuilder:
                 if rel.source_id in uc_placements and rel.target_id in uc_placements:
                     src_p = uc_placements[rel.source_id]
                     tgt_p = uc_placements[rel.target_id]
-                    rel_lbl = "«Include»" if rel.type == "Include" else ("«Extend»" if rel.type == "Extend" else "")
+                    clean_lbl = sanitize_use_case_relation(rel.type, rel.name)
                     self._add_connector_element(
                         omg_elements,
                         rel_id=rel.id,
                         rel_type=rel.type,
-                        rel_name=rel_lbl,
+                        rel_name=clean_lbl,
                         src_p=src_p,
                         tgt_p=tgt_p,
                         creator_diag_type="UseCaseDiagram",
@@ -2306,12 +2326,17 @@ class XMIBuilder:
                 if flow.source_id in act_placements and flow.target_id in act_placements:
                     src_p = act_placements[flow.source_id]
                     tgt_p = act_placements[flow.target_id]
+                    src_node = self.state.find_activity_node(flow.source_id)
+                    src_type = src_node.type if src_node else "Action"
                     guard_text = getattr(flow, "guard", "") or getattr(flow, "guard_condition", "")
-                    lbl = f"[{guard_text}]" if guard_text and not guard_text.startswith("[") else guard_text
-                    if flow.name and not lbl:
-                        lbl = flow.name
-
+                    clean_name, clean_guard = sanitize_activity_flow(
+                        source_type=src_type,
+                        flow_type=flow.type,
+                        name=flow.name,
+                        guard=guard_text,
+                    )
                     flow_shape = "ObjectFlow" if flow.type == "ObjectFlow" else "ControlFlow"
+                    lbl = clean_guard or clean_name
                     self._add_connector_element(
                         omg_elements,
                         rel_id=flow.id,
@@ -2369,13 +2394,18 @@ class XMIBuilder:
                 if rel.source_id in dep_placements and rel.target_id in dep_placements:
                     src_p = dep_placements[rel.source_id]
                     tgt_p = dep_placements[rel.target_id]
+                    proto = getattr(rel, "protocol", "")
+                    clean_name, clean_proto = sanitize_deployment_relation(
+                        rel_type=rel.type,
+                        name=rel.name,
+                        protocol=proto,
+                    )
                     rel_shape = "Deployment" if rel.type == "Deployment" else "CommunicationPath"
-                    lbl = getattr(rel, "protocol", "") or rel.name or ""
                     self._add_connector_element(
                         omg_elements,
                         rel_id=rel.id,
                         rel_type=rel_shape,
-                        rel_name=lbl,
+                        rel_name=clean_name,
                         src_p=src_p,
                         tgt_p=tgt_p,
                         creator_diag_type="DeploymentDiagram",
@@ -2391,6 +2421,9 @@ class XMIBuilder:
 
     def build_tree(self) -> ET.ElementTree:
         """Construct full XML ElementTree with Metamodel and Visual Layout."""
+        # Automated Architectural Linter pass with auto_fix
+        ArchitectureLinter(self.state).lint(auto_fix=True)
+
         ET.register_namespace("xmi", XMI_NS)
         ET.register_namespace("uml", UML_NS)
 
